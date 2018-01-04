@@ -33,7 +33,7 @@ include_directories(
     ${catkin_INCLUDE_DIRS}
     )
 
-add_executable(mrslistener /home/leonardo/catkin_mrs/src/mrs_ocv/mrslistener.cpp)
+add_executable(mrslistener mrslistener.cpp)
 target_link_libraries(mrslistener ${catkin_LIBRARIES})
 add_dependencies(mrslistener mrs_lilstener_cpp)
 
