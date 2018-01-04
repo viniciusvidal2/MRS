@@ -1,0 +1,13 @@
+<launch>
+  <!--argumentos-->
+  <arg name="nome_stick" default="Logitech Logitech Attack 3"/>
+  <arg name="porta" default="/dev/input/js0"/>
+  <arg name="vamos_rodar" default="true"/>
+  <arg name="vamos_escutar" default="true"/>
+
+  <!--comecar o no que eu quero-->
+  <group if="$(arg vamos_rodar)">
+    <node name="joy_vinicius" pkg="joy" type="joy_node" output="screen">
+    </node>
+  </group>
+</launch>
