@@ -10,6 +10,7 @@
 #include <sensor_msgs/image_encodings.h>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include "opencv2/videoio.hpp"
 #include <qobject.h>
 #include <QThread>
 #include <QMutex>

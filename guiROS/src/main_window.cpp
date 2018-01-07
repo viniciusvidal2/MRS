@@ -12,6 +12,7 @@
 #include <QMessageBox>
 #include <iostream>
 #include "../include/guiROS/main_window.hpp"
+#include "opencv2/videoio.hpp"
 
 
 /*****************************************************************************

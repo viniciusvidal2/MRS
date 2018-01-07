@@ -8,6 +8,8 @@ project(mrs_ocv)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 
+find_package(OpenCV REQUIRED)
+
 find_package(catkin REQUIRED COMPONENTS
     roscpp
     rospy
@@ -21,7 +23,7 @@ find_package(catkin REQUIRED COMPONENTS
     )
 
 catkin_package(
-    INCLUDE_DIRS include
+    INCLUDE_DIRS
     LIBRARIES
     CATKIN_DEPENDS std_msgs cv_bridge roscpp rospy camera_info_manager diagnostic_updater dynamic_reconfigure image_transport roscpp sensor_msgs
     DEPENDS
@@ -35,7 +37,8 @@ include_directories(
 
 add_executable(mrslistener mrslistener.cpp)
 target_link_libraries(mrslistener ${catkin_LIBRARIES})
-add_dependencies(mrslistener mrs_lilstener_cpp)
+target_link_libraries(mrslistener ${OpenCV_LIBS})
+#add_dependencies(mrslistener mrs_lilstener_cpp)
 
 
 ## System dependencies are found with CMake's conventions
