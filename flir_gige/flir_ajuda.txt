@@ -1,0 +1,36 @@
+clonar do repositorio Kumar Robotics https://github.com/KumarRobotics/flir_gige na sua pasta catkin_ws/src
+
+link para clone https://github.com/viniciusvidal2/flir_gige.git
+
+pre-requisito: Ebus para ubuntu instalado https://supportcenter.pleora.com/s/article/eBUS-SDK-5-0-Software-and-Release-Notes-Dwnload
+
+Instalar segundo sua versao de ubuntu e de arquitetura, porem nao ha tanto problema quanto a versao
+
+Alterar o arquivo flir_gige/cmake/FindEbus.cmake para a sua pasta de instalaçao
+
+list(APPEND Ebus_CHECK_INCLUDE_DIRS
+    /opt/pleora/ebus_sdk/Ubuntu-x86_64/include) # OU a pasta que tiver para voce
+list(APPEND Ebus_CHECK_LIBRARY_DIRS
+    /opt/pleora/ebus_sdk/Ubuntu-x86_64/lib) # OU a pasta que tiver para voce
+
+executar os comandos para realizar source nos componentes necessarios (adicionar no ~/.bashrc)
+
+source <seu workspace>/src/MRS/flir_gige/install/set_puregev_gen
+source /opt/pleora/ebus_sdk/Ubuntu-x86_64/bin/set_puregev_gen # OU a pasta que tiver pra voce
+
+Comentar o arquivo que utiliza recursos ultrapassados do opencv
+
+<seu workspace>/src/MRS/flir_gige/src/thermal_proc/thermal_proc_node.cpp
+
+na linha que diz
+
+#include <opencv2/contrib/contrib.hpp> # deixar comentado
+
+Deve compilar ok agora ao fazer catkin_make sobre o workspace de ros
+
+para rodar o primeiro exemplo:
+
+roslaunch flir_gige node.launch <ip_address:=xxx.xxx.xxx.xxx> 
+<fps:=20>  <raw:=false> <view:=false>
+
+Vale a pena olhar o readme da pagina da kumar robotics
