@@ -45,14 +45,12 @@ PositionControl::PositionControl()
   if (multi_driver_->getProtocolVersion() == 2.0 &&
       !(multi_driver_->multi_dynamixel_[0]->model_name_.find("PRO") != std::string::npos))
   {
+    ROS_INFO("NOSSO PROTOCOLO E 2.0");
     setProfileValue(profile_velocity_, profile_acceleration_);
   }
 
   initDynamixelStatePublisher();
   initDynamixelInfoServer();
-
-  // Ajustando CURVA SUAVE para motores - Vinicius
-//  multi_driver_->writeRegister("0x1C", 128);
 }
 
 PositionControl::~PositionControl()
@@ -174,6 +172,7 @@ bool PositionControl::checkLoadDynamixel()
     ROS_INFO("Profile Acceleration : %d", profile_acceleration_);
   }
   ROS_INFO("-----------------------------------------------------------------------");
+  ROS_INFO("------------------ pega viado ------------------");
 }
 
 bool PositionControl::initDynamixelStatePublisher()
