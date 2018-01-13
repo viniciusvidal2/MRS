@@ -1,5 +1,3 @@
 # Dynamixel workbench packages
 
-For more information, please check the document below.
-
-[ROS Wiki for Dynamixel workbench](http://wiki.ros.org/dynamixel_workbench)
+Rodar sempre o arquivo launch para multiport.launch, pois ali ha contato maior com os drivers de cada motor.

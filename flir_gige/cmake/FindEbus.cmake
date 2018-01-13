@@ -66,11 +66,12 @@ endmacro(Ebus_REPORT_NOT_FOUND)
 # Search user-installed locations first, so that we prefer user installs
 # to system installs where both exist.
 list(APPEND Ebus_CHECK_INCLUDE_DIRS
-    /opt/pleora/ebus_sdk/Ubuntu-x86_64/include)
+    /opt/pleora/ebus_sdk/Ubuntu-x86_64/include) # OU a pasta que tiver para voce
 list(APPEND Ebus_CHECK_LIBRARY_DIRS
-    /opt/pleora/ebus_sdk/Ubuntu-x86_64/lib)
+    /opt/pleora/ebus_sdk/Ubuntu-x86_64/lib) # OU a pasta que tiver para voce
 
 # Check general hints
+#set(Ebus_HINTS /opt/pleora/ebus_sdk/Ubuntu-x86_64)
 if(Ebus_HINTS AND EXISTS ${Ebus_HINTS})
     set(Ebus_INCLUDE_DIR_HINTS ${Ebus_HINTS}/include)
     set(Ebus_LIBRARY_DIR_HINTS ${Ebus_HINTS}/lib)
@@ -83,6 +84,7 @@ find_path(Ebus_INCLUDE_DIR
     PATHS ${Ebus_INCLUDE_DIR_HINTS}
     ${Ebus_CHECK_INCLUDE_DIRS}
     NO_DEFAULT_PATH)
+
 if(NOT Ebus_INCLUDE_DIR OR NOT EXISTS ${Ebus_INCLUDE_DIR})
     Ebus_REPORT_NOT_FOUND(
         "Could not find ebus include directory, set Ebus_INCLUDE_DIR to "
