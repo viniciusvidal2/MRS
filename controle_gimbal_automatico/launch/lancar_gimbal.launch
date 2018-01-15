@@ -1,0 +1,25 @@
+<launch>
+<!--argumentos para possivel Joy-->
+<arg name="nome_stick" default="Logitech Logitech Attack 3"/>
+<arg name="porta" default="/dev/input/js0"/>
+<arg name="vamos_rodar" default="false"/>
+<arg name="vamos_escutar" default="false"/>
+
+<!--argumentos para automatico ou nao-->
+<arg name="automatico" default="true"/>
+
+<!--comecar o no que eu quero-->
+<group if="$(arg automatico)">
+  <include file="$(find dynamixel_workbench_controllers)/launch/multi_port.launch">
+  </include>
+  <include file="$(find mavros)/launch/px4.launch">
+  </include>
+  <node name="controle_automatico" pkg="automatico_mrs" type="controle_automatico" output="screen">
+  </node>
+</group>
+
+<group if="$(arg vamos_rodar)">
+  <node name="joy_vinicius" pkg="joy" type="joy_node" output="screen">
+  </node>
+</group>
+</launch>
