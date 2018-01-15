@@ -76,6 +76,7 @@ private:
       delta_pitch = ((ang_pitch_horizontal + pitch_para_apontar) < ang_pitch_range[1]) ? pitch_para_apontar : ang_pitch_range[1] - ang_pitch_horizontal;
       delta_pitch = ((ang_pitch_horizontal + delta_pitch       ) > ang_pitch_range[0]) ? delta_pitch        : ang_pitch_horizontal - ang_pitch_range[0];
 
+      ROS_INFO("DELTA PITCH: %.2f", delta_pitch);
       // Uma vez todos os angulos calculados, converter para valor de pwm para enviar aos motores
       pwm_pan  = pwm_yaw_range[0] + (ang_pan - ang_yaw_range[0])*pwm_ang_yaw;
       pwm_tilt = pwm_pitch_horizontal + delta_pitch*pwm_ang_pitch;

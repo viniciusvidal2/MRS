@@ -89,7 +89,11 @@ bool MultiPort::loadDynamixel()
     dynamixel_info_[TILT]->model_name  = tilt_driver_->dynamixel_->model_name_.c_str();
   }
 
- return ret;
+  // VINICIUS
+  // Suavizar os motores
+  setSlope();
+
+  return ret;
 }
 
 bool MultiPort::setTorque(bool onoff)
@@ -111,6 +115,17 @@ bool MultiPort::setTorque(bool onoff)
   }
 
   return true;
+}
+
+// VINICIUS - Suavizar os motores, velocidade esta a 150, mas pode aumentar
+void MultiPort::setSlope()
+{
+  pan_driver_->writeRegister("cw_compliance_slope",  128);
+  pan_driver_->writeRegister("ccw_compliance_slope", 128);
+  pan_driver_->writeRegister("moving_speed", 190);
+
+  tilt_driver_->writeRegister("moving_speed", 190);
+  tilt_driver_->writeRegister("p_gain", 10);
 }
 
 bool MultiPort::setPosition(uint32_t pan_pos, uint32_t tilt_pos)
