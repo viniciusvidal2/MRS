@@ -2,8 +2,6 @@
 <!--argumentos para possivel Joy-->
 <arg name="nome_stick" default="Logitech Logitech Attack 3"/>
 <arg name="porta" default="/dev/input/js0"/>
-<arg name="vamos_rodar" default="false"/>
-<arg name="vamos_escutar" default="false"/>
 
 <!--argumentos para automatico ou nao-->
 <arg name="automatico" default="true"/>
@@ -18,8 +16,10 @@
   </node>
 </group>
 
-<group if="$(arg vamos_rodar)">
-  <node name="joy_vinicius" pkg="joy" type="joy_node" output="screen">
+<group if="$(eval arg('automatico')==false)">
+  <include file="$(find dynamixel_workbench_controllers)/launch/multi_port.launch">
+  </include>
+  <node name="joy_supercool" pkg="joy" type="joy_node" output="screen">
   </node>
 </group>
 </launch>

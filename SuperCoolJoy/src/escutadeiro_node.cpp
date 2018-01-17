@@ -95,7 +95,7 @@ public:
   {
     pan_pos  = (pan_min  + pan_max )/2;
     tilt_pos = (tilt_max + tilt_min)/2;
-    posicaoMotor = nh_.serviceClient<dynamixel_workbench_msgs::JointCommand>("/joint_command"); // TODO: Nome do servico e tipagem correta
+    posicaoMotor = nh_.serviceClient<dynamixel_workbench_msgs::JointCommand>("/joint_command");
   }
 
   int main(int argc, char **argv)
