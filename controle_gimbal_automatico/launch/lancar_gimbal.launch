@@ -3,23 +3,29 @@
 <arg name="nome_stick" default="Logitech Logitech Attack 3"/>
 <arg name="porta" default="/dev/input/js0"/>
 
-<!--argumentos para automatico ou nao-->
+<!--argumentos para automatico ou nao, motor ou nao-->
 <arg name="automatico" default="true"/>
+<arg name="motores"    default="true"/>
 
 <!--comecar o no que eu quero-->
-<group if="$(arg automatico)">
+<group if="$(arg motores)">
   <include file="$(find dynamixel_workbench_controllers)/launch/multi_port.launch">
   </include>
+</group>
+
+<group if="$(arg automatico)">
+<!--  Aqui chamar pelo rustbot para condizer com a visao stereo-->
+<!--  <include file="$(find rustbot_bringup)/launch/gps.launch">-->
   <include file="$(find mavros)/launch/px4.launch">
   </include>
   <node name="controle_automatico" pkg="automatico_mrs" type="controle_automatico" output="screen">
   </node>
 </group>
 
+<!--caso queiramos o joystick-->
 <group if="$(eval arg('automatico')==false)">
-  <include file="$(find dynamixel_workbench_controllers)/launch/multi_port.launch">
-  </include>
   <node name="joy_supercool" pkg="joy" type="joy_node" output="screen">
   </node>
 </group>
+
 </launch>
