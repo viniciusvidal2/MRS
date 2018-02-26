@@ -45,7 +45,7 @@ QNode::~QNode() {
       ros::shutdown();
       ros::waitForShutdown();
     }
-    system("gnome-terminal -x sh -c 'killall -9 roscore & killall -9 rosmaster'");
+    system("gnome-terminal -x sh -c 'killall -9 roscore & killall -9 rosmaster & killall -9 rosout'");
 	wait();
 }
 
@@ -53,7 +53,7 @@ QNode::~QNode() {
 
 void QNode::init() {
 
-  system("gnome-terminal -x sh -c 'roscore'");
+//  system("gnome-terminal -x sh -c 'roscore'");
   // start();
   cout << "iniciando classe monitor_mrs" << endl;
 

@@ -37,7 +37,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
   ui.setupUi(this);
   timer = new QTimer(this);
 
-
+  ui.radioButton_automatico->setChecked(true);
 }
 
 MainWindow::~MainWindow() {}
@@ -54,28 +54,6 @@ void MainWindow::receive_mat_image(Mat img, qint64 timestamp)
    ui.label_4->resize(ui.label_4->pixmap()->size());
   mutex.unlock();
 
-}
-
-void MainWindow::on_pushButton_open_webcam_clicked(){
-  cap.open(0);
-  if(!cap.isOpened()){
-    cout << "camera nao esta aberta" << endl;
-  }
-  else
-    cout <<"camera esta aberta"<< endl;
-
-  QObject::connect(timer, SIGNAL(timeout()),this, SLOT(update_window()));
-  timer->start(20);
-}
-
-void MainWindow::on_pushButton_close_webcam_clicked(){
-  disconnect(timer, SIGNAL(timeout()),this,SLOT());
-  cap.release();
-  Mat image = Mat::zeros(frame.size(),CV_8UC3);
-  qt_image = QImage((const unsigned char*) (image.data), image.cols, image.rows, QImage::Format_RGB888);
-  ui.label_4->setPixmap(QPixmap::fromImage(qt_image));
-  ui.label_4->resize(ui.label_4->pixmap()->size());
-  cout << "camera esta fechada" <<endl;
 }
 
 void MainWindow::update_window(){
@@ -106,13 +84,3 @@ void monitor_mrs::MainWindow::on_pushButton_rviz_clicked()
 //  QEventLoop::processEvents();
 }
 
-void monitor_mrs::MainWindow::on_PushButton_tab1_clicked()
-{
-  system("gnome-terminal -x sh -c 'roscore'");
-  ui.lineEdit_roscore->setText("Core iniciado");
-}
-
-void monitor_mrs::MainWindow::on_pushButton_tab2_clicked()
-{
-  system("gnome-terminal -x sh -c 'rosrun rqt_image_view rqt_image_view'");
-}

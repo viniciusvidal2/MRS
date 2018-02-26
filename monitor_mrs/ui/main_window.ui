@@ -14,63 +14,155 @@
    <string>QRosApp</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="../resources/images.qrc">
+   <iconset resource="../../guiROS/resources/images.qrc">
     <normaloff>:/images/icon.png</normaloff>:/images/icon.png</iconset>
   </property>
   <property name="locale">
    <locale language="English" country="Australia"/>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QLabel" name="label_4">
-    <property name="geometry">
-     <rect>
-      <x>230</x>
-      <y>10</y>
-      <width>351</width>
-      <height>231</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Imagem</string>
-    </property>
-   </widget>
    <widget class="QTabWidget" name="tabWidget">
     <property name="geometry">
      <rect>
-      <x>60</x>
-      <y>440</y>
-      <width>281</width>
-      <height>171</height>
+      <x>10</x>
+      <y>0</y>
+      <width>921</width>
+      <height>671</height>
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
       <string>Tab 1</string>
      </attribute>
-     <widget class="QPushButton" name="PushButton_tab1">
+     <widget class="QLabel" name="label_4">
       <property name="geometry">
        <rect>
-        <x>30</x>
-        <y>40</y>
-        <width>80</width>
-        <height>22</height>
+        <x>290</x>
+        <y>20</y>
+        <width>601</width>
+        <height>351</height>
        </rect>
       </property>
       <property name="text">
-       <string>PushButton</string>
+       <string>Imagem</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="lineEdit_roscore">
+     <widget class="QGroupBox" name="groupBox_hardware">
       <property name="geometry">
        <rect>
-        <x>120</x>
-        <y>40</y>
-        <width>113</width>
-        <height>22</height>
+        <x>10</x>
+        <y>10</y>
+        <width>281</width>
+        <height>181</height>
        </rect>
+      </property>
+      <property name="title">
+       <string>Ligar hardware</string>
+      </property>
+      <widget class="QWidget" name="layoutWidget">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>30</y>
+         <width>271</width>
+         <height>151</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QRadioButton" name="radioButton_automatico">
+          <property name="text">
+           <string>Automatico</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="radioButton_manual">
+          <property name="text">
+           <string>Manual</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButton_rviz">
+          <property name="text">
+           <string>RViz</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButton">
+          <property name="text">
+           <string>Ligar motores</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_processaOnline">
+      <property name="geometry">
+       <rect>
+        <x>9</x>
+        <y>299</y>
+        <width>281</width>
+        <height>291</height>
+       </rect>
+      </property>
+      <property name="autoFillBackground">
+       <bool>true</bool>
+      </property>
+      <property name="title">
+       <string>Lancar coleta de dados no trilho</string>
+      </property>
+      <widget class="QWidget" name="">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>50</y>
+         <width>261</width>
+         <height>221</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="QPushButton" name="pushButton_iniciaStereo">
+          <property name="text">
+           <string>Iniciar processo Stereo</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButton_salvaBag">
+          <property name="text">
+           <string>Gravar dados</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="lineEdit_nomeBag">
+          <property name="text">
+           <string>Nome_do_arquivo.bag</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+     <widget class="QPushButton" name="pushButton_2">
+      <property name="geometry">
+       <rect>
+        <x>480</x>
+        <y>460</y>
+        <width>301</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Reconstrucao instantanea</string>
       </property>
      </widget>
     </widget>
@@ -78,63 +170,7 @@
      <attribute name="title">
       <string>Tab 2</string>
      </attribute>
-     <widget class="QPushButton" name="pushButton_tab2">
-      <property name="geometry">
-       <rect>
-        <x>30</x>
-        <y>50</y>
-        <width>80</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>PushButton</string>
-      </property>
-     </widget>
-     <widget class="QLineEdit" name="lineEdit_image">
-      <property name="geometry">
-       <rect>
-        <x>130</x>
-        <y>50</y>
-        <width>113</width>
-        <height>22</height>
-       </rect>
-      </property>
-     </widget>
     </widget>
-   </widget>
-   <widget class="QWidget" name="">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>30</y>
-      <width>107</width>
-      <height>80</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="verticalLayout">
-     <item>
-      <widget class="QPushButton" name="pushButton_open_webcam">
-       <property name="text">
-        <string>Webcam</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_close_webcam">
-       <property name="text">
-        <string>Fechar Webcam</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_rviz">
-       <property name="text">
-        <string>RViz</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -187,7 +223,7 @@
   </action>
  </widget>
  <resources>
-  <include location="../resources/images.qrc"/>
+  <include location="../../guiROS/resources/images.qrc"/>
  </resources>
  <connections>
   <connection>

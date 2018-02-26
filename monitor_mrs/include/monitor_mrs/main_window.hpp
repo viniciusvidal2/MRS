@@ -55,16 +55,10 @@ public Q_SLOTS:
 
 
 private Q_SLOTS:
-        void on_pushButton_open_webcam_clicked();
-        void on_pushButton_close_webcam_clicked();
         void update_window();
         void receive_mat_image(cv::Mat img,qint64 timestamp);
 
         void on_pushButton_rviz_clicked();
-
-        void on_PushButton_tab1_clicked();
-
-        void on_pushButton_tab2_clicked();
 
 private:
         Ui::MainWindowDesign ui;
