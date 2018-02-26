@@ -11,7 +11,7 @@
 #include <QtGui>
 #include <QMessageBox>
 #include <iostream>
-#include "../include/guiROS/main_window.hpp"
+#include "../include/monitor_mrs/main_window.hpp"
 #include "opencv2/videoio.hpp"
 
 
@@ -19,7 +19,7 @@
 ** Namespaces
 *****************************************************************************/
 
-namespace guiROS {
+namespace monitor_mrs {
 
 using namespace Qt;
 
@@ -97,21 +97,22 @@ void MainWindow::closeEvent(QCloseEvent *event)
   QMainWindow::closeEvent(event);
 }
 
-}  // namespace guiROS
+}  // namespace monitor_mrs
 
 
-void guiROS::MainWindow::on_pushButton_rviz_clicked()
+void monitor_mrs::MainWindow::on_pushButton_rviz_clicked()
 {
-  system("rosrun rviz rviz");
+  system("gnome-terminal -x sh -c 'rosrun rviz rviz'");
+//  QEventLoop::processEvents();
 }
 
-void guiROS::MainWindow::on_PushButton_tab1_clicked()
+void monitor_mrs::MainWindow::on_PushButton_tab1_clicked()
 {
-  system("roscore");
+  system("gnome-terminal -x sh -c 'roscore'");
   ui.lineEdit_roscore->setText("Core iniciado");
 }
 
-void guiROS::MainWindow::on_pushButton_tab2_clicked()
+void monitor_mrs::MainWindow::on_pushButton_tab2_clicked()
 {
-  system("rosrun rqt_image_view rqt_image_view");
+  system("gnome-terminal -x sh -c 'rosrun rqt_image_view rqt_image_view'");
 }

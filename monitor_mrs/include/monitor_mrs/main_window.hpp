@@ -5,8 +5,8 @@
  *
  *
  **/
-#ifndef guiROS_MAIN_WINDOW_H
-#define guiROS_MAIN_WINDOW_H
+#ifndef monitor_mrs_MAIN_WINDOW_H
+#define monitor_mrs_MAIN_WINDOW_H
 
 /*****************************************************************************
 ** Includes
@@ -34,7 +34,7 @@ using namespace std;
 ** Namespace
 *****************************************************************************/
 
-namespace guiROS {
+namespace monitor_mrs {
 
 /*****************************************************************************
 ** Interface [MainWindow]
@@ -78,6 +78,6 @@ private:
 
 };
 
-}  // namespace guiROS
+}  // namespace monitor_mrs
 
-#endif // guiROS_MAIN_WINDOW_H
+#endif // monitor_mrs_MAIN_WINDOW_H
