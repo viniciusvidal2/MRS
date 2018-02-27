@@ -23,7 +23,7 @@
 </group>
 
 <!--caso queiramos o joystick-->
-<group if="$(eval arg('automatico')==false)">
+<group unless="$(arg automatico)">
   <node name="joy_supercool" pkg="joy" type="joy_node" output="screen">
   </node>
 </group>

@@ -80,6 +80,40 @@ void MainWindow::closeEvent(QCloseEvent *event)
 void monitor_mrs::MainWindow::on_pushButton_rviz_clicked()
 {
   system("gnome-terminal -x sh -c 'rosrun rviz rviz'");
-//  QEventLoop::processEvents();
 }
 
+void monitor_mrs::MainWindow::on_pushButton_motores_clicked()
+{
+  if(ui.radioButton_automatico->isChecked()){ // Aqui estamos com a pixhawk
+    system("gnome-terminal -x sh -c 'roslaunch automatico_mrs lancar_gimbal.launch'");
+
+  }else if(ui.radioButton_manual->isChecked()){ // Aqui estamos com o joy
+    system("gnome-terminal -x sh -c 'roslaunch automatico_mrs lancar_gimbal.launch automatico:=false'");
+  }
+}
+
+void monitor_mrs::MainWindow::on_pushButton_qground_clicked()
+{
+  system("gnome-terminal -x sh -c 'cd ~/Desktop && ./QGroundControl.AppImage'");
+}
+
+void monitor_mrs::MainWindow::on_pushButton_resetaPX4_clicked()
+{
+  system("gnome-terminal -x sh -c 'echo violao05 | sudo -S modprobe -r cdc_acm && echo violao05 | sudo -S modprobe cdc_acm");
+}
+
+void monitor_mrs::MainWindow::on_pushButton_iniciaStereo_clicked()
+{
+  system("roslaunch rustbot_bringup all.launch do_accumulation:=false do_gps:=true do_fusion:=false do_slam:=false do_stereo:=true");
+}
+
+void monitor_mrs::MainWindow::on_pushButton_salvaBag_clicked()
+{
+  std::string nome = ui.lineEdit_nomeBag->text().toStdString();
+  std::string comando_full = "roslaunch rustbot_bringup record_raw.launch only_raw_data:=true bag:=";
+  if(nome.length() == 0){
+    system("roslaunch rustbot_bringup record_raw.launch only_raw_data:=true");
+  } else {
+    system((comando_full+=nome).c_str());
+  }
+}

@@ -40,9 +40,9 @@
      <widget class="QLabel" name="label_4">
       <property name="geometry">
        <rect>
-        <x>290</x>
+        <x>340</x>
         <y>20</y>
-        <width>601</width>
+        <width>551</width>
         <height>351</height>
        </rect>
       </property>
@@ -55,8 +55,8 @@
        <rect>
         <x>10</x>
         <y>10</y>
-        <width>281</width>
-        <height>181</height>
+        <width>271</width>
+        <height>211</height>
        </rect>
       </property>
       <property name="title">
@@ -94,7 +94,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton">
+         <widget class="QPushButton" name="pushButton_motores">
           <property name="text">
            <string>Ligar motores</string>
           </property>
@@ -107,9 +107,9 @@
       <property name="geometry">
        <rect>
         <x>9</x>
-        <y>299</y>
-        <width>281</width>
-        <height>291</height>
+        <y>359</y>
+        <width>271</width>
+        <height>211</height>
        </rect>
       </property>
       <property name="autoFillBackground">
@@ -118,13 +118,13 @@
       <property name="title">
        <string>Lancar coleta de dados no trilho</string>
       </property>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>50</y>
-         <width>261</width>
-         <height>221</height>
+         <x>0</x>
+         <y>60</y>
+         <width>271</width>
+         <height>131</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -155,8 +155,8 @@
      <widget class="QPushButton" name="pushButton_2">
       <property name="geometry">
        <rect>
-        <x>480</x>
-        <y>460</y>
+        <x>470</x>
+        <y>580</y>
         <width>301</width>
         <height>41</height>
        </rect>
@@ -164,6 +164,45 @@
       <property name="text">
        <string>Reconstrucao instantanea</string>
       </property>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_pontosDeInteresse">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>200</y>
+        <width>271</width>
+        <height>151</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Pontos de interesse</string>
+      </property>
+      <widget class="QWidget" name="">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>30</y>
+         <width>271</width>
+         <height>91</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_3">
+        <item>
+         <widget class="QPushButton" name="pushButton_qground">
+          <property name="text">
+           <string>Ajustar pontos por GPS</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButton_resetaPX4">
+          <property name="text">
+           <string>Reiniciar driver de comunicacao</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </widget>
     <widget class="QWidget" name="tab_2">
