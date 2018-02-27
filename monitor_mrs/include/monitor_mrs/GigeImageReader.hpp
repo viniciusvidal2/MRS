@@ -25,9 +25,6 @@ class GigeImageReader:public QThread {
 public:
 
   image_transport::Subscriber image_sub_;
- // image_transport::Publisher image_pub_;
-
-
 
   GigeImageReader(int argc, char** argv, QMutex*);
   virtual ~GigeImageReader();

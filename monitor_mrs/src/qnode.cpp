@@ -35,9 +35,6 @@ QNode::QNode(int argc, char** argv ) :
     {
 
    cout << "iniciando ZERO" << endl;
-   //QFuture<void> future = QtConcurrent::run(this, &QNode::init);
-
-
 }
 
 QNode::~QNode() {
@@ -49,13 +46,7 @@ QNode::~QNode() {
 	wait();
 }
 
-
-
 void QNode::init() {
-
-//  system("gnome-terminal -x sh -c 'roscore'");
-  // start();
-  cout << "iniciando classe monitor_mrs" << endl;
 
   ros::init(init_argc,init_argv,"monitor_mrs");
 
@@ -73,7 +64,6 @@ void QNode::init() {
   this->run();
 
 }
-
 
 void QNode::run() {
   ros::Rate loop_rate(10);

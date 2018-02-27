@@ -45,15 +45,12 @@ void GigeImageReader::init(){
   ros::NodeHandle nh_;
   image_transport::ImageTransport it_= image_transport::ImageTransport(nh_);
 
-  image_sub_ = it_.subscribe("/thermal/image_raw", 1, &GigeImageReader::imageCb, this);
+  image_sub_ = it_.subscribe("/stereo/left/image_color", 1, &GigeImageReader::imageCb, this);
 
 
   ros::spin();
 
 }
-
-
-
 
 void GigeImageReader::imageCb(const sensor_msgs::ImageConstPtr &msg)
 {

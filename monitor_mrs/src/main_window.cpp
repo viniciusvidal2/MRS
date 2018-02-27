@@ -69,7 +69,6 @@ void MainWindow::update_window(){
   ui.label_4->resize(ui.label_4->pixmap()->size());
 }
 
-
 void MainWindow::closeEvent(QCloseEvent *event)
 {
   QMainWindow::closeEvent(event);
