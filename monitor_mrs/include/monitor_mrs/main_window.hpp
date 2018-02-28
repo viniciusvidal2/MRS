@@ -26,6 +26,15 @@
 
 #include <sys/syscall.h>
 #include <syscall.h>
+#include <sys/types.h>
+#include <dirent.h>
+#include <errno.h>
+#include <vector>
+#include <string>
+#include <iostream>
+#include <fstream>
+#include <stdlib.h>
+#include <stdio.h>
 
 using namespace cv;
 using namespace std;
@@ -57,13 +66,14 @@ public Q_SLOTS:
 private Q_SLOTS:
         void update_window();
         void receive_mat_image(cv::Mat img,qint64 timestamp);
-
-        void on_pushButton_rviz_clicked();
+        int getProcIdByName(string procName);
+        // Vinicius, aba 1
         void on_pushButton_motores_clicked();
         void on_pushButton_qground_clicked();
         void on_pushButton_resetaPX4_clicked();
         void on_pushButton_iniciaStereo_clicked();
         void on_pushButton_salvaBag_clicked();
+        void on_pushButton_nuvemInstantanea_clicked();
 
 private:
         Ui::MainWindowDesign ui;
@@ -74,6 +84,8 @@ private:
         VideoCapture cap;
         Mat frame;
         QImage qt_image;
+
+        bool controle_gravacao;
 
 };
 

@@ -1338,13 +1338,6 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton_rviz">
-          <property name="text">
-           <string>RViz</string>
-          </property>
-         </widget>
-        </item>
-        <item>
          <widget class="QPushButton" name="pushButton_motores">
           <property name="text">
            <string>Ligar motores</string>
@@ -1818,7 +1811,7 @@
        </layout>
       </widget>
      </widget>
-     <widget class="QPushButton" name="pushButton_2">
+     <widget class="QPushButton" name="pushButton_nuvemInstantanea">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -2243,7 +2236,7 @@
        </palette>
       </property>
       <property name="autoFillBackground">
-       <bool>true</bool>
+       <bool>false</bool>
       </property>
       <property name="text">
        <string>Reconstrucao instantanea</string>

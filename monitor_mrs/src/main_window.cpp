@@ -37,7 +37,12 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
   ui.setupUi(this);
   timer = new QTimer(this);
 
-  ui.radioButton_automatico->setChecked(true);
+  ui.radioButton_automatico->setChecked(true); // Comecar sempre com o controle automatico selecionado
+  ui.radioButton_manual->setChecked(false);
+
+  controle_gravacao = false; // Se false, nao estamos gravando, pode gravar
+  ui.pushButton_salvaBag->setAutoFillBackground(true);
+  ui.pushButton_salvaBag->setStyleSheet("background-color: rgb(0, 200, 50); color: rgb(0, 0, 0)"); // Assim esta quando pode gravars
 }
 
 MainWindow::~MainWindow() {}
@@ -74,13 +79,51 @@ void MainWindow::closeEvent(QCloseEvent *event)
   QMainWindow::closeEvent(event);
 }
 
-}  // namespace monitor_mrs
-
-
-void monitor_mrs::MainWindow::on_pushButton_rviz_clicked()
+int MainWindow::getProcIdByName(string procName)
 {
-  system("gnome-terminal -x sh -c 'rosrun rviz rviz -f left_optical -d ~/mrs_ws/src/MRS/monitor_mrs/resources/salvacao_do_mundo.rviz'");
+    int pid = -1;
+
+    // Open the /proc directory
+    DIR *dp = opendir("/proc");
+    if (dp != NULL)
+    {
+        // Enumerate all entries in directory until process found
+        struct dirent *dirp;
+        while (pid < 0 && (dirp = readdir(dp)))
+        {
+            // Skip non-numeric entries
+            int id = atoi(dirp->d_name);
+            if (id > 0)
+            {
+                // Read contents of virtual /proc/{pid}/cmdline file
+                string cmdPath = string("/proc/") + dirp->d_name + "/cmdline";
+                ifstream cmdFile(cmdPath.c_str());
+                string cmdLine;
+                getline(cmdFile, cmdLine);
+                if (!cmdLine.empty())
+                {
+                    // Keep first cmdline item which contains the program path
+                    size_t pos = cmdLine.find('\0');
+                    if (pos != string::npos)
+                        cmdLine = cmdLine.substr(0, pos);
+                    // Keep program name only, removing the path
+                    pos = cmdLine.rfind('/');
+                    if (pos != string::npos)
+                        cmdLine = cmdLine.substr(pos + 1);
+                    // Compare against requested process name
+                    if (procName == cmdLine)
+                        pid = id;
+                }
+            }
+        }
+    }
+
+    closedir(dp);
+
+    return pid;
 }
+
+}  // namespace monitor_mrs
 
 void monitor_mrs::MainWindow::on_pushButton_motores_clicked()
 {
@@ -104,16 +147,39 @@ void monitor_mrs::MainWindow::on_pushButton_resetaPX4_clicked()
 
 void monitor_mrs::MainWindow::on_pushButton_iniciaStereo_clicked()
 {
-  system("roslaunch rustbot_bringup all.launch do_accumulation:=false do_gps:=true do_fusion:=false do_slam:=false do_stereo:=true");
+  system("gnome-terminal -x sh -c 'roslaunch rustbot_bringup all.launch do_accumulation:=false do_gps:=true do_fusion:=false do_slam:=false do_stereo:=true'");
 }
 
 void monitor_mrs::MainWindow::on_pushButton_salvaBag_clicked()
 {
-  std::string nome = ui.lineEdit_nomeBag->text().toStdString();
-  std::string comando_full = "roslaunch rustbot_bringup record_raw.launch only_raw_data:=true bag:=";
-  if(nome.length() == 0){
-    system("roslaunch rustbot_bringup record_raw.launch only_raw_data:=true");
-  } else {
-    system((comando_full+=nome).c_str());
+  if(!controle_gravacao){ // Nao estamos gravando, pode gravar
+    // Botao fica vermelho, mostrando que vamos ficar gravando
+    ui.pushButton_salvaBag->setAutoFillBackground(true);
+    ui.pushButton_salvaBag->setStyleSheet("background-color: rgb(200, 0, 20); color: rgb(0, 0, 0)"); // Assim esta quando pode gravar
+    // ajusta flag para estamos gravando
+    controle_gravacao = true;
+    // COmeca gravacao segundo nome do bag
+    std::string nome = ui.lineEdit_nomeBag->text().toStdString();
+    std::string comando_full = "gnome-terminal -x sh -c 'roslaunch rustbot_bringup record_raw.launch only_raw_data:=true bag:=";
+    if(nome.length() == 0){
+      system("gnome-terminal -x sh -c 'roslaunch rustbot_bringup record_raw.launch only_raw_data:=true'");
+    } else {
+      system((comando_full+=(nome+"'")).c_str());
+    }
+  } else if(controle_gravacao){ // Estamos gravando
+    // Traz aparencia novamente para poder gravar
+    ui.pushButton_salvaBag->setAutoFillBackground(true);
+    ui.pushButton_salvaBag->setStyleSheet("background-color: rgb(0, 200, 50); color: rgb(0, 0, 0)"); // Assim esta quando pode gravars
+    // ajusta flag de novo para gravar
+    controle_gravacao = false;
+    // Envia sinal para parar bag (SIGKILL)
+
+    int pid = getProcIdByName("rosbag_record");
+    ui.lineEdit_nomeBag->setText(QString::number(pid));
   }
+}
+
+void monitor_mrs::MainWindow::on_pushButton_nuvemInstantanea_clicked()
+{
+  system("gnome-terminal -x sh -c 'rosrun rviz rviz -f left_optical -d ~/mrs_ws/src/MRS/monitor_mrs/resources/salvacao_do_mundo.rviz'");
 }
