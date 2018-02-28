@@ -79,7 +79,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void monitor_mrs::MainWindow::on_pushButton_rviz_clicked()
 {
-  system("gnome-terminal -x sh -c 'rosrun rviz rviz'");
+  system("gnome-terminal -x sh -c 'rosrun rviz rviz -f left_optical -d ~/mrs_ws/src/MRS/monitor_mrs/resources/salvacao_do_mundo.rviz'");
 }
 
 void monitor_mrs::MainWindow::on_pushButton_motores_clicked()
