@@ -35,6 +35,8 @@
 #include <fstream>
 #include <stdlib.h>
 #include <stdio.h>
+#include <cstdlib>
+#include <csignal>
 
 using namespace cv;
 using namespace std;
@@ -74,6 +76,7 @@ private Q_SLOTS:
         void on_pushButton_iniciaStereo_clicked();
         void on_pushButton_salvaBag_clicked();
         void on_pushButton_nuvemInstantanea_clicked();
+        void on_pushButton_reiniciarTudo_clicked();
 
 private:
         Ui::MainWindowDesign ui;
@@ -86,7 +89,6 @@ private:
         QImage qt_image;
 
         bool controle_gravacao;
-
 };
 
 }  // namespace monitor_mrs

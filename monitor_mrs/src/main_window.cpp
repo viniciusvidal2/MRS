@@ -37,12 +37,15 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
   ui.setupUi(this);
   timer = new QTimer(this);
 
+  // Ajustando design
   ui.radioButton_automatico->setChecked(true); // Comecar sempre com o controle automatico selecionado
   ui.radioButton_manual->setChecked(false);
 
   controle_gravacao = false; // Se false, nao estamos gravando, pode gravar
   ui.pushButton_salvaBag->setAutoFillBackground(true);
-  ui.pushButton_salvaBag->setStyleSheet("background-color: rgb(0, 200, 50); color: rgb(0, 0, 0)"); // Assim esta quando pode gravars
+  ui.pushButton_salvaBag->setStyleSheet("background-color: rgb(0, 200, 50); color: rgb(0, 0, 0)"); // Assim esta quando pode gravar
+  ui.pushButton_reiniciarTudo->setStyleSheet("background-color: rgb(200, 0, 20); color: rgb(0, 0, 0)");
+  ui.pushButton_nuvemInstantanea->setStyleSheet("background-color: rgb(200, 200, 200); color: rgb(0, 0, 0)");
 }
 
 MainWindow::~MainWindow() {}
@@ -55,8 +58,8 @@ void MainWindow::receive_mat_image(Mat img, qint64 timestamp)
 
   mutex.lock();
    qt_image = QImage((const unsigned char*) (img.data), img.cols, img.rows, QImage::Format_RGB888);
-   ui.label_4->setPixmap(QPixmap::fromImage(qt_image));
-   ui.label_4->resize(ui.label_4->pixmap()->size());
+   ui.imagem_tab1->setPixmap(QPixmap::fromImage(qt_image));
+   ui.imagem_tab1->resize(ui.imagem_tab1->pixmap()->size());
   mutex.unlock();
 
 }
@@ -65,13 +68,13 @@ void MainWindow::update_window(){
   cap >> frame;
 
   cvtColor(frame,frame,CV_BGR2RGB);
-  qt_image = QImage((const unsigned char*) (frame.data), frame.cols,frame.rows,QImage::Format_RGB888);
+  qt_image = QImage((const unsigned char*) (frame.data), frame.cols,frame.rows,QImage::Format_RGB32);
 
   //cvtColor(frame,frame,cv::COLOR_RGB2GRAY);
   //qt_image = QImage((const unsigned char*) (frame.data), frame.cols,frame.rows,QImage::Format_Indexed8);
 
-  ui.label_4->setPixmap(QPixmap::fromImage(qt_image));
-  ui.label_4->resize(ui.label_4->pixmap()->size());
+  ui.imagem_tab1->setPixmap(QPixmap::fromImage(qt_image));
+  ui.imagem_tab1->resize(ui.imagem_tab1->pixmap()->size());
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -81,46 +84,47 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 int MainWindow::getProcIdByName(string procName)
 {
-    int pid = -1;
+  int pid = -1;
 
-    // Open the /proc directory
-    DIR *dp = opendir("/proc");
-    if (dp != NULL)
+  // Open the /proc directory
+  DIR *dp = opendir("/proc");
+  if (dp != NULL)
+  {
+    // Enumerate all entries in directory until process found
+    struct dirent *dirp;
+    while (pid < 0 && (dirp = readdir(dp)))
     {
-        // Enumerate all entries in directory until process found
-        struct dirent *dirp;
-        while (pid < 0 && (dirp = readdir(dp)))
+      // Skip non-numeric entries
+      int id = atoi(dirp->d_name);
+      if (id > 0)
+      {
+        // Read contents of virtual /proc/{pid}/cmdline file
+        string cmdPath = string("/proc/") + dirp->d_name + "/cmdline";
+        ifstream cmdFile(cmdPath.c_str());
+        string cmdLine;
+        getline(cmdFile, cmdLine);
+        if (!cmdLine.empty())
         {
-            // Skip non-numeric entries
-            int id = atoi(dirp->d_name);
-            if (id > 0)
-            {
-                // Read contents of virtual /proc/{pid}/cmdline file
-                string cmdPath = string("/proc/") + dirp->d_name + "/cmdline";
-                ifstream cmdFile(cmdPath.c_str());
-                string cmdLine;
-                getline(cmdFile, cmdLine);
-                if (!cmdLine.empty())
-                {
-                    // Keep first cmdline item which contains the program path
-                    size_t pos = cmdLine.find('\0');
-                    if (pos != string::npos)
-                        cmdLine = cmdLine.substr(0, pos);
-                    // Keep program name only, removing the path
-                    pos = cmdLine.rfind('/');
-                    if (pos != string::npos)
-                        cmdLine = cmdLine.substr(pos + 1);
-                    // Compare against requested process name
-                    if (procName == cmdLine)
-                        pid = id;
-                }
-            }
+
+          // Keep first cmdline item which contains the program path
+          size_t pos = cmdLine.find('\0');
+          if (pos != string::npos)
+            cmdLine = cmdLine.substr(0, pos);
+          // Keep program name only, removing the path
+          pos = cmdLine.rfind('/');
+          if (pos != string::npos)
+            cmdLine = cmdLine.substr(pos + 1);
+          // Compare against requested process name
+          if (procName == cmdLine)
+            pid = id;
         }
+      }
     }
+  }
 
-    closedir(dp);
+  closedir(dp);
 
-    return pid;
+  return pid;
 }
 
 }  // namespace monitor_mrs
@@ -156,6 +160,7 @@ void monitor_mrs::MainWindow::on_pushButton_salvaBag_clicked()
     // Botao fica vermelho, mostrando que vamos ficar gravando
     ui.pushButton_salvaBag->setAutoFillBackground(true);
     ui.pushButton_salvaBag->setStyleSheet("background-color: rgb(200, 0, 20); color: rgb(0, 0, 0)"); // Assim esta quando pode gravar
+    ui.pushButton_salvaBag->setText("Parar gravacao");
     // ajusta flag para estamos gravando
     controle_gravacao = true;
     // COmeca gravacao segundo nome do bag
@@ -170,16 +175,21 @@ void monitor_mrs::MainWindow::on_pushButton_salvaBag_clicked()
     // Traz aparencia novamente para poder gravar
     ui.pushButton_salvaBag->setAutoFillBackground(true);
     ui.pushButton_salvaBag->setStyleSheet("background-color: rgb(0, 200, 50); color: rgb(0, 0, 0)"); // Assim esta quando pode gravars
+    ui.pushButton_salvaBag->setText("Gravar dados");
     // ajusta flag de novo para gravar
     controle_gravacao = false;
     // Envia sinal para parar bag (SIGKILL)
-
-    int pid = getProcIdByName("rosbag_record");
-    ui.lineEdit_nomeBag->setText(QString::number(pid));
+    int pid = getProcIdByName("record");
+    kill(pid, SIGKILL);
   }
 }
 
 void monitor_mrs::MainWindow::on_pushButton_nuvemInstantanea_clicked()
 {
-  system("gnome-terminal -x sh -c 'rosrun rviz rviz -f left_optical -d ~/mrs_ws/src/MRS/monitor_mrs/resources/salvacao_do_mundo.rviz'");
+  system("gnome-terminal -x sh -c 'rosrun rviz rviz -f left_optical -d ~/MRS_ws/src/MRS/monitor_mrs/resources/salvacao_do_mundo.rviz'");
+}
+
+void monitor_mrs::MainWindow::on_pushButton_reiniciarTudo_clicked()
+{
+  system("gnome-terminal -x sh -c 'killall -9 roscore && killall -9 rosmaster && killall -9 rosout && killall -9 record && roscore'");
 }
