@@ -25,15 +25,13 @@
 #include <iostream>
 
 #include <sys/syscall.h>
-#include <syscall.h>
 #include <sys/types.h>
 #include <dirent.h>
 #include <errno.h>
 #include <vector>
 #include <string>
-#include <iostream>
 #include <fstream>
-#include <stdlib.h>
+//#include <stdlib.h>
 #include <stdio.h>
 #include <cstdlib>
 #include <csignal>
@@ -78,9 +76,11 @@ private Q_SLOTS:
         void on_pushButton_salvaBag_clicked();
         void on_pushButton_nuvemInstantanea_clicked();
         void on_pushButton_reiniciarTudo_clicked();
+        void on_pushButton_limpaTexto_clicked();
 
 private:
         Ui::MainWindowDesign ui;
+        std::string nome;
 
         QNode qnode;
         GigeImageReader gige_ir;

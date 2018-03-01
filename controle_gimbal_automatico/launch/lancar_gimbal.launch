@@ -13,11 +13,13 @@
   </include>
 </group>
 
+<!--lancar sempre a placa, pois ai com automatico ou joy sempre funciona a parte do rustbot-->
+<include file="$(find mavros)/launch/px4.launch">
+</include>
+
 <group if="$(arg automatico)">
 <!--  Aqui chamar pelo rustbot para condizer com a visao stereo-->
 <!--  <include file="$(find rustbot_bringup)/launch/gps.launch">-->
-  <include file="$(find mavros)/launch/px4.launch">
-  </include>
   <node name="controle_automatico" pkg="automatico_mrs" type="controle_automatico" output="screen">
   </node>
 </group>
