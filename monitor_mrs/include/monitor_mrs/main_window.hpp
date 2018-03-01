@@ -37,6 +37,7 @@
 #include <stdio.h>
 #include <cstdlib>
 #include <csignal>
+#include <ctime>
 
 using namespace cv;
 using namespace std;
@@ -55,7 +56,7 @@ class MainWindow : public QMainWindow {
 Q_OBJECT
 
 public:
-	MainWindow(int argc, char** argv, QWidget *parent = 0);
+  MainWindow(int argc, char** argv, QWidget *parent = 0);
   QMutex mutex;
 	~MainWindow();
 

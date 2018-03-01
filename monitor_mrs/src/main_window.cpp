@@ -13,6 +13,7 @@
 #include <iostream>
 #include "../include/monitor_mrs/main_window.hpp"
 #include "opencv2/videoio.hpp"
+#include <string>
 
 
 /*****************************************************************************
@@ -22,6 +23,7 @@
 namespace monitor_mrs {
 
 using namespace Qt;
+using namespace std;
 
 /*****************************************************************************
 **
@@ -156,6 +158,17 @@ void monitor_mrs::MainWindow::on_pushButton_iniciaStereo_clicked()
 
 void monitor_mrs::MainWindow::on_pushButton_salvaBag_clicked()
 {
+  // Ver o tempo para diferenciar bags gravadas automaticamente
+  time_t t = time(0);
+  struct tm * now = localtime( & t );
+  string year, month, day, hour, minutes;
+  year = boost::lexical_cast<std::string>(now->tm_year);
+  month = boost::lexical_cast<std::string>(now->tm_mon);
+  day = boost::lexical_cast<std::string>(now->tm_mday);
+  hour = boost::lexical_cast<std::string>(now->tm_hour);
+  minutes = boost::lexical_cast<std::string>(now->tm_min);
+  string date = "_" + year + "_" + month + "_" + day + "_" + hour + "h_" + minutes + "m";
+
   if(!controle_gravacao){ // Nao estamos gravando, pode gravar
     // Botao fica vermelho, mostrando que vamos ficar gravando
     ui.pushButton_salvaBag->setAutoFillBackground(true);
@@ -167,8 +180,10 @@ void monitor_mrs::MainWindow::on_pushButton_salvaBag_clicked()
     std::string nome = ui.lineEdit_nomeBag->text().toStdString();
     std::string comando_full = "gnome-terminal -x sh -c 'roslaunch rustbot_bringup record_raw.launch only_raw_data:=true bag:=";
     if(nome.length() == 0){
-      system("gnome-terminal -x sh -c 'roslaunch rustbot_bringup record_raw.launch only_raw_data:=true'");
+      nome = "mrs_"+date+".bag";
+      system((comando_full+=(nome+"'")).c_str());
     } else {
+      nome += (date+".bag");
       system((comando_full+=(nome+"'")).c_str());
     }
   } else if(controle_gravacao){ // Estamos gravando
@@ -191,5 +206,5 @@ void monitor_mrs::MainWindow::on_pushButton_nuvemInstantanea_clicked()
 
 void monitor_mrs::MainWindow::on_pushButton_reiniciarTudo_clicked()
 {
-  system("gnome-terminal -x sh -c 'killall -9 roscore && killall -9 rosmaster && killall -9 rosout && killall -9 record && roscore'");
+  system("gnome-terminal -x sh -c 'killall -9 roscore && killall -9 rosmaster && killall -9 rosout && killall -9 record'");
 }
