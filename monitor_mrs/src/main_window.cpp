@@ -61,7 +61,7 @@ void MainWindow::receive_mat_image(Mat img, qint64 timestamp)
 {
 
   mutex.lock();
-   qt_image = QImage((const unsigned char*) (img.data), img.cols, img.rows, QImage::Format_RGB32);
+   qt_image = QImage((const unsigned char*) (img.data), img.cols, img.rows, QImage::Format_RGB888);
    ui.imagem_tab1->setPixmap(QPixmap::fromImage(qt_image));
    ui.imagem_tab1->resize(ui.imagem_tab1->pixmap()->size());
   mutex.unlock();
@@ -72,7 +72,7 @@ void MainWindow::update_window(){
   cap >> frame;
 
   cvtColor(frame,frame,CV_BGR2RGB);
-  qt_image = QImage((const unsigned char*) (frame.data), frame.cols,frame.rows,QImage::Format_RGB32);
+  qt_image = QImage((const unsigned char*) (frame.data), frame.cols,frame.rows,QImage::Format_RGB888);
 
   //cvtColor(frame,frame,cv::COLOR_RGB2GRAY);
   //qt_image = QImage((const unsigned char*) (frame.data), frame.cols,frame.rows,QImage::Format_Indexed8);
@@ -205,7 +205,8 @@ void monitor_mrs::MainWindow::on_pushButton_salvaBag_clicked()
     controle_gravacao = false;
     // Envia sinal para parar bag (SIGKILL)
     int pid = getProcIdByName("record");
-    kill(pid, SIGKILL);
+    if(pid!=-1)
+      kill(pid, SIGINT);
     // Anunciar ao usuario
     ui.listWidget->addItem(QString::fromStdString("Arquivo gravado para pos processamento. Conferir na area de trabalho por "+nome));
   }

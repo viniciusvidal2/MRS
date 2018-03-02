@@ -1,0 +1,4 @@
+<launch>
+  <node name="monitor" pkg="monitor_mrs" type="monitor_mrs" output="screen">
+  </node>
+</launch>

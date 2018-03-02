@@ -30,8 +30,6 @@ int main(int argc, char **argv) {
     QApplication app(argc, argv);
     monitor_mrs::MainWindow w(argc,argv);
 
-    system("gnome-terminal -x sh -c 'roscore'");
-
     w.show();
     app.connect(&app, SIGNAL(lastWindowClosed()), &app, SLOT(quit()));
 
