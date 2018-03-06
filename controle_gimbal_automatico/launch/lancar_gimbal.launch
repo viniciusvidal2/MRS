@@ -28,6 +28,8 @@
 <group unless="$(arg automatico)">
   <node name="joy_supercool" pkg="joy" type="joy_node" output="screen">
   </node>
+  <node name="escutadeiro" pkg="joy" type="escutadeiro_node" output="screen">
+  </node>
 </group>
 
 </launch>
