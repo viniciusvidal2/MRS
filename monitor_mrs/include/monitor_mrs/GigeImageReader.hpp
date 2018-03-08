@@ -46,7 +46,7 @@ private:
 
   ros::Publisher offset_pub;
   int offset; // Para guardar o offset a ser publicado
-  std_msgs::Int8 msg;
+  std_msgs::Int8 msg_off;
 };
 
 }

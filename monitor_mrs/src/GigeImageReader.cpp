@@ -71,9 +71,9 @@ void GigeImageReader::imageCb(const sensor_msgs::ImageConstPtr &msg)
   mutex->lock();
   qint64 timestamp = QDateTime().currentMSecsSinceEpoch();
   send_mat_image(cv_ptr->image,timestamp);
-
-  msg.data = offset;
-  offset_pub.publish(msg);
+  // Enviar com uma certa frequencia aqui o offset para deslocar o motor
+  msg_off.data = offset;
+  offset_pub.publish(msg_off);
   mutex->unlock();
 
   // Update GUI Window

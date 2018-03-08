@@ -158,7 +158,7 @@ void monitor_mrs::MainWindow::on_pushButton_qground_clicked()
 
 void monitor_mrs::MainWindow::on_pushButton_resetaPX4_clicked()
 {
-  system("gnome-terminal -x sh -c 'echo ufjf | sudo -S modprobe -r cdc_acm && echo ufjf | sudo -S modprobe cdc_acm");
+  system("gnome-terminal -x sh -c 'echo ufjf | sudo -S modprobe -r cdc_acm && echo ufjf | sudo -S modprobe cdc_acm'");
   ui.listWidget->addItem(QString::fromStdString("Drivers foram reiniciados, pode dar seguimento ao procedimento"));
 }
 
@@ -209,7 +209,7 @@ void monitor_mrs::MainWindow::on_pushButton_salvaBag_clicked()
     ui.pushButton_salvaBag->setText("Gravar dados");
     // ajusta flag de novo para gravar
     controle_gravacao = false;
-    // Envia sinal para parar bag (SIGKILL)
+    // Envia sinal para parar bag (SIGINT)
     int pid = getProcIdByName("record");
     if(pid!=-1)
       kill(pid, SIGINT);
