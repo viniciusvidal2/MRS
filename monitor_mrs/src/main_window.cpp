@@ -14,6 +14,7 @@
 #include "../include/monitor_mrs/main_window.hpp"
 #include "opencv2/videoio.hpp"
 #include <string>
+#include<QPixmap>
 
 
 /*****************************************************************************
@@ -50,6 +51,10 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
   ui.pushButton_nuvemInstantanea->setStyleSheet("background-color: rgb(200, 200, 200); color: rgb(0, 0, 0)");
 
   ui.listWidget->addItem(QString::fromStdString("Iniciando o programa MRS monitor!"));
+
+  QPixmap pix(":/images/mrs.jpg");
+  ui.label_MRS->setPixmap(pix.scaled(120,120,Qt::KeepAspectRatio));
+  ui.label_MRS2->setPixmap(pix.scaled(120,120,Qt::KeepAspectRatio));
 }
 
 MainWindow::~MainWindow() {}
@@ -64,6 +69,11 @@ void MainWindow::receive_mat_image(Mat img, qint64 timestamp)
    qt_image = QImage((const unsigned char*) (img.data), img.cols, img.rows, QImage::Format_RGB888);
    ui.imagem_tab1->setPixmap(QPixmap::fromImage(qt_image));
    ui.imagem_tab1->resize(ui.imagem_tab1->pixmap()->size());
+
+   //Lucas, aba 2
+   ui.imagem_tab2->setPixmap(QPixmap::fromImage(qt_image));
+   ui.imagem_tab2->resize(ui.imagem_tab2->pixmap()->size());
+
   mutex.unlock();
 
 }
@@ -79,6 +89,10 @@ void MainWindow::update_window(){
 
   ui.imagem_tab1->setPixmap(QPixmap::fromImage(qt_image));
   ui.imagem_tab1->resize(ui.imagem_tab1->pixmap()->size());
+
+  //Lucas, aba 2
+  ui.imagem_tab2->setPixmap(QPixmap::fromImage(qt_image));
+  ui.imagem_tab2->resize(ui.imagem_tab2->pixmap()->size());
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -228,4 +242,62 @@ void monitor_mrs::MainWindow::on_pushButton_reiniciarTudo_clicked()
 void monitor_mrs::MainWindow::on_pushButton_limpaTexto_clicked()
 {
   ui.listWidget->clear();
+}
+
+ //Lucas, aba 2
+void monitor_mrs::MainWindow::on_pushButtonSelectBag_clicked()
+{
+  filename = QFileDialog::getOpenFileName(this, "Abrir arquivo", "", "Bag Files(*.bag)");
+  ui.labelBagName->setText(filename);
+  ui.listWidget_2->addItem(QString::fromStdString("Bag pronta para ser inicializada. Clique em Iniciar Bag para prosseguir."));
+  ui.pushButton_playBag->setEnabled(true);
+}
+
+void monitor_mrs::MainWindow::on_pushButton_playBag_clicked()
+{
+  QString local, arquivo; // Obtem o nome do arquivo e do local em que se encontra (para selecionar a pasta)
+  int i;
+  for(i=filename.length();i>0;i--)
+  {
+    if (filename[i]=='/')
+    {
+      local = filename.left(i);
+      arquivo = filename.right(filename.length()-i-1);
+      break;
+    }
+  }
+  QString teste_comando = "gnome-terminal -x sh -c 'roslaunch rustbot_bringup playback.launch bag:=";
+  teste_comando.append(arquivo.left(arquivo.size()-4));
+  teste_comando.append(" local:=");
+  teste_comando.append(local);
+  teste_comando.append("'");
+
+  localstd = teste_comando.toStdString();
+  system(localstd.c_str());
+  ui.listWidget_2->addItem(QString::fromStdString("Bag inicializada."));
+  system("gnome-terminal -x sh -c 'roslaunch rustbot_bringup all.launch online_stereo:=false do_stereo:=true do_accumulation:=true'");
+  system("gnome-terminal -x sh -c 'rosrun rviz rviz -f left_optical -d ~/MRS_ws/src/MRS/monitor_mrs/resources/salvacao_do_mundo.rviz'");
+  ui.pushButton_paraBag->setEnabled(true);
+  ui.pushButton_salvaNuvem->setEnabled(true);
+}
+
+void monitor_mrs::MainWindow::on_pushButton_clear2_clicked()
+{
+  ui.listWidget_2->clear();
+}
+
+void monitor_mrs::MainWindow::on_pushButton_paraBag_clicked()
+{
+  int pid = getProcIdByName("play");
+  if(pid!=-1)
+    kill(pid, SIGINT);
+  ui.listWidget_2->addItem(QString::fromStdString("Bag parada com sucesso."));
+  ui.pushButton_paraBag->setEnabled(false);
+  ui.pushButton_salvaNuvem->setEnabled(false);
+}
+
+void monitor_mrs::MainWindow::on_pushButton_salvaNuvem_clicked()
+{
+  system("gnome-terminal -x sh -c 'rosrun rustbot_accumulate_point_clouds save_cloud'");
+  ui.listWidget_2->addItem(QString::fromStdString("Nuvem de pontos salva com sucesso."));
 }

@@ -15,6 +15,8 @@
 #include <QtGui/QMainWindow>
 #include "ui_main_window.h"
 #include "qnode.hpp"
+#include <QFileDialog>
+#include <QLabel>
 
 #include <QTimer>
 #include <opencv2/core/core.hpp>
@@ -78,6 +80,13 @@ private Q_SLOTS:
         void on_pushButton_reiniciarTudo_clicked();
         void on_pushButton_limpaTexto_clicked();
 
+        //Lucas, aba 2
+        void on_pushButtonSelectBag_clicked();
+        void on_pushButton_playBag_clicked();
+        void on_pushButton_clear2_clicked();
+        void on_pushButton_paraBag_clicked();
+        void on_pushButton_salvaNuvem_clicked();
+
 private:
         Ui::MainWindowDesign ui;
         std::string nome;
@@ -90,6 +99,11 @@ private:
         QImage qt_image;
 
         bool controle_gravacao;
+
+        // Lucas, aba 2
+        QString filename;
+        std::string localstd;
+
 };
 
 }  // namespace monitor_mrs
