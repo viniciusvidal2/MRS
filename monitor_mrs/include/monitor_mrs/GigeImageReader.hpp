@@ -5,6 +5,7 @@
 
 #include <string>
 #include <ros/ros.h>
+#include <std_msgs/Int8.h>
 #include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/image_encodings.h>
@@ -32,6 +33,8 @@ public:
   void imageCb(const sensor_msgs::ImageConstPtr& msg);
   QMutex* mutex;
 
+  void setOffset(int off);
+
 Q_SIGNALS:
   void send_mat_image(cv::Mat img,qint64 timestamp);
   void loggingUpdated();
@@ -41,8 +44,9 @@ private:
   int init_argc;
   char** init_argv;
 
-
-
+  ros::Publisher offset_pub;
+  int offset; // Para guardar o offset a ser publicado
+  std_msgs::Int8 msg;
 };
 
 }

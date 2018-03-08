@@ -239,5 +239,5 @@ void monitor_mrs::MainWindow::on_pushButton_limpaTexto_clicked()
 void monitor_mrs::MainWindow::on_horizontalSlider_offset_sliderMoved()
 {
   offset = ui.horizontalSlider_offset->value() - 49;
-  qnode.setOffset(offset);
+  gige_ir.setOffset(offset);
 }

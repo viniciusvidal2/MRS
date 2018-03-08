@@ -2,6 +2,7 @@
 #include <QTime>
 #include <iostream>
 #include <std_msgs/String.h>
+#include <std_msgs/Int8.h>
 #include <sstream>
 #include <string>
 #include <QStringListModel>
@@ -46,7 +47,8 @@ void GigeImageReader::init(){
   image_transport::ImageTransport it_= image_transport::ImageTransport(nh_);
 
   image_sub_ = it_.subscribe("/stereo/left/image_color", 1, &GigeImageReader::imageCb, this);
-
+  offset_pub = nh_.advertise<std_msgs::Int8>("offset_pub", 100);
+  offset = 0; // a ser publicado para alterar pan do motor
 
   ros::spin();
 
@@ -69,6 +71,9 @@ void GigeImageReader::imageCb(const sensor_msgs::ImageConstPtr &msg)
   mutex->lock();
   qint64 timestamp = QDateTime().currentMSecsSinceEpoch();
   send_mat_image(cv_ptr->image,timestamp);
+
+  msg.data = offset;
+  offset_pub.publish(msg);
   mutex->unlock();
 
   // Update GUI Window
@@ -76,5 +81,9 @@ void GigeImageReader::imageCb(const sensor_msgs::ImageConstPtr &msg)
   //cv::waitKey(3);
 }
 
+void GigeImageReader::setOffset(int off)
+{
+  offset = off;
+}
 
 }

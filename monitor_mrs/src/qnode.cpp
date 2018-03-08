@@ -35,7 +35,7 @@ QNode::QNode(int argc, char** argv ) :
 	init_argv(argv)
     {
 
-   cout << "iniciando ZERO" << endl;
+//   cout << "iniciando ZERO" << endl;
 }
 
 QNode::~QNode() {
@@ -61,20 +61,17 @@ void QNode::init() {
   ros::start();
   ros::NodeHandle n;
 //  chatter_publisher = n.advertise<std_msgs::String>("chatter", 1000);
-  offset_pub = n.advertise<std_msgs::Int8>("offset_pub", 100);
 
   this->run();
-
-  offset = 0; // a ser publicado para alterar pan do motor
 
 }
 
 void QNode::run() {
-  ros::Rate loop_rate(10);
+//  ros::Rate loop_rate(10);
 
   std_msgs::Int8 msg;
 //  int count = 0;
-  while ( ros::ok() ) {
+//  while ( ros::ok() ) {
 //    std_msgs::String msg;
 
 //    std::stringstream ss;
@@ -86,19 +83,15 @@ void QNode::run() {
 
 //    chatter_publisher.publish(msg);
 
-    msg.data = offset;
-    offset_pub.publish(msg);
-    ros::spinOnce();
-    loop_rate.sleep();
+//    ros::spin();
+
+//    ros::spinOnce();
+//    loop_rate.sleep();
 //    ++count;
-  }
-  std::cout << "Sai do ROS e fecha GUI." << std::endl;
-  Q_EMIT rosShutdown(); //
+//  }
+//  std::cout << "Sai do ROS e fecha GUI." << std::endl;
+//  Q_EMIT rosShutdown(); //
 }
 
-void QNode::setOffset(int off)
-{
-  offset = off;
-}
 
 }  // namespace monitor_mrs
