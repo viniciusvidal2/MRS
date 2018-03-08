@@ -60,6 +60,8 @@ public:
 	QStringListModel* loggingModel() { return &logging_model; }
 	void log( const LogLevel &level, const std::string &msg);
 
+  void setOffset(int off);
+
 Q_SIGNALS:
     void loggingUpdated();
     void rosShutdown();
@@ -72,7 +74,10 @@ private:
 	int init_argc;
 	char** init_argv;
   ros::Publisher chatter_publisher;
+  ros::Publisher offset_pub;
   QStringListModel logging_model;
+
+  int offset; // Para guardar o offset a ser publicado
 };
 
 }  // namespace monitor_mrs

@@ -31,7 +31,6 @@
 #include <vector>
 #include <string>
 #include <fstream>
-//#include <stdlib.h>
 #include <stdio.h>
 #include <cstdlib>
 #include <csignal>
@@ -77,6 +76,7 @@ private Q_SLOTS:
         void on_pushButton_nuvemInstantanea_clicked();
         void on_pushButton_reiniciarTudo_clicked();
         void on_pushButton_limpaTexto_clicked();
+        void on_horizontalSlider_offset_sliderMoved();
 
 private:
         Ui::MainWindowDesign ui;
@@ -90,6 +90,7 @@ private:
         QImage qt_image;
 
         bool controle_gravacao;
+        int offset;
 };
 
 }  // namespace monitor_mrs

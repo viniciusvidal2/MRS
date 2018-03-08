@@ -50,6 +50,12 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
   ui.pushButton_nuvemInstantanea->setStyleSheet("background-color: rgb(200, 200, 200); color: rgb(0, 0, 0)");
 
   ui.listWidget->addItem(QString::fromStdString("Iniciando o programa MRS monitor!"));
+
+  ui.horizontalSlider_offset->setValue(49); // Posicionar no centro, que e 49 aproximadamente
+  offset = 49; // Centro do range
+
+  // Por que esse no nao funciona?
+  qnode.init();
 }
 
 MainWindow::~MainWindow() {}
@@ -228,4 +234,10 @@ void monitor_mrs::MainWindow::on_pushButton_reiniciarTudo_clicked()
 void monitor_mrs::MainWindow::on_pushButton_limpaTexto_clicked()
 {
   ui.listWidget->clear();
+}
+
+void monitor_mrs::MainWindow::on_horizontalSlider_offset_sliderMoved()
+{
+  offset = ui.horizontalSlider_offset->value() - 49;
+  qnode.setOffset(offset);
 }

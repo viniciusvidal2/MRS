@@ -66,7 +66,6 @@ void GigeImageReader::imageCb(const sensor_msgs::ImageConstPtr &msg)
     return;
   }
 
-  //mutex->lock();
   mutex->lock();
   qint64 timestamp = QDateTime().currentMSecsSinceEpoch();
   send_mat_image(cv_ptr->image,timestamp);

@@ -13,8 +13,9 @@
 #include <ros/network.h>
 #include <string>
 #include <std_msgs/String.h>
+#include <std_msgs/Int8.h>
 #include <sstream>
-#include<iostream>
+#include <iostream>
 #include "../include/monitor_mrs/qnode.hpp"
 #include <QFuture>
 #include <QtConcurrentRun>
@@ -59,33 +60,45 @@ void QNode::init() {
   cout << "iniciando ros" << endl;
   ros::start();
   ros::NodeHandle n;
-  chatter_publisher = n.advertise<std_msgs::String>("chatter", 1000);
+//  chatter_publisher = n.advertise<std_msgs::String>("chatter", 1000);
+  offset_pub = n.advertise<std_msgs::Int8>("offset_pub", 100);
 
   this->run();
+
+  offset = 0; // a ser publicado para alterar pan do motor
 
 }
 
 void QNode::run() {
   ros::Rate loop_rate(10);
-  int count = 0;
-  while ( ros::ok() ) {
-    std_msgs::String msg;
 
-    std::stringstream ss;
-    ss << "hello world " << count;
-    msg.data = ss.str();
+  std_msgs::Int8 msg;
+//  int count = 0;
+  while ( ros::ok() ) {
+//    std_msgs::String msg;
+
+//    std::stringstream ss;
+//    ss << "hello world " << count;
+//    msg.data = ss.str();
     // Aqui viria as linhas de comando como num programa padrao do ros
 
-    ROS_INFO("%s", msg.data.c_str());
+//    ROS_INFO("%s", msg.data.c_str());
 
-    chatter_publisher.publish(msg);
+//    chatter_publisher.publish(msg);
 
+    msg.data = offset;
+    offset_pub.publish(msg);
     ros::spinOnce();
     loop_rate.sleep();
-    ++count;
+//    ++count;
   }
   std::cout << "Sai do ROS e fecha GUI." << std::endl;
   Q_EMIT rosShutdown(); //
+}
+
+void QNode::setOffset(int off)
+{
+  offset = off;
 }
 
 }  // namespace monitor_mrs
