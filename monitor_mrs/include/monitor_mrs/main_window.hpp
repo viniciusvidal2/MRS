@@ -89,6 +89,7 @@ private:
         Mat frame;
         QImage qt_image;
 
+        bool controle_stereo;
         bool controle_gravacao;
         int offset;
 };

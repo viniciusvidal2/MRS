@@ -44,6 +44,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
   ui.radioButton_manual->setChecked(false);
 
   controle_gravacao = false; // Se false, nao estamos gravando, pode gravar
+  controle_stereo = false; // Se false, nao estamos fazendo stereo
   ui.pushButton_salvaBag->setAutoFillBackground(true);
   ui.pushButton_salvaBag->setStyleSheet("background-color: rgb(0, 200, 50); color: rgb(0, 0, 0)"); // Assim esta quando pode gravar
   ui.pushButton_reiniciarTudo->setStyleSheet("background-color: rgb(200, 0, 20); color: rgb(0, 0, 0)");
@@ -164,9 +165,28 @@ void monitor_mrs::MainWindow::on_pushButton_resetaPX4_clicked()
 
 void monitor_mrs::MainWindow::on_pushButton_iniciaStereo_clicked()
 {
-  system("gnome-terminal -x sh -c 'roslaunch rustbot_bringup all.launch do_accumulation:=false do_gps:=true do_fusion:=false do_slam:=false do_stereo:=true'");
-  ui.listWidget->addItem(QString::fromStdString("Processamento Stereo lançado, sistema rodando..."));
-  ui.listWidget->addItem(QString::fromStdString("Assim que possivel, inicie a coleta e armazenagem de dados."));
+  if(!controle_stereo){ // Nao estamos fazendo stereo, clicou para comecar
+    ui.pushButton_iniciaStereo->setAutoFillBackground(true);
+    ui.pushButton_iniciaStereo->setStyleSheet("background-color: rgb(230, 0, 20); color: rgb(0, 0, 0)"); // Assim esta deve parar stereo
+    ui.pushButton_iniciaStereo->setText("Parar processo Stereo");
+
+    system("gnome-terminal -x sh -c 'roslaunch rustbot_bringup all.launch do_accumulation:=false do_gps:=true do_fusion:=false do_slam:=false do_stereo:=true online_stereo:=false'");
+    ui.listWidget->addItem(QString::fromStdString("Processamento Stereo lancado, sistema rodando..."));
+    ui.listWidget->addItem(QString::fromStdString("Assim que possivel, inicie a coleta e armazenagem de dados."));
+
+    controle_stereo = true;
+  } else {
+    ui.pushButton_iniciaStereo->setAutoFillBackground(true);
+    ui.pushButton_iniciaStereo->setStyleSheet("background-color: rgb(0, 200, 50); color: rgb(0, 0, 0)"); // Assim esta para comecar a gravar
+    ui.pushButton_iniciaStereo->setText("Iniciar processo Stereo");
+
+    int pid = getProcIdByName("stereo_image_proc");
+    if(pid != -1)
+      kill(pid, SIGINT);
+    ui.listWidget->addItem(QString::fromStdString("Processamento Stereo interrompido..."));
+
+    controle_stereo = false;
+  }
 }
 
 void monitor_mrs::MainWindow::on_pushButton_salvaBag_clicked()
@@ -201,7 +221,7 @@ void monitor_mrs::MainWindow::on_pushButton_salvaBag_clicked()
     }
     // Anunciar ao usuario
     ui.listWidget->addItem(QString::fromStdString("Iniciando gravacao do arquivo na area de trabalho..."));
-    ui.listWidget->addItem(QString::fromStdString("ATENCAO: APOS X MINUTOS REINICIE o programa por seguranca."));
+    ui.listWidget->addItem(QString::fromStdString("ATENCAO: APOS 20 MINUTOS REINICIE o programa por seguranca."));
   } else if(controle_gravacao){ // Estamos gravando
     // Traz aparencia novamente para poder gravar
     ui.pushButton_salvaBag->setAutoFillBackground(true);
@@ -220,7 +240,7 @@ void monitor_mrs::MainWindow::on_pushButton_salvaBag_clicked()
 
 void monitor_mrs::MainWindow::on_pushButton_nuvemInstantanea_clicked()
 {
-  system("gnome-terminal -x sh -c 'rosrun rviz rviz -f left_optical -d ~/MRS_ws/src/MRS/monitor_mrs/resources/salvacao_do_mundo.rviz'");
+  system("gnome-terminal -x sh -c 'rosrun rviz rviz -f left_optical -d src/MRS/monitor_mrs/resources/salvacao_do_mundo.rviz'"); // Ja estamos por default no diretorio do ws
   ui.listWidget->addItem(QString::fromStdString("Abrindo visualizador para reconstrucao instantanea..."));
 }
 
