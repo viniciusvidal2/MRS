@@ -43,7 +43,7 @@ QNode::~QNode() {
       ros::shutdown();
       ros::waitForShutdown();
     }
-    system("gnome-terminal -x sh -c 'killall -9 roscore & killall -9 rosmaster & killall -9 rosout'");
+    system("gnome-terminal -x sh -c 'killall -9 roscore && killall -9 rosmaster && killall -9 rosout'");
 	wait();
 }
 

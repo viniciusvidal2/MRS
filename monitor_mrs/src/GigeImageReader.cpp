@@ -46,7 +46,8 @@ void GigeImageReader::init(){
   ros::NodeHandle nh_;
   image_transport::ImageTransport it_= image_transport::ImageTransport(nh_);
 
-  image_sub_ = it_.subscribe("/stereo/left/image_color", 1, &GigeImageReader::imageCb, this);
+  //image_sub_ = it_.subscribe("/stereo/left/image_color", 1, &GigeImageReader::imageCb, this);
+  image_sub_ = it_.subscribe("/stereo/left/image_raw", 1, &GigeImageReader::imageCb, this);
   offset_pub = nh_.advertise<std_msgs::Int8>("offset_pub", 100);
   offset = 0; // a ser publicado para alterar pan do motor
 
