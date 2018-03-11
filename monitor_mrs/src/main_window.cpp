@@ -110,6 +110,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
   if(pid!=-1)
     kill(pid, SIGINT);
   QMainWindow::closeEvent(event);
+  system("gnome-terminal -x sh -c 'rosnode kill -a'");
 }
 
 int MainWindow::getProcIdByName(string procName)
