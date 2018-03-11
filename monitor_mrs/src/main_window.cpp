@@ -260,7 +260,7 @@ void monitor_mrs::MainWindow::on_pushButton_salvaBag_clicked()
 
 void monitor_mrs::MainWindow::on_pushButton_nuvemInstantanea_clicked()
 {
-  system("gnome-terminal -x sh -c 'rosrun rviz rviz -f left_optical -d /home/mrs/mrs_ws/src/MRS/monitor_mrs/resources/salvacao_do_mundo.rviz'"); // Ja estamos por default no diretorio do ws
+  system("gnome-terminal -x sh -c 'rosrun rviz rviz -f left_optical -d $HOME/mrs_ws/src/MRS/monitor_mrs/resources/salvacao_do_mundo.rviz'"); // Ja estamos por default no diretorio do ws
   ui.listWidget->addItem(QString::fromStdString("Abrindo visualizador para reconstrucao instantanea..."));
 }
 
@@ -311,6 +311,7 @@ void monitor_mrs::MainWindow::on_pushButton_playBag_clicked()
  teste_comando.append("'");
  localstd = teste_comando.toStdString();
  system(localstd.c_str());
+ sleep(4); // Para dar tempo do topico entrar ok
  ui.listWidget_2->addItem(QString::fromStdString("Bag inicializada."));
  system("gnome-terminal -x sh -c 'roslaunch rustbot_bringup all.launch online_stereo:=false do_stereo:=true do_accumulation:=true'");
 
@@ -343,5 +344,5 @@ void monitor_mrs::MainWindow::on_pushButton_salvaNuvem_clicked()
 
 void monitor_mrs::MainWindow::on_pushButton_recAcumulada_clicked()
 {
- system("gnome-terminal -x sh -c 'rosrun rviz rviz -f left_optical -d /home/mrs/mrs_ws/src/MRS/monitor_mrs/resources/salvacao_do_mundo_2.rviz'");
+ system("gnome-terminal -x sh -c 'rosrun rviz rviz -f left_optical -d $HOME/mrs_ws/src/MRS/monitor_mrs/resources/salvacao_do_mundo_2.rviz'");
 }
