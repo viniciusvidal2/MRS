@@ -23,12 +23,12 @@ private:
   float pitch_para_apontar, yaw_atual, yaw_para_apontar, estamos_dentro;
   // Ranges para alcance de pwm e angulo [DEGREES] de yaw e pitch
   int pwm_yaw_range[2]     = {0, 1023}; // [PWM]
-  int pwm_pitch_range[2]   = {1655, 2435}; // [PWM]
+  int pwm_pitch_range[2]   = {1876, 2342}; // [PWM]
   float ang_yaw_range[2]   = {0.0  , 300.0}; // [DEGREES]
-  float ang_pitch_range[2] = {145.0, 214.0}; // [DEGREES]
-  float ang_pitch_horizontal = 173.0; // [DEGREES] 1976 DE PWM
-  int pwm_pitch_horizontal = 1976; // [PWM]
-  int pwm_yaw_frente = 512; // apontar sempre para frente do veiculo caso nao precise virar [PWM]
+  float ang_pitch_range[2] = {164.0, 205.0}; // [DEGREES]
+  float ang_pitch_horizontal = 185.1; // [DEGREES] 1976 DE PWM
+  int pwm_pitch_horizontal = 2156; // [PWM]
+  int pwm_yaw_frente = 466; // apontar sempre para frente do veiculo caso nao precise virar [PWM]
   float yaw_mid_range, pitch_mid_range; // [DEGREES]
   // Relacao pwm/ang[DEGREES] para os dois casos
   float pwm_ang_yaw, pwm_ang_pitch;

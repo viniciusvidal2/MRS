@@ -311,7 +311,7 @@ void monitor_mrs::MainWindow::on_pushButton_playBag_clicked()
  teste_comando.append("'");
  localstd = teste_comando.toStdString();
  system(localstd.c_str());
- sleep(4); // Para dar tempo do topico entrar ok
+ sleep(8); // Para dar tempo do topico entrar ok
  ui.listWidget_2->addItem(QString::fromStdString("Bag inicializada."));
  system("gnome-terminal -x sh -c 'roslaunch rustbot_bringup all.launch online_stereo:=false do_stereo:=true do_accumulation:=true'");
 
