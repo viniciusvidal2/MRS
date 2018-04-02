@@ -48,8 +48,8 @@ private:
   void MandaProMotor(){
     if(centro_bt == 1)
     {
-      pan_pos  = (pan_min  + pan_max )/2;
-      tilt_pos = (tilt_max + tilt_min)/2;
+      pan_pos  =  466; //(pan_min  + pan_max )/2;
+      tilt_pos = 2156; //(tilt_max + tilt_min)/2;
     }
     if(shut_bt == 1) // Botao 3
     {
@@ -91,10 +91,10 @@ private:
 public:
 
   // Construtor inicia tudo
-  JoyAndMotor():deadzone(0.2), pan_min(0), tilt_min(1437.0), pan_max(1007.0), tilt_max(2652.0)
+  JoyAndMotor():deadzone(0.2), pan_min(0), tilt_min(1876.0), pan_max(1023.0), tilt_max(2342.0)
   {
-    pan_pos  = (pan_min  + pan_max )/2;
-    tilt_pos = (tilt_max + tilt_min)/2;
+    pan_pos  =  466; // Posicao pan frente na pratica //(pan_min  + pan_max )/2;
+    tilt_pos = 2156; // Posicao horizontal tilt //(tilt_max + tilt_min)/2;
     posicaoMotor = nh_.serviceClient<dynamixel_workbench_msgs::JointCommand>("/joint_command");
   }
 

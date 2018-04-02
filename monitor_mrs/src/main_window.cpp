@@ -52,6 +52,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
   ui.pushButton_reiniciarTudo->setStyleSheet("background-color: rgb(200, 0, 20); color: rgb(0, 0, 0)");
   ui.pushButton_nuvemInstantanea->setStyleSheet("background-color: rgb(200, 200, 200); color: rgb(0, 0, 0)");
   ui.pushButton_iniciaStereo->setStyleSheet("background-color: rgb(0, 200, 50); color: rgb(0, 0, 0)"); // Assim esta para comecar a gravar
+  ui.horizontalSlider_offset->hide();
 
   ui.listWidget->addItem(QString::fromStdString("Iniciando o programa MRS monitor!"));
 
@@ -193,6 +194,7 @@ void monitor_mrs::MainWindow::on_pushButton_iniciaStereo_clicked()
     system("gnome-terminal -x sh -c 'roslaunch rustbot_bringup all.launch do_accumulation:=false do_gps:=true do_fusion:=false do_slam:=false do_stereo:=true online_stereo:=false'");
     ui.listWidget->addItem(QString::fromStdString("Processamento Stereo lancado, sistema rodando..."));
     ui.listWidget->addItem(QString::fromStdString("Assim que possivel, inicie a coleta e armazenagem de dados."));
+    ui.horizontalSlider_offset->show();
 
     controle_stereo = true;
   } else {
@@ -204,6 +206,7 @@ void monitor_mrs::MainWindow::on_pushButton_iniciaStereo_clicked()
     if(pid != -1)
       kill(pid, SIGINT);
     ui.listWidget->addItem(QString::fromStdString("Processamento Stereo interrompido..."));
+    ui.horizontalSlider_offset->hide();
 
     controle_stereo = false;
   }
