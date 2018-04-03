@@ -12,8 +12,8 @@
 
 namespace flir_gige {
 
-FlirGige::FlirGige(const std::string &ip_address)
-    : ip_address_{ip_address}, dinfo_{nullptr}, param_array_{nullptr} {
+FlirGige::FlirGige(const std::string &mac_address)
+    : mac_address_{mac_address}, dinfo_{nullptr}, param_array_{nullptr} {
   // Find all devices on the network
   const PvResult result = system_.Find();
   if (!result.IsOK()) {
@@ -21,8 +21,8 @@ FlirGige::FlirGige(const std::string &ip_address)
                              result.GetCodeString().GetAscii());
   }
   const PvDeviceInfoGEVVec dinfo_gev_vec = GatherGevDevice();
-  if (!FindDevice(ip_address, dinfo_gev_vec)) {
-    throw std::runtime_error(ip_address +
+  if (!FindDevice(mac_address, dinfo_gev_vec)) {
+    throw std::runtime_error(mac_address +
                              " not found. Available IP Address(es): " +
                              AvailableDevice(dinfo_gev_vec));
   }
@@ -33,6 +33,11 @@ void FlirGige::Connect() {
   OpenStream();
   ConfigureStream();
   CreatePipeline();
+
+  //param_array_->SetEnumValue( "SensorFrameRate", 1 );
+  param_array_->SetEnumValue( "AcquisitionMode", 1 );
+  param_array_->SetBooleanValue( "GrbCh0TrigCfgPLCTriggerable", true );
+  param_array_->SetEnumValue ("PLC_Q14_Variable0", "PLC_I0" );
 }
 
 void FlirGige::Disconnect() {
@@ -92,15 +97,15 @@ FlirGige::PvDeviceInfoGEVVec FlirGige::GatherGevDevice() const {
   return dinfo_gev_vec;
 }
 
-bool FlirGige::FindDevice(const std::string &ip,
+bool FlirGige::FindDevice(const std::string &mac_address,
                           const PvDeviceInfoGEVVec &dinfo_gev_vec) {
   // Check GigE devices found on network adaptor
   if (dinfo_gev_vec.empty()) return false;
 
   // Try finding the device with the correct ip address
   const auto it = std::find_if(dinfo_gev_vec.cbegin(), dinfo_gev_vec.cend(),
-                               [&ip](const PvDeviceInfoGEV *dinfo) {
-    return ip == dinfo->GetIPAddress().GetAscii();
+                               [&mac_address](const PvDeviceInfoGEV *dinfo) {
+    return mac_address == dinfo->GetMACAddress().GetAscii();
   });
 
   if (it == dinfo_gev_vec.end()) return false;
@@ -114,10 +119,65 @@ bool FlirGige::FindDevice(const std::string &ip,
   PvResult result;
 
   // Creates and connects the device controller
+
   PvDevice *device = PvDevice::CreateAndConnect(dinfo_, &result);
   if (!result.IsOK()) return false;
   PvDevice::Free(device);
   return true;
+}
+
+
+bool FlirGige::FindDeviceMAC(const std::string &mac_address,
+                          const PvDeviceInfoGEVVec &dinfo_gev_vec) { // Conectar a camera termica
+//  // Check GigE devices found on network adaptor                     // atraves do endereco MAC(fixo)
+//  if (dinfo_gev_vec.empty()) return false;
+
+// // const PvDeviceInfo *dinfo;
+
+//  // Creates and connects the device controller
+//  PvString macAddress = mac_address.c_str();
+//  PvSystem system__;
+
+
+//  PvResult result = system__.FindDevice(macAddress, &dinfo_);
+//  PvDevice *device = PvDevice::CreateAndConnect(dinfo_, &result);
+//  ip_address_ = macAddress;
+
+//  //ROS_INFO("Interface: %s", interface->GetDisplayID().GetAscii());
+//  //std::cout << result << "\n";
+
+//  if (!result.IsOK()) return false;
+//  PvDevice::Free(device);
+//  return true;
+
+
+    // Tentativa 2
+// Check GigE devices found on network adaptor
+if (dinfo_gev_vec.empty()) return false;
+
+// Try finding the device with the correct ip address
+const auto it = std::find_if(dinfo_gev_vec.cbegin(), dinfo_gev_vec.cend(),
+                             [&mac_address](const PvDeviceInfoGEV *dinfo) {
+  return mac_address == dinfo->GetMACAddress().GetAscii();
+});
+
+if (it == dinfo_gev_vec.end()) return false;
+// Found device with given ip address
+const PvDeviceInfoGEV *dinfo_gev = *it;
+display_id_ = std::string(dinfo_gev->GetDisplayID().GetAscii());
+
+if (!dinfo_gev->IsConfigurationValid()) return false;
+// Try connect and disconnect to verify
+dinfo_ = dinfo_gev;
+PvResult result;
+
+// Creates and connects the device controller
+
+PvDevice *device = PvDevice::CreateAndConnect(dinfo_, &result);
+if (!result.IsOK()) return false;
+PvDevice::Free(device);
+return true;
+
 }
 
 std::string FlirGige::AvailableDevice(
@@ -130,14 +190,19 @@ std::string FlirGige::AvailableDevice(
 }
 
 void FlirGige::ConnectDevice() {
+
   PvResult result;
   // Use a unique_ptr to manage device resource
+  //std::cout << "felipe1: " << dinfo->GetUniqueID() << "\n";
   device_.reset(PvDevice::CreateAndConnect(dinfo_, &result));
+  //std::cout << "felipe2: " << &dinfo << "\n";
+  //device_.reset(PvDevice::CreateAndConnect("00:11:1c:01:7c:80", &result));
   if (!result.IsOK()) {
     throw std::runtime_error("Unable to connect to " + display_id());
   }
   param_array_ = device_->GetParameters();
-}
+
+ }
 
 void FlirGige::OpenStream() {
   PvResult result;
@@ -236,6 +301,8 @@ bool FlirGige::GrabImage(sensor_msgs::Image &image_msg,
 
   // Release the buffer back to the pipeline
   pipeline_->ReleaseBuffer(buffer);
+  //FlirGige::StartAcquisition();
+  param_array_->ExecuteCommand("AcquisitionStart");
   return true;
 }
 
