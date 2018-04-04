@@ -32,9 +32,9 @@ struct FreeStream {
 
 class FlirGige {
  public:
-  FlirGige(const std::string &ip_address);
+  FlirGige(const std::string &mac_address);
 
-  const std::string &ip_address() const { return ip_address_; }
+  const std::string &mac_address() const { return mac_address_; }
   const std::string &display_id() const { return display_id_; }
 
   void Connect();
@@ -54,6 +54,8 @@ class FlirGige {
 
   bool FindDevice(const std::string &ip,
                   const PvDeviceInfoGEVVec &dinfo_gev_vec);
+  bool FindDeviceMAC(const std::string &mac_address,
+                  const PvDeviceInfoGEVVec &dinfo_gev_vec);
   std::string AvailableDevice(const PvDeviceInfoGEVVec &dinfo_gev_vec) const;
   PvDeviceInfoGEVVec GatherGevDevice() const;
 
@@ -70,7 +72,7 @@ class FlirGige {
 
   //  double GetSpotPixel(const cv::Mat &image) const;
 
-  std::string ip_address_;
+  std::string mac_address_;
   std::string display_id_;
   PvSystem system_;
   const PvDeviceInfo *dinfo_;
