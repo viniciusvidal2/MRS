@@ -79,6 +79,7 @@ private Q_SLOTS:
         void on_pushButton_reiniciarTudo_clicked();
         void on_pushButton_limpaTexto_clicked();
         void on_horizontalSlider_offset_sliderMoved();
+        void on_verticalSlider_offset_sliderMoved();
 
         //Lucas, aba 2
         void on_pushButtonSelectBag_clicked();
@@ -102,6 +103,7 @@ private:
         bool controle_stereo;
         bool controle_gravacao;
         int offset;
+        int offset_tilt;
 
         // Lucas, aba 2
         QString filename;

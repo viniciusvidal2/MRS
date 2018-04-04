@@ -33,7 +33,7 @@ public:
   void imageCb(const sensor_msgs::ImageConstPtr& msg);
   QMutex* mutex;
 
-  void setOffset(int off);
+  void setOffset(int offp, int offt);
 
 Q_SIGNALS:
   void send_mat_image(cv::Mat img,qint64 timestamp);
@@ -45,8 +45,11 @@ private:
   char** init_argv;
 
   ros::Publisher offset_pub;
-  int offset; // Para guardar o offset a ser publicado
+  ros::Publisher offset_tilt_pub;
+  int offset; // Para guardar os offsets a serem publicados
+  int offset_tilt;
   std_msgs::Int8 msg_off;
+  std_msgs::Int8 msg_off_tilt;
 };
 
 }

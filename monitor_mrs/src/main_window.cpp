@@ -53,6 +53,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
   ui.pushButton_nuvemInstantanea->setStyleSheet("background-color: rgb(200, 200, 200); color: rgb(0, 0, 0)");
   ui.pushButton_iniciaStereo->setStyleSheet("background-color: rgb(0, 200, 50); color: rgb(0, 0, 0)"); // Assim esta para comecar a gravar
   ui.horizontalSlider_offset->hide();
+  ui.verticalSlider_offset->hide();
 
   ui.listWidget->addItem(QString::fromStdString("Iniciando o programa MRS monitor!"));
 
@@ -61,7 +62,9 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
   ui.label_MRS2->setPixmap(pix.scaled(120,120,Qt::KeepAspectRatio));
 
   ui.horizontalSlider_offset->setValue(49); // Posicionar no centro, que e 49 aproximadamente
+  ui.verticalSlider_offset->setValue(59); // Posicionar em 59 que e aproximadamente a horizontal
   offset = 49; // Centro do range
+  offset_tilt = 59; // horizontal
 
   // Por que esse no nao funciona?
   qnode.init();
@@ -207,8 +210,10 @@ void monitor_mrs::MainWindow::on_pushButton_iniciaStereo_clicked()
     system("gnome-terminal -x sh -c 'roslaunch rustbot_bringup all.launch do_accumulation:=false do_gps:=true do_fusion:=false do_slam:=false do_stereo:=true online_stereo:=true'");
     ui.listWidget->addItem(QString::fromStdString("Processamento Stereo lancado, sistema rodando..."));
     ui.listWidget->addItem(QString::fromStdString("Assim que possivel, inicie a coleta e armazenagem de dados."));
-    ui.horizontalSlider_offset->show();
-
+    if(ui.radioButton_automatico->isChecked()){
+      ui.horizontalSlider_offset->show();
+      ui.verticalSlider_offset->show();
+    }
     controle_stereo = true;
   } else {
     ui.pushButton_iniciaStereo->setAutoFillBackground(true);
@@ -220,6 +225,7 @@ void monitor_mrs::MainWindow::on_pushButton_iniciaStereo_clicked()
       kill(pid, SIGINT);
     ui.listWidget->addItem(QString::fromStdString("Processamento Stereo interrompido..."));
     ui.horizontalSlider_offset->hide();
+    ui.verticalSlider_offset->hide();
 
     controle_stereo = false;
   }
@@ -299,7 +305,13 @@ void monitor_mrs::MainWindow::on_pushButton_limpaTexto_clicked()
 void monitor_mrs::MainWindow::on_horizontalSlider_offset_sliderMoved()
 {
   offset = ui.horizontalSlider_offset->value() - 49;
-  gige_ir.setOffset(offset);
+  gige_ir.setOffset(offset, offset_tilt);
+}
+
+void monitor_mrs::MainWindow::on_verticalSlider_offset_sliderMoved()
+{
+  offset_tilt = ui.verticalSlider_offset->value() - 59; // Aqui diferente por causa do nivel horizontal estar em 60% do range
+  gige_ir.setOffset(offset, offset_tilt);
 }
 
 //Lucas, aba 2

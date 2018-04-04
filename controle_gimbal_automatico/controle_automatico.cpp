@@ -43,9 +43,11 @@ private:
   ros::ServiceClient motor;
   // Mensagem destinada ao servico do motor
   dynamixel_workbench_msgs::JointCommand posicao;
-  // Offset vindo da GUI, movimenta em PAN
+  // Offset vindo da GUI, movimenta em PAN e TILT
   int offset = 0; // Vem na mensagem de -48 a 49
   float offset_ang = 0; // Convertido para angulos [DEGREES]
+  int offset_tilt = 0; // Vem na mensagem de -48 a 49
+  float offset_tilt_ang = 0; // Convertido para angulos [DEGREES]
   ros::Subscriber subOff;
 
 public:
@@ -62,8 +64,9 @@ public:
     // Servico que envia valores ao motor
     motor = nh_.serviceClient<dynamixel_workbench_msgs::JointCommand>("/joint_command");
 
-    //Inicia subscriber para lidar com offset de PAN
+    //Inicia subscriber para lidar com offset de PAN e TILT
     subOff = nh_.subscribe("/offset_pub", 10, &PixhawkeMotor::escutarOffset, this);
+    subOff = nh_.subscribe("/offset_tilt_pub", 10, &PixhawkeMotor::escutarOffset_tilt, this);
   }
 
   int ExecutarClasse(int argc, char **argv)
@@ -79,22 +82,26 @@ private:
     delta_yaw = wrap180(yaw_atual, yaw_para_apontar);
     // Inserindo o offset vindo da GUI
     offset_ang = 300.0f*((float)offset + 48.0f)/97.0f - yaw_mid_range; // Diferenca para o centro do range
+    offset_tilt_ang = 41.0f*((float)offset_tilt + 59.0f)/98.0f + ang_pitch_range[0] - ang_pitch_horizontal; // Diferenca para o centro do range
 
 //    ROS_INFO("offset: %.2f", offset_ang);
     //ROS_INFO("delta yaw: %.2f", yaw_mid_range);
     if(estamos_dentro == 0.0f){ // Se nao estamos dentro o offset vale, se estamos dentro so vale o automatico
       ang_pan = ((yaw_mid_range + offset_ang) < ang_yaw_range[1]) ? yaw_mid_range + offset_ang : ang_yaw_range[1]; // LImitando maximo
       ang_pan = (ang_pan > ang_yaw_range[0]) ? ang_pan : ang_yaw_range[0]; // LImitando minimo
-      ROS_INFO("ang pan: %.2f", ang_pan);
+//      ROS_INFO("ang pan: %.2f", ang_pan);
+      // Analisando diferenca de pitch -> somente a mesma sobre o pwm para manter horizontal
+      delta_pitch = ((ang_pitch_horizontal + offset_tilt_ang) < ang_pitch_range[1]) ? offset_tilt_ang : ang_pitch_range[1] - ang_pitch_horizontal;
+      delta_pitch = ((ang_pitch_horizontal + offset_tilt_ang) > ang_pitch_range[0]) ? offset_tilt_ang : ang_pitch_range[0] - ang_pitch_horizontal;
+      ROS_INFO("delta tilt: %.2f", delta_pitch);
     } else { // de 60 em 60 graus aqui !!
       delta_yaw = (int)(delta_yaw/60) * 60; // Aqui arredonda para multiplos de 60, creio eu
       ang_pan = ((yaw_mid_range + delta_yaw) < ang_yaw_range[1]) ? yaw_mid_range + delta_yaw : ang_yaw_range[1]; // LImitando maximo
       ang_pan = (ang_pan > ang_yaw_range[0]) ? ang_pan : ang_yaw_range[0]; // LImitando minimo
+      // Analisando diferenca de pitch -> somente a mesma sobre o pwm para manter horizontal
+      delta_pitch = ((ang_pitch_horizontal + pitch_para_apontar) < ang_pitch_range[1]) ? pitch_para_apontar : ang_pitch_range[1] - ang_pitch_horizontal;
+      delta_pitch = ((ang_pitch_horizontal + pitch_para_apontar) > ang_pitch_range[0]) ? pitch_para_apontar : ang_pitch_range[0] - ang_pitch_horizontal;
     }
-    // Analisando diferenca de pitch -> somente a mesma sobre o pwm para manter horizontal
-    delta_pitch = ((ang_pitch_horizontal + pitch_para_apontar) < ang_pitch_range[1]) ? pitch_para_apontar : ang_pitch_range[1] - ang_pitch_horizontal;
-    delta_pitch = ((ang_pitch_horizontal + delta_pitch       ) > ang_pitch_range[0]) ? delta_pitch        : ang_pitch_horizontal - ang_pitch_range[0];
-
 //    ROS_INFO("DELTA PITCH: %.2f", delta_pitch);
     // Uma vez todos os angulos calculados, converter para valor de pwm para enviar aos motores
     pwm_pan  = pwm_yaw_range[0] + (ang_pan - ang_yaw_range[0])*pwm_ang_yaw;
@@ -151,6 +158,11 @@ private:
   void escutarOffset(const std_msgs::Int8& msg)
   {
     offset = msg.data;
+  }
+
+  void escutarOffset_tilt(const std_msgs::Int8& msg)
+  {
+    offset_tilt = msg.data;
   }
 
 };

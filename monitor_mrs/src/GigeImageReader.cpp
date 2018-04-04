@@ -48,8 +48,10 @@ void GigeImageReader::init(){
 
   //image_sub_ = it_.subscribe("/stereo/left/image_color", 1, &GigeImageReader::imageCb, this);
   image_sub_ = it_.subscribe("/stereo/left/image_raw", 1, &GigeImageReader::imageCb, this);
-  offset_pub = nh_.advertise<std_msgs::Int8>("offset_pub", 100);
+  offset_pub      = nh_.advertise<std_msgs::Int8>("offset_pub", 100);
+  offset_tilt_pub = nh_.advertise<std_msgs::Int8>("offset_tilt_pub", 100);
   offset = 0; // a ser publicado para alterar pan do motor
+  offset_tilt = 0; // a ser publicado para alterar tilt do motor
 
   ros::spin();
 
@@ -74,7 +76,9 @@ void GigeImageReader::imageCb(const sensor_msgs::ImageConstPtr &msg)
   send_mat_image(cv_ptr->image,timestamp);
   // Enviar com uma certa frequencia aqui o offset para deslocar o motor
   msg_off.data = offset;
+  msg_off_tilt.data = offset_tilt;
   offset_pub.publish(msg_off);
+  offset_tilt_pub.publish(msg_off_tilt);
   mutex->unlock();
 
   // Update GUI Window
@@ -82,9 +86,10 @@ void GigeImageReader::imageCb(const sensor_msgs::ImageConstPtr &msg)
   //cv::waitKey(3);
 }
 
-void GigeImageReader::setOffset(int off)
+void GigeImageReader::setOffset(int offp, int offt)
 {
-  offset = off;
+  offset = offp;
+  offset_tilt = offt;
 }
 
 }
