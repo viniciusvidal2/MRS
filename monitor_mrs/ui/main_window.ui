@@ -2858,6 +2858,9 @@
         <height>751</height>
        </rect>
       </property>
+      <property name="layoutDirection">
+       <enum>Qt::RightToLeft</enum>
+      </property>
       <property name="orientation">
        <enum>Qt::Vertical</enum>
       </property>

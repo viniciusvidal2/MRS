@@ -63,11 +63,13 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
 
   ui.horizontalSlider_offset->setValue(49); // Posicionar no centro, que e 49 aproximadamente
   ui.verticalSlider_offset->setValue(59); // Posicionar em 59 que e aproximadamente a horizontal
-  offset = 49; // Centro do range
-  offset_tilt = 59; // horizontal
+//  offset = 49; // Centro do range
+//  offset_tilt = 59; // horizontal
 
   // Por que esse no nao funciona?
   qnode.init();
+
+  gige_ir.setOffset(ui.horizontalSlider_offset->value(), ui.verticalSlider_offset->value());
 }
 
 MainWindow::~MainWindow() {}
@@ -310,7 +312,7 @@ void monitor_mrs::MainWindow::on_horizontalSlider_offset_sliderMoved()
 
 void monitor_mrs::MainWindow::on_verticalSlider_offset_sliderMoved()
 {
-  offset_tilt = ui.verticalSlider_offset->value() - 59; // Aqui diferente por causa do nivel horizontal estar em 60% do range
+  offset_tilt = -ui.verticalSlider_offset->value() + 39; // Aqui diferente por causa do nivel horizontal estar em 60% do range, invertendo tudo
   gige_ir.setOffset(offset, offset_tilt);
 }
 

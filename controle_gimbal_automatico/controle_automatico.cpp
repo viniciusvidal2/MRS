@@ -46,9 +46,10 @@ private:
   // Offset vindo da GUI, movimenta em PAN e TILT
   int offset = 0; // Vem na mensagem de -48 a 49
   float offset_ang = 0; // Convertido para angulos [DEGREES]
-  int offset_tilt = 0; // Vem na mensagem de -48 a 49
+  int offset_tilt = 0; // Vem na mensagem de -59 a 39
   float offset_tilt_ang = 0; // Convertido para angulos [DEGREES]
   ros::Subscriber subOff;
+  ros::Subscriber subOffTilt;
 
 public:
   PixhawkeMotor()
@@ -65,8 +66,8 @@ public:
     motor = nh_.serviceClient<dynamixel_workbench_msgs::JointCommand>("/joint_command");
 
     //Inicia subscriber para lidar com offset de PAN e TILT
-    subOff = nh_.subscribe("/offset_pub", 10, &PixhawkeMotor::escutarOffset, this);
-    subOff = nh_.subscribe("/offset_tilt_pub", 10, &PixhawkeMotor::escutarOffset_tilt, this);
+    subOff     = nh_.subscribe("/offset_pub"     , 10, &PixhawkeMotor::escutarOffset     , this);
+    subOffTilt = nh_.subscribe("/offset_tilt_pub", 10, &PixhawkeMotor::escutarOffset_tilt, this);
   }
 
   int ExecutarClasse(int argc, char **argv)
@@ -89,7 +90,7 @@ private:
     if(estamos_dentro == 0.0f){ // Se nao estamos dentro o offset vale, se estamos dentro so vale o automatico
       ang_pan = ((yaw_mid_range + offset_ang) < ang_yaw_range[1]) ? yaw_mid_range + offset_ang : ang_yaw_range[1]; // LImitando maximo
       ang_pan = (ang_pan > ang_yaw_range[0]) ? ang_pan : ang_yaw_range[0]; // LImitando minimo
-//      ROS_INFO("ang pan: %.2f", ang_pan);
+      ROS_INFO("ang pan: %.2f", ang_pan);
       // Analisando diferenca de pitch -> somente a mesma sobre o pwm para manter horizontal
       delta_pitch = ((ang_pitch_horizontal + offset_tilt_ang) < ang_pitch_range[1]) ? offset_tilt_ang : ang_pitch_range[1] - ang_pitch_horizontal;
       delta_pitch = ((ang_pitch_horizontal + offset_tilt_ang) > ang_pitch_range[0]) ? offset_tilt_ang : ang_pitch_range[0] - ang_pitch_horizontal;
