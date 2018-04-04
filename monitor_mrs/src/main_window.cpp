@@ -110,6 +110,18 @@ void MainWindow::closeEvent(QCloseEvent *event)
   int pid = getProcIdByName("play");
   if(pid!=-1)
     kill(pid, SIGINT);
+  if(ui.radioButton_automatico->isChecked()){ // Aqui para automatico
+  pid = getProcIdByName("controle_automatico");
+  if(pid!=-1)
+    kill(pid, SIGINT);
+  } else { // Aqui para manual
+  pid = getProcIdByName("escutadeiro_node");
+  if(pid!=-1)
+    kill(pid, SIGINT);
+  }
+  sleep(2);
+  system("gnome-terminal -x sh -c 'rosservice call /joint_command raw 466 1876'"); // Posiciona o motor no minimo cuidadosamente ao desligar
+  sleep(5);
   QMainWindow::closeEvent(event);
   system("gnome-terminal -x sh -c 'rosnode kill -a'");
 }
@@ -147,6 +159,7 @@ int MainWindow::getProcIdByName(string procName)
           if (pos != string::npos)
             cmdLine = cmdLine.substr(pos + 1);
           // Compare against requested process name
+//          ROS_INFO("PROC %s", cmdLine.c_str());
           if (procName == cmdLine)
             pid = id;
         }
@@ -191,7 +204,7 @@ void monitor_mrs::MainWindow::on_pushButton_iniciaStereo_clicked()
     ui.pushButton_iniciaStereo->setStyleSheet("background-color: rgb(230, 0, 20); color: rgb(0, 0, 0)"); // Assim esta deve parar stereo
     ui.pushButton_iniciaStereo->setText("Parar processo Stereo");
 
-    system("gnome-terminal -x sh -c 'roslaunch rustbot_bringup all.launch do_accumulation:=false do_gps:=true do_fusion:=false do_slam:=false do_stereo:=true online_stereo:=false'");
+    system("gnome-terminal -x sh -c 'roslaunch rustbot_bringup all.launch do_accumulation:=false do_gps:=true do_fusion:=false do_slam:=false do_stereo:=true online_stereo:=true'");
     ui.listWidget->addItem(QString::fromStdString("Processamento Stereo lancado, sistema rodando..."));
     ui.listWidget->addItem(QString::fromStdString("Assim que possivel, inicie a coleta e armazenagem de dados."));
     ui.horizontalSlider_offset->show();
@@ -269,9 +282,13 @@ void monitor_mrs::MainWindow::on_pushButton_nuvemInstantanea_clicked()
 
 void monitor_mrs::MainWindow::on_pushButton_reiniciarTudo_clicked()
 {
-  system("gnome-terminal -x sh -c 'killall -9 roscore && killall -9 rosmaster && killall -9 rosout && killall -9 record'");
+  system("gnome-terminal -x sh -c 'rosservice call /joint_command raw 466 1876'"); //Posiciona o motor no minimo cuidadosamente ao desligar
+  sleep(5);
+  int pid = getProcIdByName("play");
+  if(pid!=-1)
+    kill(pid, SIGINT);
+  system("gnome-terminal -x sh -c 'rosnode kill -a'");
   ui.listWidget->addItem(QString::fromStdString("Todos os processos foram interrompidos. Feche todos os terminais que restarem e reinicie esse programa para funcionamento adequado."));
-  system("gnome-terminal -x sh -c 'roscore'");
 }
 
 void monitor_mrs::MainWindow::on_pushButton_limpaTexto_clicked()

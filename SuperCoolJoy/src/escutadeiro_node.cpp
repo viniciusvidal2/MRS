@@ -69,9 +69,9 @@ private:
       // Controle da entrada de tilt
       if(fabs(joy_tilt) > deadzone){
         if(joy_tilt > 0){ // TODO: verificar sentido de giro do motor
-          tilt_pos = tilt_pos - move_rate;
-        } else {
           tilt_pos = tilt_pos + move_rate;
+        } else {
+          tilt_pos = tilt_pos - move_rate;
         }
       }
       limitarValor(tilt_min, tilt_max, tilt_pos);
@@ -128,7 +128,7 @@ private:
       joy_tilt = msg.axes[1];
     }
 
-    move_rate = (msg.axes[2]+1.1)*20; // Le o stick de gas entre o + e -
+    move_rate = (msg.axes[2]+1.1)*40; // Le o stick de gas entre o + e -
   }
 }; // Fim da classe, agora o main de verdade do problema
 
