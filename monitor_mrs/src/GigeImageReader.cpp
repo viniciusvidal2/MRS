@@ -63,7 +63,8 @@ void GigeImageReader::imageCb(const sensor_msgs::ImageConstPtr &msg)
   cv_bridge::CvImagePtr cv_ptr;
   try
   {
-    cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+    cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::RGB8);
+//    cv_bridge::cvtColor(cv_ptr, sensor_msgs::image_encodings::RGB8);
   }
   catch (cv_bridge::Exception& e)
   {
