@@ -204,6 +204,7 @@ void monitor_mrs::MainWindow::on_pushButton_resetaPX4_clicked()
 
 void monitor_mrs::MainWindow::on_pushButton_iniciaStereo_clicked()
 {
+  gige_ir.setOffset(0, 0); // Assim apontamos para frente forcado
   if(!controle_stereo){ // Nao estamos fazendo stereo, clicou para comecar
     ui.pushButton_iniciaStereo->setAutoFillBackground(true);
     ui.pushButton_iniciaStereo->setStyleSheet("background-color: rgb(230, 0, 20); color: rgb(0, 0, 0)"); // Assim esta deve parar stereo

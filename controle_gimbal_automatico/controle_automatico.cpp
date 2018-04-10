@@ -58,7 +58,7 @@ public:
     subPix = nh_.subscribe("/mavros/vfr_hud", 10, &PixhawkeMotor::escutarPixhawk, this);
     // Inicia a relacao de pwm/ang para cada motor
     pwm_ang_yaw   = (pwm_yaw_range[1] - pwm_yaw_range[0]) / (ang_yaw_range[1] - ang_yaw_range[0]);         // [PWM/DEGREES]
-    pwm_ang_pitch = (pwm_pitch_range[1] - pwm_pitch_range[0]) / (ang_pitch_range[1] - ang_pitch_range[0]); // [PWM/DEGREES]
+    pwm_ang_pitch = (pwm_pitch_range[0] - pwm_pitch_range[1]) / (ang_pitch_range[1] - ang_pitch_range[0]); // [PWM/DEGREES] sinal invertido nesse caso
     // Pontos centrais dos dois servos
     yaw_mid_range   = (ang_yaw_range[1]   + ang_yaw_range[0])  /2; // [DEGREES]
     pitch_mid_range = (ang_pitch_range[1] + ang_pitch_range[0])/2; // [DEGREES]
@@ -90,13 +90,13 @@ private:
     if(estamos_dentro == 0.0f){ // Se nao estamos dentro o offset vale, se estamos dentro so vale o automatico
       ang_pan = ((yaw_mid_range + offset_ang) < ang_yaw_range[1]) ? yaw_mid_range + offset_ang : ang_yaw_range[1]; // LImitando maximo
       ang_pan = (ang_pan > ang_yaw_range[0]) ? ang_pan : ang_yaw_range[0]; // LImitando minimo
-      ROS_INFO("ang pan: %.2f", ang_pan);
+//      ROS_INFO("ang pan: %.2f", ang_pan);
       // Analisando diferenca de pitch -> somente a mesma sobre o pwm para manter horizontal
       delta_pitch = ((ang_pitch_horizontal + offset_tilt_ang) < ang_pitch_range[1]) ? offset_tilt_ang : ang_pitch_range[1] - ang_pitch_horizontal;
       delta_pitch = ((ang_pitch_horizontal + offset_tilt_ang) > ang_pitch_range[0]) ? offset_tilt_ang : ang_pitch_range[0] - ang_pitch_horizontal;
-      ROS_INFO("delta tilt: %.2f", delta_pitch);
+//      ROS_INFO("delta tilt: %.2f", delta_pitch);
     } else { // de 60 em 60 graus aqui !!
-      delta_yaw = (int)(delta_yaw/60) * 60; // Aqui arredonda para multiplos de 60, creio eu
+//      delta_yaw = (int)(delta_yaw/60) * 60; // Aqui arredonda para multiplos de 60, creio eu
       ang_pan = ((yaw_mid_range + delta_yaw) < ang_yaw_range[1]) ? yaw_mid_range + delta_yaw : ang_yaw_range[1]; // LImitando maximo
       ang_pan = (ang_pan > ang_yaw_range[0]) ? ang_pan : ang_yaw_range[0]; // LImitando minimo
       // Analisando diferenca de pitch -> somente a mesma sobre o pwm para manter horizontal
@@ -144,7 +144,7 @@ private:
     /// Relacoes obtidas da mensagem VFR_HUD vinda da placa
     ///
     estamos_dentro = msg->throttle*100; // Se estamos ou nao na regiao de interesse -> cancela offset (vem 0 ou 0.01 da placa)
-//    ROS_INFO("ESTAMOS DENTRO: %f", estamos_dentro);
+    ROS_INFO("ESTAMOS DENTRO: %f", estamos_dentro);
     pitch_para_apontar = rad2deg(msg->airspeed);     // [RAD] -> [DEGREES]
     yaw_atual          = msg->groundspeed;           // [DEGREES]
     // Ajusta chegada desse angulo que vai de -180 a +180
