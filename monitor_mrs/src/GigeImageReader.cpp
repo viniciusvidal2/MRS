@@ -9,6 +9,8 @@
 #include <QFuture>
 #include <QtConcurrentRun>
 
+#include <boost/lexical_cast.hpp>
+
 namespace monitor_mrs {
 
 using namespace std;
@@ -54,6 +56,8 @@ void GigeImageReader::init(){
   offset_tilt = 0; // a ser publicado para alterar tilt do motor
   sub_estamosdentro = nh_.subscribe("/estamos_dentro", 10, &GigeImageReader::estamosdentroCb, this);
 
+  sub_gps = nh_.subscribe("/mavros/global_position/global", 10, &GigeImageReader::ler_gps, this);
+
   estado_anterior_gravar = 0.0f;
 
   ros::spin();
@@ -89,22 +93,49 @@ void GigeImageReader::imageCb(const sensor_msgs::ImageConstPtr &msg)
   //cv::waitKey(3);
 }
 
-void GigeImageReader::estamosdentroCb(const std_msgs::Float32 &msg){
+void GigeImageReader::estamosdentroCb(const std_msgs::Int8 &msg){
   // A mensagem fala se estamos dentro ou nao, mas chamaremos somente na transicao entre a entrada e a saida.
   // Portanto, pegaremos o chaveamento armazenando o estado anterior.
+  // Ver o tempo para diferenciar bags gravadas automaticamente
+  time_t t = time(0);
+  struct tm * now = localtime( & t );
+  string year, month, day, hour, minutes;
+  year    = boost::lexical_cast<std::string>(now->tm_year + 1900);
+  month   = boost::lexical_cast<std::string>(now->tm_mon );
+  day     = boost::lexical_cast<std::string>(now->tm_mday);
+  hour    = boost::lexical_cast<std::string>(now->tm_hour);
+  minutes = boost::lexical_cast<std::string>(now->tm_min );
+  ROS_INFO("estamos_dentro_cb = %d", stereo_funcionando);
   if(stereo_funcionando){ // se clicou no stereo para processar la na janela principal
     if(msg.data - estado_anterior_gravar == 1){ // Temos que gravar o bag, saiu de 0 para 1
       // Entrar na pasta que queremos e comecar o bag no tempo e coordenadas aqui certas
 
+      if(lat != 0 && lon != 0) // Assim o gps ja esta funcionando ok
+        nome_bag = "ponto_lat_";//+boost::lexical_cast<string>(-(int)lat)+"_"+boost::lexical_cast<string>(-(int)(pow(10, 17)*(-lat+(int)lat)))+"_lon_"+boost::lexical_cast<string>(-(int)lon)+"_"+boost::lexical_cast<string>(-(int)(pow(10, 17)*(-lon+(int)lon)))+".bag";
+      else
+        nome_bag = "ponto_"+year+"_"+month+"_"+day+"_"+hour+"h_"+minutes+"m.bag";
+      string comando_full = "gnome-terminal -x sh -c 'roslaunch rustbot_bringup record_raw.launch only_raw_data:=true bag:=";
+      ROS_INFO("%s", (comando_full+nome_bag+"'").c_str());
+      sleep((10));
+      system((comando_full+nome_bag+"'").c_str());
+
     } else if(msg.data - estado_anterior_gravar == -1) { // nao vamos gravar, parar a gravacao
       // Finalizar o processo
+      int pid = getProcIdByName("record");
+      if(pid!=-1)
+        kill(pid, SIGINT);
     }
     estado_anterior_gravar = msg.data;
   }
 }
 
+void GigeImageReader::ler_gps(const sensor_msgs::NavSatFixConstPtr &msg){
+  lat = msg->latitude;
+  lon = msg->longitude;
+}
+
 void GigeImageReader::set_nomeDaPasta(std::string nome){
-  pasta = nome;
+  pasta = "/home/mrs/Desktop/"+nome;
 }
 
 void GigeImageReader::vamos_gravar(bool decisao){
@@ -115,6 +146,52 @@ void GigeImageReader::setOffset(int offp, int offt)
 {
   offset = offp;
   offset_tilt = offt;
+}
+
+int GigeImageReader::getProcIdByName(string procName)
+{
+  int pid = -1;
+
+  // Open the /proc directory
+  DIR *dp = opendir("/proc");
+  if (dp != NULL)
+  {
+    // Enumerate all entries in directory until process found
+    struct dirent *dirp;
+    while (pid < 0 && (dirp = readdir(dp)))
+    {
+      // Skip non-numeric entries
+      int id = atoi(dirp->d_name);
+      if (id > 0)
+      {
+        // Read contents of virtual /proc/{pid}/cmdline file
+        string cmdPath = string("/proc/") + dirp->d_name + "/cmdline";
+        ifstream cmdFile(cmdPath.c_str());
+        string cmdLine;
+        getline(cmdFile, cmdLine);
+        if (!cmdLine.empty())
+        {
+
+          // Keep first cmdline item which contains the program path
+          size_t pos = cmdLine.find('\0');
+          if (pos != string::npos)
+            cmdLine = cmdLine.substr(0, pos);
+          // Keep program name only, removing the path
+          pos = cmdLine.rfind('/');
+          if (pos != string::npos)
+            cmdLine = cmdLine.substr(pos + 1);
+          // Compare against requested process name
+          //          ROS_INFO("PROC %s", cmdLine.c_str());
+          if (procName == cmdLine)
+            pid = id;
+        }
+      }
+    }
+  }
+
+  closedir(dp);
+
+  return pid;
 }
 
 }

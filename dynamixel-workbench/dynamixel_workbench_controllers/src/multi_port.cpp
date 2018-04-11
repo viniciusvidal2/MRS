@@ -124,10 +124,10 @@ void MultiPort::setSlope()
   pan_driver_->writeRegister("ccw_compliance_slope", 128);
   pan_driver_->writeRegister("moving_speed", 140);
 
-  tilt_driver_->writeRegister("moving_speed", 20);
-  tilt_driver_->writeRegister("p_gain", 19);
-  tilt_driver_->writeRegister("i_gain", 20);
-  tilt_driver_->writeRegister("d_gain",  1);
+  tilt_driver_->writeRegister("moving_speed", 23);
+  tilt_driver_->writeRegister("p_gain", 25);
+  tilt_driver_->writeRegister("i_gain", 23);
+  tilt_driver_->writeRegister("d_gain",  2);
 }
 
 bool MultiPort::setPosition(uint32_t pan_pos, uint32_t tilt_pos)

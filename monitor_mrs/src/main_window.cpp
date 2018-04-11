@@ -44,6 +44,8 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
   // Ajustando design
   ui.radioButton_automatico->setChecked(true); // Comecar sempre com o controle automatico selecionado
   ui.radioButton_manual->setChecked(false);
+  ui.radioButton_pontosdeinteresse->setChecked(true); // Comecar com a gravacao por trecho automatica
+  ui.radioButton_caminhocompleto->setChecked(false);
 
   controle_gravacao = false; // Se false, nao estamos gravando, pode gravar
   controle_stereo = false; // Se false, nao estamos fazendo stereo
@@ -70,6 +72,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
   qnode.init();
 
   gige_ir.setOffset(ui.horizontalSlider_offset->value(), ui.verticalSlider_offset->value());
+  gige_ir.vamos_gravar(false);
 }
 
 MainWindow::~MainWindow() {}
@@ -206,20 +209,17 @@ void monitor_mrs::MainWindow::on_pushButton_iniciaStereo_clicked()
 {
   gige_ir.setOffset(0, 0); // Assim apontamos para frente forcado
 
-  // Ver o tempo para criar pasta automaticamente onde gravar dados novos
-  time_t t = time(0);
-  struct tm * now = localtime( & t );
-  string year, month, day, hour, minutes;
-  year    = boost::lexical_cast<std::string>(now->tm_year + 1900);
-  month   = boost::lexical_cast<std::string>(now->tm_mon );
-  day     = boost::lexical_cast<std::string>(now->tm_mday);
-  hour    = boost::lexical_cast<std::string>(now->tm_hour);
-  minutes = boost::lexical_cast<std::string>(now->tm_min );
-  string date = "trecho_" + year + "_" + month + "_" + day + "_" + hour + "h_" + minutes + "m";
-  gige_ir.set_nomeDaPasta(date);
-  // Criando a pasta na area de trabalho
-  string comando_temp = "gnome-terminal -x sh -c 'cd ~/Desktop && mkdir "+date+"'";
-  system(comando_temp.c_str());
+//  // Ver o tempo para criar pasta automaticamente onde gravar dados novos
+//  time_t t = time(0);
+//  struct tm * now = localtime( & t );
+//  string year, month, day, hour, minutes;
+//  year    = boost::lexical_cast<std::string>(now->tm_year + 1900);
+//  month   = boost::lexical_cast<std::string>(now->tm_mon );
+//  day     = boost::lexical_cast<std::string>(now->tm_mday);
+//  hour    = boost::lexical_cast<std::string>(now->tm_hour);
+//  minutes = boost::lexical_cast<std::string>(now->tm_min );
+//  string date = year + "_" + month + "_" + day + "_" + hour + "h_" + minutes + "m";
+
 
   if(!controle_stereo){ // Nao estamos fazendo stereo, clicou para comecar
     ui.pushButton_iniciaStereo->setAutoFillBackground(true);
@@ -234,7 +234,7 @@ void monitor_mrs::MainWindow::on_pushButton_iniciaStereo_clicked()
       ui.verticalSlider_offset->show();
     }
     controle_stereo = true;
-    gige_ir.vamos_gravar(true);
+
   } else {
     ui.pushButton_iniciaStereo->setAutoFillBackground(true);
     ui.pushButton_iniciaStereo->setStyleSheet("background-color: rgb(0, 200, 50); color: rgb(0, 0, 0)"); // Assim esta para comecar a gravar
@@ -273,6 +273,7 @@ void monitor_mrs::MainWindow::on_pushButton_salvaBag_clicked()
     // ajusta flag para estamos gravando
     controle_gravacao = true;
     // COmeca gravacao segundo nome do bag
+    if(ui.radioButton_caminhocompleto->isChecked()){
     nome = ui.lineEdit_nomeBag->text().toStdString();
     std::string comando_full = "gnome-terminal -x sh -c 'roslaunch rustbot_bringup record_raw.launch only_raw_data:=true bag:=";
     if(nome.length() == 0){
@@ -282,10 +283,17 @@ void monitor_mrs::MainWindow::on_pushButton_salvaBag_clicked()
       nome += (date+".bag");
       system((comando_full+=(nome+"'")).c_str());
     }
+    } else if(ui.radioButton_pontosdeinteresse->isChecked()) {
+      gige_ir.set_nomeDaPasta(ui.lineEdit_nomeBag->text().toStdString()+date);
+      // Criando a pasta na area de trabalho
+      string comando_temp = "gnome-terminal -x sh -c 'cd ~/Desktop && mkdir "+ui.lineEdit_nomeBag->text().toStdString()+date+"'";
+      system(comando_temp.c_str());
+      gige_ir.vamos_gravar(true);
+    }
     // Anunciar ao usuario
     ui.listWidget->addItem(QString::fromStdString("Iniciando gravacao do arquivo na area de trabalho..."));
     ui.listWidget->addItem(QString::fromStdString("ATENCAO: APOS 20 MINUTOS REINICIE o programa por seguranca."));
-  } else if(controle_gravacao){ // Estamos gravando
+  } else if(controle_gravacao) { // Estamos gravando
     // Traz aparencia novamente para poder gravar
     ui.pushButton_salvaBag->setAutoFillBackground(true);
     ui.pushButton_salvaBag->setStyleSheet("background-color: rgb(0, 200, 50); color: rgb(0, 0, 0)"); // Assim esta quando pode gravars
@@ -297,7 +305,9 @@ void monitor_mrs::MainWindow::on_pushButton_salvaBag_clicked()
     if(pid!=-1)
       kill(pid, SIGINT);
     // Anunciar ao usuario
-    ui.listWidget->addItem(QString::fromStdString("Arquivo gravado para pos processamento. Conferir na area de trabalho por "+nome));
+    ui.listWidget->addItem(QString::fromStdString("Arquivo gravado para pos processamento. Conferir na area de trabalho"));
+    if(ui.radioButton_pontosdeinteresse->isChecked())
+      gige_ir.vamos_gravar(false);
   }
 }
 

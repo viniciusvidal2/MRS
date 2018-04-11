@@ -10,12 +10,28 @@
 #include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/image_encodings.h>
+#include <sensor_msgs/NavSatFix.h>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include "opencv2/videoio.hpp"
 #include <qobject.h>
 #include <QThread>
 #include <QMutex>
+
+#include "mavros_msgs/GlobalPositionTarget.h"
+
+#include <sys/syscall.h>
+#include <sys/types.h>
+#include <dirent.h>
+#include <errno.h>
+#include <vector>
+#include <string>
+#include <fstream>
+#include <stdio.h>
+#include <cstdlib>
+#include <csignal>
+#include <ctime>
+#include <math.h>
 
 
 namespace monitor_mrs {
@@ -32,12 +48,14 @@ public:
   virtual ~GigeImageReader();
   void init();
   void imageCb(const sensor_msgs::ImageConstPtr& msg);
-  void estamosdentroCb(const std_msgs::Float32& msg);
+  void estamosdentroCb(const std_msgs::Int8& msg);
   QMutex* mutex;
 
   void setOffset(int offp, int offt);
   void set_nomeDaPasta(std::string nome);
   void vamos_gravar(bool decisao);
+  void ler_gps(const sensor_msgs::NavSatFixConstPtr& msg);
+  int  getProcIdByName(std::string procName);
 
 Q_SIGNALS:
   void send_mat_image(cv::Mat img,qint64 timestamp);
@@ -56,9 +74,15 @@ private:
   std_msgs::Int8 msg_off_tilt;
 
   ros::Subscriber sub_estamosdentro;
+  ros::Subscriber sub_gps;
   int estado_anterior_gravar; // Se estamos no raio ok, liga e comeca a gravar um bag
   bool stereo_funcionando; // mensagem se estamos com o stereo ligado
   std::string pasta; // pasta atual para gravar bags automaticos
+
+  double lat;
+  double lon; // Vindo da placa
+
+  std::string nome_bag; // para gravar automaticamente
 };
 
 }
