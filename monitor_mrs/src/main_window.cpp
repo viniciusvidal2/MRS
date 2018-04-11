@@ -14,9 +14,9 @@
 #include "../include/monitor_mrs/main_window.hpp"
 #include "opencv2/videoio.hpp"
 #include <string>
-#include<QPixmap>
+#include <QPixmap>
 
-
+#include <sys/stat.h>
 
 /*****************************************************************************
 ** Namespaces
@@ -205,6 +205,22 @@ void monitor_mrs::MainWindow::on_pushButton_resetaPX4_clicked()
 void monitor_mrs::MainWindow::on_pushButton_iniciaStereo_clicked()
 {
   gige_ir.setOffset(0, 0); // Assim apontamos para frente forcado
+
+  // Ver o tempo para criar pasta automaticamente onde gravar dados novos
+  time_t t = time(0);
+  struct tm * now = localtime( & t );
+  string year, month, day, hour, minutes;
+  year    = boost::lexical_cast<std::string>(now->tm_year + 1900);
+  month   = boost::lexical_cast<std::string>(now->tm_mon );
+  day     = boost::lexical_cast<std::string>(now->tm_mday);
+  hour    = boost::lexical_cast<std::string>(now->tm_hour);
+  minutes = boost::lexical_cast<std::string>(now->tm_min );
+  string date = "trecho_" + year + "_" + month + "_" + day + "_" + hour + "h_" + minutes + "m";
+  gige_ir.set_nomeDaPasta(date);
+  // Criando a pasta na area de trabalho
+  string comando_temp = "gnome-terminal -x sh -c 'cd ~/Desktop && mkdir "+date+"'";
+  system(comando_temp.c_str());
+
   if(!controle_stereo){ // Nao estamos fazendo stereo, clicou para comecar
     ui.pushButton_iniciaStereo->setAutoFillBackground(true);
     ui.pushButton_iniciaStereo->setStyleSheet("background-color: rgb(230, 0, 20); color: rgb(0, 0, 0)"); // Assim esta deve parar stereo
@@ -218,6 +234,7 @@ void monitor_mrs::MainWindow::on_pushButton_iniciaStereo_clicked()
       ui.verticalSlider_offset->show();
     }
     controle_stereo = true;
+    gige_ir.vamos_gravar(true);
   } else {
     ui.pushButton_iniciaStereo->setAutoFillBackground(true);
     ui.pushButton_iniciaStereo->setStyleSheet("background-color: rgb(0, 200, 50); color: rgb(0, 0, 0)"); // Assim esta para comecar a gravar
@@ -231,6 +248,7 @@ void monitor_mrs::MainWindow::on_pushButton_iniciaStereo_clicked()
     ui.verticalSlider_offset->hide();
 
     controle_stereo = false;
+    gige_ir.vamos_gravar(false);
   }
 }
 

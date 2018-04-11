@@ -52,6 +52,9 @@ void GigeImageReader::init(){
   offset_tilt_pub = nh_.advertise<std_msgs::Int8>("offset_tilt_pub", 100);
   offset = 0; // a ser publicado para alterar pan do motor
   offset_tilt = 0; // a ser publicado para alterar tilt do motor
+  sub_estamosdentro = nh_.subscribe("/estamos_dentro", 10, &GigeImageReader::estamosdentroCb, this);
+
+  estado_anterior_gravar = 0.0f;
 
   ros::spin();
 
@@ -84,6 +87,28 @@ void GigeImageReader::imageCb(const sensor_msgs::ImageConstPtr &msg)
   // Update GUI Window
   //cv::imshow(OPENCV_WINDOW, cv_ptr->image);
   //cv::waitKey(3);
+}
+
+void GigeImageReader::estamosdentroCb(const std_msgs::Float32 &msg){
+  // A mensagem fala se estamos dentro ou nao, mas chamaremos somente na transicao entre a entrada e a saida.
+  // Portanto, pegaremos o chaveamento armazenando o estado anterior.
+  if(stereo_funcionando){ // se clicou no stereo para processar la na janela principal
+    if(msg.data - estado_anterior_gravar == 1){ // Temos que gravar o bag, saiu de 0 para 1
+      // Entrar na pasta que queremos e comecar o bag no tempo e coordenadas aqui certas
+
+    } else if(msg.data - estado_anterior_gravar == -1) { // nao vamos gravar, parar a gravacao
+      // Finalizar o processo
+    }
+    estado_anterior_gravar = msg.data;
+  }
+}
+
+void GigeImageReader::set_nomeDaPasta(std::string nome){
+  pasta = nome;
+}
+
+void GigeImageReader::vamos_gravar(bool decisao){
+  stereo_funcionando = decisao;
 }
 
 void GigeImageReader::setOffset(int offp, int offt)

@@ -6,6 +6,7 @@
 #include <string>
 #include <ros/ros.h>
 #include <std_msgs/Int8.h>
+#include <std_msgs/Float32.h>
 #include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/image_encodings.h>
@@ -31,9 +32,12 @@ public:
   virtual ~GigeImageReader();
   void init();
   void imageCb(const sensor_msgs::ImageConstPtr& msg);
+  void estamosdentroCb(const std_msgs::Float32& msg);
   QMutex* mutex;
 
   void setOffset(int offp, int offt);
+  void set_nomeDaPasta(std::string nome);
+  void vamos_gravar(bool decisao);
 
 Q_SIGNALS:
   void send_mat_image(cv::Mat img,qint64 timestamp);
@@ -50,6 +54,11 @@ private:
   int offset_tilt;
   std_msgs::Int8 msg_off;
   std_msgs::Int8 msg_off_tilt;
+
+  ros::Subscriber sub_estamosdentro;
+  int estado_anterior_gravar; // Se estamos no raio ok, liga e comeca a gravar um bag
+  bool stereo_funcionando; // mensagem se estamos com o stereo ligado
+  std::string pasta; // pasta atual para gravar bags automaticos
 };
 
 }

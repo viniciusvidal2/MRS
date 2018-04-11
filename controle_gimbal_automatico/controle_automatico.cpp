@@ -12,6 +12,8 @@
 #include <mavros_msgs/mavlink_convert.h>
 #include <mavros_msgs/VFR_HUD.h>
 
+#include <std_msgs/Float32.h>
+
 #include <dynamixel_workbench_toolbox/dynamixel_multi_driver.h>
 #include <dynamixel_workbench_msgs/JointCommand.h>
 #include <dynamixel_workbench_msgs/DynamixelStateList.h>
@@ -50,6 +52,8 @@ private:
   float offset_tilt_ang = 0; // Convertido para angulos [DEGREES]
   ros::Subscriber subOff;
   ros::Subscriber subOffTilt;
+  // Publicando se estamos dentro ou nao, para controle de gravacao de bag
+  ros::Publisher pub_estamosdentro;
 
 public:
   PixhawkeMotor()
@@ -65,9 +69,11 @@ public:
     // Servico que envia valores ao motor
     motor = nh_.serviceClient<dynamixel_workbench_msgs::JointCommand>("/joint_command");
 
-    //Inicia subscriber para lidar com offset de PAN e TILT
+    // Inicia subscriber para lidar com offset de PAN e TILT
     subOff     = nh_.subscribe("/offset_pub"     , 10, &PixhawkeMotor::escutarOffset     , this);
     subOffTilt = nh_.subscribe("/offset_tilt_pub", 10, &PixhawkeMotor::escutarOffset_tilt, this);
+    // Inicia publisher de estamos dentro ou fora do raio de interesse
+    pub_estamosdentro = nh_.advertise<std_msgs::Int8>("/estamos_dentro", 10);
   }
 
   int ExecutarClasse(int argc, char **argv)
@@ -144,11 +150,14 @@ private:
     /// Relacoes obtidas da mensagem VFR_HUD vinda da placa
     ///
     estamos_dentro = msg->throttle*100; // Se estamos ou nao na regiao de interesse -> cancela offset (vem 0 ou 0.01 da placa)
-    ROS_INFO("ESTAMOS DENTRO: %f", estamos_dentro);
+//    ROS_INFO("ESTAMOS DENTRO: %f", estamos_dentro);
     pitch_para_apontar = rad2deg(msg->airspeed);     // [RAD] -> [DEGREES]
     yaw_atual          = msg->groundspeed;           // [DEGREES]
     // Ajusta chegada desse angulo que vai de -180 a +180
     yaw_para_apontar   = ((float)(msg->heading)*0.01 >= 0) ? (float)(msg->heading)*0.01 : yaw_atual; // [DEGREES]
+    std_msgs::Int8 msg_estamosdentro;
+    msg_estamosdentro.data = estamos_dentro;
+    pub_estamosdentro.publish(msg_estamosdentro); // Daqui vou ler la na janela principal
     //        yaw_para_apontar = msg->heading*0.01;
     // Mostrando na tela se esta tudo ok
     //        ROS_INFO("Pitch: [%.2f]", pitch_para_apontar);
