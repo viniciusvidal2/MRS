@@ -105,18 +105,18 @@ void GigeImageReader::estamosdentroCb(const std_msgs::Int8 &msg){
   day     = boost::lexical_cast<std::string>(now->tm_mday);
   hour    = boost::lexical_cast<std::string>(now->tm_hour);
   minutes = boost::lexical_cast<std::string>(now->tm_min );
-  ROS_INFO("estamos_dentro_cb = %d", stereo_funcionando);
+//  ROS_INFO("estamos_dentro_cb = %d", stereo_funcionando);
   if(stereo_funcionando){ // se clicou no stereo para processar la na janela principal
     if(msg.data - estado_anterior_gravar == 1){ // Temos que gravar o bag, saiu de 0 para 1
       // Entrar na pasta que queremos e comecar o bag no tempo e coordenadas aqui certas
 
       if(lat != 0 && lon != 0) // Assim o gps ja esta funcionando ok
-        nome_bag = "ponto_lat_";//+boost::lexical_cast<string>(-(int)lat)+"_"+boost::lexical_cast<string>(-(int)(pow(10, 17)*(-lat+(int)lat)))+"_lon_"+boost::lexical_cast<string>(-(int)lon)+"_"+boost::lexical_cast<string>(-(int)(pow(10, 17)*(-lon+(int)lon)))+".bag";
+        nome_bag = "ponto_lat_"+boost::lexical_cast<string>(-lat)+"_lon_"+boost::lexical_cast<string>(-lon)+".bag";
       else
         nome_bag = "ponto_"+year+"_"+month+"_"+day+"_"+hour+"h_"+minutes+"m.bag";
-      string comando_full = "gnome-terminal -x sh -c 'roslaunch rustbot_bringup record_raw.launch only_raw_data:=true bag:=";
-      ROS_INFO("%s", (comando_full+nome_bag+"'").c_str());
-      sleep((10));
+      string comando_full = "gnome-terminal -x sh -c 'roslaunch rustbot_bringup record_raw.launch only_raw_data:=true folder:="+pasta+" bag:=";
+//      ROS_INFO("%s", (comando_full+nome_bag+"'").c_str());
+//      sleep((10));
       system((comando_full+nome_bag+"'").c_str());
 
     } else if(msg.data - estado_anterior_gravar == -1) { // nao vamos gravar, parar a gravacao

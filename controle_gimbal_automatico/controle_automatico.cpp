@@ -98,25 +98,25 @@ private:
       ang_pan = (ang_pan > ang_yaw_range[0]) ? ang_pan : ang_yaw_range[0]; // LImitando minimo
 //      ROS_INFO("ang pan: %.2f", ang_pan);
       // Analisando diferenca de pitch -> somente a mesma sobre o pwm para manter horizontal
-      ROS_INFO("offset tilt ang: %.2f", offset_tilt_ang);
+//      ROS_INFO("offset tilt ang: %.2f", offset_tilt_ang);
       delta_pitch = ((ang_pitch_horizontal + offset_tilt_ang) < ang_pitch_range[1]) ? offset_tilt_ang : ang_pitch_range[1] - ang_pitch_horizontal;
       delta_pitch = ((ang_pitch_horizontal + delta_pitch) > ang_pitch_range[0]) ? delta_pitch : ang_pitch_range[0] - ang_pitch_horizontal;
-      ROS_INFO("delta tilt: %.2f", delta_pitch);
+//      ROS_INFO("delta tilt: %.2f", delta_pitch);
     } else { // de 60 em 60 graus aqui !!
 //      delta_yaw = (int)(delta_yaw/60) * 60; // Aqui arredonda para multiplos de 60, creio eu
       ang_pan = ((yaw_mid_range + delta_yaw) < ang_yaw_range[1]) ? yaw_mid_range + delta_yaw : ang_yaw_range[1]; // LImitando maximo
       ang_pan = (ang_pan > ang_yaw_range[0]) ? ang_pan : ang_yaw_range[0]; // LImitando minimo
       // Analisando diferenca de pitch -> somente a mesma sobre o pwm para manter horizontal
-      ROS_INFO("pitch_para_apontar: %.2f", pitch_para_apontar);
+//      ROS_INFO("pitch_para_apontar: %.2f", pitch_para_apontar);
       delta_pitch = ((ang_pitch_horizontal + pitch_para_apontar) < ang_pitch_range[1]) ? pitch_para_apontar : ang_pitch_range[1] - ang_pitch_horizontal;
       delta_pitch = ((ang_pitch_horizontal + delta_pitch) > ang_pitch_range[0]) ? delta_pitch : ang_pitch_range[0] - ang_pitch_horizontal;
-      ROS_INFO("delta_pitch: %.2f", delta_pitch);
+//      ROS_INFO("delta_pitch: %.2f", delta_pitch);
     }
 //    ROS_INFO("DELTA PITCH: %.2f", delta_pitch);
     // Uma vez todos os angulos calculados, converter para valor de pwm para enviar aos motores
     pwm_pan  = pwm_yaw_range[0] + (ang_pan - ang_yaw_range[0])*pwm_ang_yaw;
     pwm_tilt = pwm_pitch_horizontal + delta_pitch*pwm_ang_pitch;
-    ROS_INFO("pwm_tilt porra: %.2f", pwm_tilt);
+//    ROS_INFO("pwm_tilt porra: %.2f", pwm_tilt);
   }
 
   void enviarAngulosMotores()
@@ -154,7 +154,7 @@ private:
     /// Relacoes obtidas da mensagem VFR_HUD vinda da placa
     ///
     estamos_dentro = msg->throttle*100; // Se estamos ou nao na regiao de interesse -> cancela offset (vem 0 ou 0.01 da placa)
-    ROS_INFO("ESTAMOS DENTRO: %f", estamos_dentro);
+//    ROS_INFO("ESTAMOS DENTRO: %f", estamos_dentro);
     pitch_para_apontar = rad2deg(msg->airspeed);     // [RAD] -> [DEGREES]
     yaw_atual          = msg->groundspeed;           // [DEGREES]
     // Ajusta chegada desse angulo que vai de -180 a +180
