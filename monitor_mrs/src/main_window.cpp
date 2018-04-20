@@ -52,7 +52,8 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
   ui.pushButton_salvaBag->setAutoFillBackground(true);
   ui.pushButton_salvaBag->setStyleSheet("background-color: rgb(0, 200, 50); color: rgb(0, 0, 0)"); // Assim esta quando pode gravar
   ui.pushButton_reiniciarTudo->setStyleSheet("background-color: rgb(200, 0, 20); color: rgb(0, 0, 0)");
-  ui.pushButton_nuvemInstantanea->setStyleSheet("background-color: rgb(200, 200, 200); color: rgb(0, 0, 0)");
+//  ui.pushButton_nuvemInstantanea->setStyleSheet("background-color: rgb(200, 200, 200); color: rgb(0, 0, 0)");
+//  ui.pushButton_cameratermica->setStyleSheet("background-color: rgb(200, 200, 200); color: rgb(0, 0, 0)");
   ui.pushButton_iniciaStereo->setStyleSheet("background-color: rgb(0, 200, 50); color: rgb(0, 0, 0)"); // Assim esta para comecar a gravar
   ui.horizontalSlider_offset->hide();
   ui.verticalSlider_offset->hide();
@@ -71,7 +72,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
   // Por que esse no nao funciona?
   qnode.init();
 
-  gige_ir.setOffset(ui.horizontalSlider_offset->value(), ui.verticalSlider_offset->value());
+//  gige_ir.setOffset(0, 0);
   gige_ir.vamos_gravar(false);
 }
 
@@ -128,7 +129,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
     kill(pid, SIGINT);
   }
   sleep(2);
-  system("gnome-terminal -x sh -c 'rosservice call /joint_command raw 466 1876'"); // Posiciona o motor no minimo cuidadosamente ao desligar
+  system("gnome-terminal -x sh -c 'rosservice call /joint_command raw 490 1790'"); // Posiciona o motor no minimo cuidadosamente ao desligar
   sleep(5);
   QMainWindow::closeEvent(event);
   system("gnome-terminal -x sh -c 'rosnode kill -a'");
@@ -186,6 +187,7 @@ void monitor_mrs::MainWindow::on_pushButton_motores_clicked()
 {
   if(ui.radioButton_automatico->isChecked()){ // Aqui estamos com a pixhawk
     system("gnome-terminal -x sh -c 'roslaunch automatico_mrs lancar_gimbal.launch'");
+//    system("gnome-terminal -x sh -c 'rosservice call /joint_command raw 490 2000'"); // Posiciona o robo olhando para frente
     ui.listWidget->addItem(QString::fromStdString("Motores ligados, controle automatico."));
   }else if(ui.radioButton_manual->isChecked()){ // Aqui estamos com o joy
     system("gnome-terminal -x sh -c 'roslaunch automatico_mrs lancar_gimbal.launch automatico:=false'");
@@ -250,6 +252,11 @@ void monitor_mrs::MainWindow::on_pushButton_iniciaStereo_clicked()
     controle_stereo = false;
     gige_ir.vamos_gravar(false);
   }
+}
+
+void monitor_mrs::MainWindow::on_pushButton_cameratermica_clicked()
+{
+  system("gnome-terminal -x sh -c 'rqt_image_view /termica/thermal/image_raw'");
 }
 
 void monitor_mrs::MainWindow::on_pushButton_salvaBag_clicked()

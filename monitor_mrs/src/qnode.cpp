@@ -57,7 +57,7 @@ void QNode::init() {
     return;
   }
 
-  cout << "iniciando ros" << endl;
+//  cout << "iniciando ros" << endl;
   ros::start();
   ros::NodeHandle n;
 //  chatter_publisher = n.advertise<std_msgs::String>("chatter", 1000);
