@@ -25,11 +25,11 @@ private:
   float pitch_para_apontar, yaw_atual, yaw_para_apontar, estamos_dentro;
   // Ranges para alcance de pwm e angulo [DEGREES] de yaw e pitch
   int pwm_yaw_range[2]     = {0, 1023}; // [PWM]
-  int pwm_pitch_range[2]   = {1850, 2096}; // [PWM]
+  int pwm_pitch_range[2]   = {1769, 2246}; // [PWM]
   float ang_yaw_range[2]   = {0.0  , 300.0}; // [DEGREES]
-  float ang_pitch_range[2] = {175.0, 183.0}; // [DEGREES]
-  float ang_pitch_horizontal = 189; // [DEGREES] 1976 DE PWM
-  int pwm_pitch_horizontal = 1991; // [PWM]
+  float ang_pitch_range[2] = {155.0, 197.0}; // [DEGREES]
+  float ang_pitch_horizontal = 178; // [DEGREES] 1976 DE PWM
+  int pwm_pitch_horizontal = 2031; // [PWM]
   int pwm_yaw_frente = 490; // apontar sempre para frente do veiculo caso nao precise virar [PWM]
   float yaw_mid_range, pitch_mid_range; // [DEGREES]
   // Relacao pwm/ang[DEGREES] para os dois casos
@@ -89,7 +89,7 @@ private:
     delta_yaw = wrap180(yaw_atual, yaw_para_apontar);
     // Inserindo o offset vindo da GUI
     offset_ang = -300.0f*((float)offset + 48.0f)/97.0f + 300 - yaw_mid_range; // Diferenca para o centro do range
-    offset_tilt_ang = 41.0f*((float)offset_tilt + 59.0f)/98.0f + ang_pitch_range[0] - ang_pitch_horizontal; // Diferenca para o centro do range
+    offset_tilt_ang = (ang_pitch_range[0]-ang_pitch_range[1])*((float)offset_tilt - 48.0f)/-97.0f + ang_pitch_range[1] - ang_pitch_horizontal; // Diferenca para o centro do range
 
 //    ROS_INFO("offset: %.2f", offset_ang);
     //ROS_INFO("delta yaw: %.2f", yaw_mid_range);

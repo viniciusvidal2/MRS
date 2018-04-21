@@ -66,13 +66,13 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
 
   ui.horizontalSlider_offset->setValue(49); // Posicionar no centro, que e 49 aproximadamente
   ui.verticalSlider_offset->setValue(59); // Posicionar em 59 que e aproximadamente a horizontal
-//  offset = 49; // Centro do range
-//  offset_tilt = 59; // horizontal
+  offset = 0;
+  offset_tilt = 0;
 
   // Por que esse no nao funciona?
   qnode.init();
 
-//  gige_ir.setOffset(0, 0);
+  gige_ir.setOffset(0, 0);
   gige_ir.vamos_gravar(false);
 }
 
@@ -129,7 +129,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
     kill(pid, SIGINT);
   }
   sleep(2);
-  system("gnome-terminal -x sh -c 'rosservice call /joint_command raw 490 1790'"); // Posiciona o motor no minimo cuidadosamente ao desligar
+  system("gnome-terminal -x sh -c 'rosservice call /joint_command raw 490 1650'"); // Posiciona o motor no minimo cuidadosamente ao desligar
   sleep(5);
   QMainWindow::closeEvent(event);
   system("gnome-terminal -x sh -c 'rosnode kill -a'");
@@ -326,7 +326,7 @@ void monitor_mrs::MainWindow::on_pushButton_nuvemInstantanea_clicked()
 
 void monitor_mrs::MainWindow::on_pushButton_reiniciarTudo_clicked()
 {
-  system("gnome-terminal -x sh -c 'rosservice call /joint_command raw 466 1876'"); //Posiciona o motor no minimo cuidadosamente ao desligar
+  system("gnome-terminal -x sh -c 'rosservice call /joint_command raw 490 1660'"); //Posiciona o motor no minimo cuidadosamente ao desligar
   sleep(5);
   int pid = getProcIdByName("play");
   if(pid!=-1)
@@ -348,7 +348,7 @@ void monitor_mrs::MainWindow::on_horizontalSlider_offset_sliderMoved()
 
 void monitor_mrs::MainWindow::on_verticalSlider_offset_sliderMoved()
 {
-  offset_tilt = -ui.verticalSlider_offset->value() + 39; // Aqui diferente por causa do nivel horizontal estar em 60% do range, invertendo tudo
+  offset_tilt = ui.verticalSlider_offset->value() - 49; // Aqui diferente por causa do nivel horizontal estar em 60% do range, invertendo tudo
   gige_ir.setOffset(offset, offset_tilt);
 }
 
