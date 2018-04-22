@@ -4,6 +4,8 @@
 #include <QMessageBox>
 #include <QFileDialog>
 
+#include <stdio.h>
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -18,12 +20,23 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pushButton_escolherarquivo_clicked()
 {
-  filename = QFileDialog::getOpenFileName(this, "Abrir arquivo", "", "KML Files(*.kml)");
+  filename = QFileDialog::getOpenFileName(this, "Abrir arquivo", QDir::homePath(), "KML Files(*.kml)");
   ui->textEdit_nomearquivo->setText(filename);
 }
 
 void MainWindow::on_pushButton_converter_clicked()
 {
-  system("gnome-terminal -x sh -c 'cd $HOME && roslaunch automatico_mrs lancar_gimbal.launch'");
-}
+  // Captar a altitude
+  altitude = ui->textEdit_altura->toPlainText();
+  if(altitude.isEmpty())
+    altitude.fromStdString("750");
 
+  // Comando chamando arquivo python com o nome do arquivo
+  if(!filename.isEmpty()){
+    std::string command = "gnome-terminal -x sh -c 'cd $HOME && python kml_waypoints.py "+filename.toStdString()+" "+altitude.toStdString()+"'";
+    system(command.c_str());
+    ui->label_fim->setText(QString::fromStdString("Conversao realizada, salva com o mesmo nome no diretorio"));
+  } else {
+    ui->label_fim->setText(QString::fromStdString("Escolha um arquivo primeiramente para conversao."));
+  }
+}

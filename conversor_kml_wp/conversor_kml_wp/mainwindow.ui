@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>754</width>
-    <height>198</height>
+    <width>1136</width>
+    <height>344</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,7 @@
      <rect>
       <x>150</x>
       <y>0</y>
-      <width>581</width>
+      <width>971</width>
       <height>31</height>
      </rect>
     </property>
@@ -37,26 +37,13 @@
      <string>Arquivo KML</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_converter">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>90</y>
-      <width>347</width>
-      <height>25</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Converter para .waypoint</string>
-    </property>
-   </widget>
    <widget class="QLabel" name="label_fim">
     <property name="geometry">
      <rect>
       <x>370</x>
       <y>90</y>
-      <width>341</width>
-      <height>25</height>
+      <width>751</width>
+      <height>151</height>
      </rect>
     </property>
     <property name="text">
@@ -68,12 +55,12 @@
      <rect>
       <x>200</x>
       <y>40</y>
-      <width>531</width>
+      <width>921</width>
       <height>31</height>
      </rect>
     </property>
    </widget>
-   <widget class="QLabel" name="label_fim_2">
+   <widget class="QLabel" name="label_altura">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -86,13 +73,39 @@
      <string>Altitude local estimada</string>
     </property>
    </widget>
+   <widget class="QWidget" name="layoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>90</y>
+      <width>341</width>
+      <height>58</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QPushButton" name="pushButton_converter">
+       <property name="text">
+        <string>Converter para .waypoint</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_enviar">
+       <property name="text">
+        <string>Enviar para o controle e navegacao</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>754</width>
+     <width>1136</width>
      <height>22</height>
     </rect>
    </property>
