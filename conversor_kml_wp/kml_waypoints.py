@@ -14,7 +14,7 @@ altitude = str(args.altitude) # altitude aproximada do local, sendo que nao sabe
 
 # Criando novo arquivo no modelo .waypoint
 format_rem = str(args.file).rsplit('.', 1)[0]
-wp_file = open(format_rem+".waypoint", "w+")
+wp_file = open(format_rem+".waypoints", "w+")
 wp_file.write("QGC WPL 110\n")
 # Comandos constantes
 home = "0\t1\t0\t16\t0\t0\t0\t0\t"
