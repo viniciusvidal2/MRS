@@ -140,9 +140,14 @@ private:
   }
 
   // Mantem o angulo de diferenca entre 180 da forma mais logica no algoritmo
+  // ALTERACAO: vamos limitar esse angulo entre -145 e +145, pois assim nao temos inversao forte de sentido
   float wrap180(float atual, float apontar)
   {
     float delta = atual - apontar;
+
+    delta = (delta > 145) ? 145 : delta;
+    delta = (delta < -145) ? -145 : delta;
+
     if(delta >  180.0) {delta -= 360.0;}
     if(delta < -180.0) {delta += 360.0;}
 
@@ -165,7 +170,7 @@ private:
     //        yaw_para_apontar = msg->heading*0.01;
     // Mostrando na tela se esta tudo ok
     //        ROS_INFO("Pitch: [%.2f]", pitch_para_apontar);
-    //        ROS_INFO("Yaw:   [%.2f]", yaw_atual);
+    ROS_INFO("Yaw:   [%.2f]", yaw_atual-yaw_para_apontar);
     //        ROS_INFO("ALvo:  [%.2f]", yaw_para_apontar);
   }
 
@@ -187,7 +192,7 @@ int main(int argc, char **argv)
 
   PixhawkeMotor pxm;
 
-  ros::Rate rate(20);
+  ros::Rate rate(60);
 
   while(ros::ok())
   {
