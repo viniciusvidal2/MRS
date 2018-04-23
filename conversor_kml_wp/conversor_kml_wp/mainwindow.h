@@ -22,6 +22,8 @@ private slots:
   void on_pushButton_escolherarquivo_clicked();
 
 
+  void on_pushButton_enviar_clicked();
+
 private:
     Ui::MainWindow *ui;
 

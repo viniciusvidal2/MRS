@@ -35,7 +35,7 @@ public:
     QLabel *label_fim;
     QTextEdit *textEdit_altura;
     QLabel *label_altura;
-    QWidget *widget;
+    QWidget *layoutWidget;
     QVBoxLayout *verticalLayout;
     QPushButton *pushButton_converter;
     QPushButton *pushButton_enviar;
@@ -47,38 +47,38 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
-        MainWindow->resize(754, 243);
+        MainWindow->resize(1136, 344);
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
         textEdit_nomearquivo = new QTextEdit(centralWidget);
         textEdit_nomearquivo->setObjectName(QString::fromUtf8("textEdit_nomearquivo"));
-        textEdit_nomearquivo->setGeometry(QRect(150, 0, 581, 31));
+        textEdit_nomearquivo->setGeometry(QRect(150, 0, 971, 31));
         pushButton_escolherarquivo = new QPushButton(centralWidget);
         pushButton_escolherarquivo->setObjectName(QString::fromUtf8("pushButton_escolherarquivo"));
         pushButton_escolherarquivo->setGeometry(QRect(10, 0, 131, 31));
         label_fim = new QLabel(centralWidget);
         label_fim->setObjectName(QString::fromUtf8("label_fim"));
-        label_fim->setGeometry(QRect(370, 90, 341, 61));
+        label_fim->setGeometry(QRect(370, 90, 751, 151));
         textEdit_altura = new QTextEdit(centralWidget);
         textEdit_altura->setObjectName(QString::fromUtf8("textEdit_altura"));
-        textEdit_altura->setGeometry(QRect(200, 40, 531, 31));
+        textEdit_altura->setGeometry(QRect(200, 40, 921, 31));
         label_altura = new QLabel(centralWidget);
         label_altura->setObjectName(QString::fromUtf8("label_altura"));
         label_altura->setGeometry(QRect(10, 40, 171, 25));
-        widget = new QWidget(centralWidget);
-        widget->setObjectName(QString::fromUtf8("widget"));
-        widget->setGeometry(QRect(10, 90, 341, 58));
-        verticalLayout = new QVBoxLayout(widget);
+        layoutWidget = new QWidget(centralWidget);
+        layoutWidget->setObjectName(QString::fromUtf8("layoutWidget"));
+        layoutWidget->setGeometry(QRect(10, 90, 341, 58));
+        verticalLayout = new QVBoxLayout(layoutWidget);
         verticalLayout->setSpacing(6);
         verticalLayout->setContentsMargins(11, 11, 11, 11);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         verticalLayout->setContentsMargins(0, 0, 0, 0);
-        pushButton_converter = new QPushButton(widget);
+        pushButton_converter = new QPushButton(layoutWidget);
         pushButton_converter->setObjectName(QString::fromUtf8("pushButton_converter"));
 
         verticalLayout->addWidget(pushButton_converter);
 
-        pushButton_enviar = new QPushButton(widget);
+        pushButton_enviar = new QPushButton(layoutWidget);
         pushButton_enviar->setObjectName(QString::fromUtf8("pushButton_enviar"));
 
         verticalLayout->addWidget(pushButton_enviar);
@@ -86,7 +86,7 @@ public:
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QString::fromUtf8("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 754, 22));
+        menuBar->setGeometry(QRect(0, 0, 1136, 22));
         MainWindow->setMenuBar(menuBar);
         mainToolBar = new QToolBar(MainWindow);
         mainToolBar->setObjectName(QString::fromUtf8("mainToolBar"));

@@ -40,3 +40,15 @@ void MainWindow::on_pushButton_converter_clicked()
     ui->label_fim->setText(QString::fromStdString("Escolha um arquivo primeiramente para conversao."));
   }
 }
+
+void MainWindow::on_pushButton_enviar_clicked()
+{
+    // Comando chamando arquivo python com o nome do arquivo
+    if(!filename.isEmpty()){
+      std::string command = "gnome-terminal -x sh -c 'cd $HOME && python send_wp.py "+filename.toStdString()+"'";
+      system(command.c_str());
+      ui->label_fim->setText(QString::fromStdString("Aguarde o processo finalizar, entao os pontos ja estarao no sistema."));
+    } else {
+      ui->label_fim->setText(QString::fromStdString("Escolha um arquivo primeiramente para conversao."));
+    }
+}
