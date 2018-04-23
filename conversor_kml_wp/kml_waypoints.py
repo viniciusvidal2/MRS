@@ -26,8 +26,8 @@ count_points = 1
 for line in kml_file:
     if 'coordinates' in line:
         lat_lon = re.findall(r"[-+]?\d*\.\d+|\d+", str(line))
-        lat = lat_lon[0]
-        lon = lat_lon[1]
+        lat = lat_lon[1]
+        lon = lat_lon[0]
         if count_points == 1: # escrevendo o Home
             wp_file.write(home+lat+"\t"+lon+"\t"+altitude+"\t1\n")
         wp_file.write(str(count_points)+wp_common_1+lat+"\t"+lon+wp_common_2)

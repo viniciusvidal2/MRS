@@ -17,11 +17,8 @@ public:
     ~MainWindow();
 
 private slots:
-//  void on_pushButton_escolherarquivo_clicked(bool checked);
   void on_pushButton_converter_clicked();
   void on_pushButton_escolherarquivo_clicked();
-
-
   void on_pushButton_enviar_clicked();
 
 private:

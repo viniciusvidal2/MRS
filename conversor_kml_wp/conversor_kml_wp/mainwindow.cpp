@@ -44,6 +44,7 @@ void MainWindow::on_pushButton_converter_clicked()
 void MainWindow::on_pushButton_enviar_clicked()
 {
     // Comando chamando arquivo python com o nome do arquivo
+    ui->label_fim->setText(QString::fromStdString("entramos"));
     if(!filename.isEmpty()){
       std::string command = "gnome-terminal -x sh -c 'cd $HOME && python send_wp.py "+filename.toStdString()+"'";
       system(command.c_str());

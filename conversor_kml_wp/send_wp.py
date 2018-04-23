@@ -19,7 +19,7 @@ from pymavlink.dialects.v20 import ardupilotmega as mavlink2
 
 # from io import FileIO
 import re
-# import argparse
+import argparse
 
 # -----------------------------------------------
 # CONEXAO COM A PLACA
@@ -78,3 +78,6 @@ if vehicle.last_heartbeat:
                 cmds.add(wp)
 print "Enviando %d pontos para o veiculo..." % len(cmds)
 cmds.upload()
+
+sleep(1)
+vehicle.close()
