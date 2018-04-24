@@ -115,6 +115,7 @@ private:
 //    ROS_INFO("DELTA PITCH: %.2f", delta_pitch);
     // Uma vez todos os angulos calculados, converter para valor de pwm para enviar aos motores
     pwm_pan  = pwm_yaw_range[0] + (ang_pan - ang_yaw_range[0])*pwm_ang_yaw;
+    ROS_INFO("PWM_PAN: %d\tAng_PAN: %.2f", pwm_pan, ang_pan);
     pwm_tilt = pwm_pitch_horizontal + delta_pitch*pwm_ang_pitch;
 //    ROS_INFO("pwm_tilt porra: %.2f", pwm_tilt);
   }
@@ -145,11 +146,11 @@ private:
   {
     float delta = atual - apontar;
 
+    if(delta >  180.0) delta = -(delta - 360.0);
+    if(delta < -180.0) delta = -(delta + 360.0);
+
     delta = (delta > 145) ? 145 : delta;
     delta = (delta < -145) ? -145 : delta;
-
-    if(delta >  180.0) {delta -= 360.0;}
-    if(delta < -180.0) {delta += 360.0;}
 
     return delta;
   }
@@ -163,15 +164,15 @@ private:
     pitch_para_apontar = rad2deg(msg->airspeed);     // [RAD] -> [DEGREES]
     yaw_atual          = msg->groundspeed;           // [DEGREES]
     // Ajusta chegada desse angulo que vai de -180 a +180
-    yaw_para_apontar   = ((float)(msg->heading)*0.01 >= 0) ? (float)(msg->heading)*0.01 : yaw_atual; // [DEGREES]
+    yaw_para_apontar   = ((float)(msg->heading)*0.01 >= 0) ? (float)(msg->heading)*0.01 : (float)(msg->heading)*0.01 + 360.0f; // [DEGREES]
     std_msgs::Int8 msg_estamosdentro;
     msg_estamosdentro.data = (int)estamos_dentro;
     pub_estamosdentro.publish(msg_estamosdentro); // Daqui vou ler la na janela principal
-    //        yaw_para_apontar = msg->heading*0.01;
+//    yaw_para_apontar = msg->heading*0.01;
     // Mostrando na tela se esta tudo ok
     //        ROS_INFO("Pitch: [%.2f]", pitch_para_apontar);
-    ROS_INFO("Yaw:   [%.2f]", yaw_atual-yaw_para_apontar);
-    //        ROS_INFO("ALvo:  [%.2f]", yaw_para_apontar);
+//    ROS_INFO("Yaw:   [%.2f]", yaw_atual-yaw_para_apontar);
+    ROS_INFO("YAW_ATUAL [%.2f]\tAPONTAR:  [%.2f]", yaw_atual, yaw_para_apontar);
   }
 
   void escutarOffset(const std_msgs::Int8& msg)
