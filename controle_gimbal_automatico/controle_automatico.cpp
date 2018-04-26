@@ -28,11 +28,12 @@ private:
   int pwm_pitch_range[2]   = {1769, 2246}; // [PWM]
   float ang_yaw_range[2]   = {0.0  , 300.0}; // [DEGREES]
   float ang_pitch_range[2] = {155.0, 197.0}; // [DEGREES]
-  float ang_pitch_horizontal = 178; // [DEGREES] 1976 DE PWM
+  float ang_pitch_horizontal = 178.0; // [DEGREES]
+  float ang_yaw_frente = 150.0; // [DEGREES]
   int pwm_pitch_horizontal = 2031; // [PWM]
   int pwm_yaw_frente = 490; // apontar sempre para frente do veiculo caso nao precise virar [PWM]
   float yaw_mid_range, pitch_mid_range; // [DEGREES]
-  // Relacao pwm/ang[DEGREES] para os dois casos
+  // Relacao pwm/ang[PWM/DEGREES] para os dois casos
   float pwm_ang_yaw, pwm_ang_pitch;
   // Diferenca entre angulos de yaw e pitch
   float delta_yaw, delta_pitch;
@@ -85,46 +86,33 @@ public:
 private:
   void calcularAngulosMotores()
   {
-    // Analisando diferenca de yaw
-    delta_yaw = wrap180(yaw_atual, yaw_para_apontar);
     // Inserindo o offset vindo da GUI
     offset_ang = -300.0f*((float)offset + 48.0f)/97.0f + 300 - yaw_mid_range; // Diferenca para o centro do range
     offset_tilt_ang = (ang_pitch_range[0]-ang_pitch_range[1])*((float)offset_tilt - 48.0f)/-97.0f + ang_pitch_range[1] - ang_pitch_horizontal; // Diferenca para o centro do range
 
-//    ROS_INFO("offset: %.2f", offset_ang);
-    //ROS_INFO("delta yaw: %.2f", yaw_mid_range);
+    ROS_INFO("yaw ATUAL: %.2f\tyaw APONTAR: %.2f\tdelta yaw: %.2f", yaw_atual, yaw_para_apontar, delta_yaw);
     if(estamos_dentro == 0.0f){ // Se nao estamos dentro o offset vale, se estamos dentro so vale o automatico
-      ang_pan = ((yaw_mid_range + offset_ang) < ang_yaw_range[1]) ? yaw_mid_range + offset_ang : ang_yaw_range[1]; // LImitando maximo
-      ang_pan = (ang_pan > ang_yaw_range[0]) ? ang_pan : ang_yaw_range[0]; // LImitando minimo
-//      ROS_INFO("ang pan: %.2f", ang_pan);
-      // Analisando diferenca de pitch -> somente a mesma sobre o pwm para manter horizontal
-//      ROS_INFO("offset tilt ang: %.2f", offset_tilt_ang);
+      delta_yaw   = offset_ang;
+
       delta_pitch = ((ang_pitch_horizontal + offset_tilt_ang) < ang_pitch_range[1]) ? offset_tilt_ang : ang_pitch_range[1] - ang_pitch_horizontal;
       delta_pitch = ((ang_pitch_horizontal + delta_pitch) > ang_pitch_range[0]) ? delta_pitch : ang_pitch_range[0] - ang_pitch_horizontal;
-//      ROS_INFO("delta tilt: %.2f", delta_pitch);
-    } else { // de 60 em 60 graus aqui !!
+    } else { // Dentro do controle automatico
 //      delta_yaw = (int)(delta_yaw/60) * 60; // Aqui arredonda para multiplos de 60, creio eu
-      ang_pan = ((yaw_mid_range + delta_yaw) < ang_yaw_range[1]) ? yaw_mid_range + delta_yaw : ang_yaw_range[1]; // LImitando maximo
-      ang_pan = (ang_pan > ang_yaw_range[0]) ? ang_pan : ang_yaw_range[0]; // LImitando minimo
+      // Analisando diferenca de yaw
+      delta_yaw = wrap180(yaw_atual, yaw_para_apontar);
       // Analisando diferenca de pitch -> somente a mesma sobre o pwm para manter horizontal
-//      ROS_INFO("pitch_para_apontar: %.2f", pitch_para_apontar);
       delta_pitch = ((ang_pitch_horizontal + pitch_para_apontar) < ang_pitch_range[1]) ? pitch_para_apontar : ang_pitch_range[1] - ang_pitch_horizontal;
       delta_pitch = ((ang_pitch_horizontal + delta_pitch) > ang_pitch_range[0]) ? delta_pitch : ang_pitch_range[0] - ang_pitch_horizontal;
-//      ROS_INFO("delta_pitch: %.2f", delta_pitch);
     }
-//    ROS_INFO("DELTA PITCH: %.2f", delta_pitch);
     // Uma vez todos os angulos calculados, converter para valor de pwm para enviar aos motores
-    pwm_pan  = pwm_yaw_range[0] + (ang_pan - ang_yaw_range[0])*pwm_ang_yaw;
-    ROS_INFO("PWM_PAN: %d\tAng_PAN: %.2f", pwm_pan, ang_pan);
+    pwm_pan  = pwm_yaw_frente + delta_yaw*pwm_ang_yaw; // OBSERVAR SINAL DAS DUAS FONTES
+    pwm_pan  = (pwm_pan > pwm_yaw_range[1]) ? pwm_yaw_range[1] : (pwm_pan < pwm_yaw_range[0] ? pwm_yaw_range[0] : pwm_pan); // Limitando em maximo e minimo aqui, mais seguro
+
     pwm_tilt = pwm_pitch_horizontal + delta_pitch*pwm_ang_pitch;
-//    ROS_INFO("pwm_tilt porra: %.2f", pwm_tilt);
   }
 
   void enviarAngulosMotores()
   {
-//    ROS_INFO("Angulo PAN : %d", pwm_pan);
-//    ROS_INFO("Angulo TILT: %d", pwm_tilt);
-
     posicao.request.pan_pos  = (int)pwm_pan;
     posicao.request.tilt_pos = (int)pwm_tilt;
     posicao.request.unit     = "raw";
