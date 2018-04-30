@@ -193,6 +193,7 @@ void monitor_mrs::MainWindow::on_pushButton_motores_clicked()
     system("gnome-terminal -x sh -c 'roslaunch automatico_mrs lancar_gimbal.launch automatico:=false'");
     ui.listWidget->addItem(QString::fromStdString("Motores ligados, controle por Joystick."));
   }
+  ui.groupBox_raio->setEnabled(true);
 }
 
 void monitor_mrs::MainWindow::on_pushButton_qground_clicked()
@@ -350,6 +351,23 @@ void monitor_mrs::MainWindow::on_verticalSlider_offset_sliderMoved()
 {
   offset_tilt = ui.verticalSlider_offset->value() - 49; // Aqui diferente por causa do nivel horizontal estar em 60% do range, invertendo tudo
   gige_ir.setOffset(offset, offset_tilt);
+}
+
+void monitor_mrs::MainWindow::on_pushButton_enviaraio_clicked()
+{
+  bool ok(false);
+  float raio = ui.lineEdit_raio->text().toDouble(&ok);
+  if(!ok){
+    raio = 30.0;
+    ui.listWidget->addItem(QString::fromStdString("Digite um valor numerico, caso contrario o raio sera ajustado para 30 metros."));
+  } else {
+    bool envio = gige_ir.set_raio(raio);
+    if(envio)
+      ui.listWidget->addItem(QString::fromStdString("Raio ajustado com sucesso para "+ui.lineEdit_raio->text().toStdString()+"."));
+    else
+      ui.listWidget->addItem(QString::fromStdString("Raio nao pode ser ajustado, mantendo valor inicial. Se desejar reinicie o equipamento para alterar."));
+  }
+
 }
 
 //Lucas, aba 2

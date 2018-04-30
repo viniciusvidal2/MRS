@@ -81,6 +81,7 @@ private Q_SLOTS:
         void on_pushButton_limpaTexto_clicked();
         void on_horizontalSlider_offset_sliderMoved();
         void on_verticalSlider_offset_sliderMoved();
+        void on_pushButton_enviaraio_clicked();
 
         //Lucas, aba 2
         void on_pushButtonSelectBag_clicked();

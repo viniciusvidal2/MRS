@@ -60,6 +60,8 @@ void GigeImageReader::init(){
 
   estado_anterior_gravar = 0.0f;
 
+  raio_client = nh_.serviceClient<mavros_msgs::ParamSet>("/mavros/ParamSet");
+
   ros::spin();
 
 }
@@ -192,6 +194,24 @@ int GigeImageReader::getProcIdByName(string procName)
   closedir(dp);
 
   return pid;
+}
+
+bool GigeImageReader::set_raio(float raio){
+  // Compondo a mensagem para enviar
+  mavros_msgs::ParamSet raio_msg;
+  mavros_msgs::ParamValue valor_enviar;
+
+  raio_msg.request.param_id = "WP_RADIUS"; // Ou WPNAV_RADIUS, testar
+  valor_enviar.integer = 0;
+  valor_enviar.real = raio;
+  raio_msg.request.value   = valor_enviar;
+
+  // Enviando
+  raio_client.call(raio_msg);
+
+  ROS_INFO("Retorno do parametro: %d", raio_msg.response.success);
+
+  return raio_msg.response.success;
 }
 
 }

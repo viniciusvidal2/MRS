@@ -19,6 +19,10 @@
 #include <QMutex>
 
 #include "mavros_msgs/GlobalPositionTarget.h"
+#include <mavros_msgs/ParamSet.h>
+#include <mavros_msgs/ParamSetRequest.h>
+#include <mavros_msgs/ParamSetResponse.h>
+#include <mavros_msgs/ParamValue.h>
 
 #include <sys/syscall.h>
 #include <sys/types.h>
@@ -56,6 +60,7 @@ public:
   void vamos_gravar(bool decisao);
   void ler_gps(const sensor_msgs::NavSatFixConstPtr& msg);
   int  getProcIdByName(std::string procName);
+  bool set_raio(float raio);
 
 Q_SIGNALS:
   void send_mat_image(cv::Mat img,qint64 timestamp);
@@ -83,6 +88,8 @@ private:
   double lon; // Vindo da placa
 
   std::string nome_bag; // para gravar automaticamente
+
+  ros::ServiceClient raio_client; // Para alterar o raio de acao do robo pela GUI
 };
 
 }
