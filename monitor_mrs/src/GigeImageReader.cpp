@@ -60,7 +60,7 @@ void GigeImageReader::init(){
 
   estado_anterior_gravar = 0.0f;
 
-  raio_client = nh_.serviceClient<mavros_msgs::ParamSet>("/mavros/ParamSet");
+  raio_client = nh_.serviceClient<mavros_msgs::ParamSet>("/mavros/param/set");
 
   ros::spin();
 
@@ -201,7 +201,7 @@ bool GigeImageReader::set_raio(float raio){
   mavros_msgs::ParamSet raio_msg;
   mavros_msgs::ParamValue valor_enviar;
 
-  raio_msg.request.param_id = "WP_RADIUS"; // Ou WPNAV_RADIUS, testar
+  raio_msg.request.param_id = "WP_RADIUS";
   valor_enviar.integer = 0;
   valor_enviar.real = raio;
   raio_msg.request.value   = valor_enviar;

@@ -25,13 +25,13 @@ private:
   float pitch_para_apontar, yaw_atual, yaw_para_apontar, estamos_dentro;
   // Ranges para alcance de pwm e angulo [DEGREES] de yaw e pitch
   int pwm_yaw_range[2]     = {0, 1023}; // [PWM]
-  int pwm_pitch_range[2]   = {1769, 2246}; // [PWM]
+  int pwm_pitch_range[2]   = {1746, 2343}; // [PWM]
   float ang_yaw_range[2]   = {0.0  , 300.0}; // [DEGREES]
-  float ang_pitch_range[2] = {155.0, 197.0}; // [DEGREES]
-  float ang_pitch_horizontal = 178.0; // [DEGREES]
-  float ang_yaw_frente = 150.0; // [DEGREES]
-  int pwm_pitch_horizontal = 2031; // [PWM]
-  int pwm_yaw_frente = 490; // apontar sempre para frente do veiculo caso nao precise virar [PWM]
+  float ang_pitch_range[2] = {153.0, 205.0}; // [DEGREES]
+  float ang_pitch_horizontal = 186.0; // [DEGREES]
+  float ang_yaw_frente = 157.0; // [DEGREES]
+  int pwm_pitch_horizontal = 2142; // [PWM]
+  int pwm_yaw_frente = 537; // apontar sempre para frente do veiculo caso nao precise virar [PWM]
   float yaw_mid_range, pitch_mid_range; // [DEGREES]
   // Relacao pwm/ang[PWM/DEGREES] para os dois casos
   float pwm_ang_yaw, pwm_ang_pitch;
@@ -87,28 +87,28 @@ private:
   void calcularAngulosMotores()
   {
     // Inserindo o offset vindo da GUI
-    offset_ang = -300.0f*((float)offset + 48.0f)/97.0f + 300 - yaw_mid_range; // Diferenca para o centro do range
-    offset_tilt_ang = (ang_pitch_range[0]-ang_pitch_range[1])*((float)offset_tilt - 48.0f)/-97.0f + ang_pitch_range[1] - ang_pitch_horizontal; // Diferenca para o centro do range
+    offset_ang = -300.0f*((float)offset + 48.0f)/97.0f + 300 - ang_yaw_frente; // Diferenca para o centro do range
+    offset_tilt_ang = (ang_pitch_range[0]-ang_pitch_range[1])*((float)offset_tilt - 48.0f)/-99.0f + ang_pitch_range[1] - ang_pitch_horizontal; // Diferenca para o centro do range
 
-    ROS_INFO("yaw ATUAL: %.2f\tyaw APONTAR: %.2f\tdelta yaw: %.2f", yaw_atual, yaw_para_apontar, delta_yaw);
+//    ROS_INFO("yaw ATUAL: %.2f\tyaw APONTAR: %.2f\tdelta yaw: %.2f", yaw_atual, yaw_para_apontar, delta_yaw);
     if(estamos_dentro == 0.0f){ // Se nao estamos dentro o offset vale, se estamos dentro so vale o automatico
       delta_yaw   = offset_ang;
+      delta_pitch = offset_tilt_ang;
+      ROS_INFO("OFFSET DE TILT: %.2f", offset_tilt_ang);
 
-      delta_pitch = ((ang_pitch_horizontal + offset_tilt_ang) < ang_pitch_range[1]) ? offset_tilt_ang : ang_pitch_range[1] - ang_pitch_horizontal;
-      delta_pitch = ((ang_pitch_horizontal + delta_pitch) > ang_pitch_range[0]) ? delta_pitch : ang_pitch_range[0] - ang_pitch_horizontal;
     } else { // Dentro do controle automatico
 //      delta_yaw = (int)(delta_yaw/60) * 60; // Aqui arredonda para multiplos de 60, creio eu
       // Analisando diferenca de yaw
       delta_yaw = wrap180(yaw_atual, yaw_para_apontar);
       // Analisando diferenca de pitch -> somente a mesma sobre o pwm para manter horizontal
-      delta_pitch = ((ang_pitch_horizontal + pitch_para_apontar) < ang_pitch_range[1]) ? pitch_para_apontar : ang_pitch_range[1] - ang_pitch_horizontal;
-      delta_pitch = ((ang_pitch_horizontal + delta_pitch) > ang_pitch_range[0]) ? delta_pitch : ang_pitch_range[0] - ang_pitch_horizontal;
+      delta_pitch = pitch_para_apontar;
     }
     // Uma vez todos os angulos calculados, converter para valor de pwm para enviar aos motores
-    pwm_pan  = pwm_yaw_frente + delta_yaw*pwm_ang_yaw; // OBSERVAR SINAL DAS DUAS FONTES
+    pwm_pan  = pwm_yaw_frente + delta_yaw*pwm_ang_yaw;
     pwm_pan  = (pwm_pan > pwm_yaw_range[1]) ? pwm_yaw_range[1] : (pwm_pan < pwm_yaw_range[0] ? pwm_yaw_range[0] : pwm_pan); // Limitando em maximo e minimo aqui, mais seguro
 
     pwm_tilt = pwm_pitch_horizontal + delta_pitch*pwm_ang_pitch;
+    pwm_tilt = (pwm_tilt > pwm_pitch_range[1]) ? pwm_pitch_range[1] : (pwm_tilt < pwm_pitch_range[0] ? pwm_pitch_range[0] : pwm_tilt); // Limitando em maximo e minimo aqui, mais seguro
   }
 
   void enviarAngulosMotores()

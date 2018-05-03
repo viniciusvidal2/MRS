@@ -129,7 +129,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
     kill(pid, SIGINT);
   }
   sleep(2);
-  system("gnome-terminal -x sh -c 'rosservice call /joint_command raw 490 1650'"); // Posiciona o motor no minimo cuidadosamente ao desligar
+  system("gnome-terminal -x sh -c 'rosservice call /joint_command raw 537 1740'"); // Posiciona o motor no minimo cuidadosamente ao desligar
   sleep(5);
   QMainWindow::closeEvent(event);
   system("gnome-terminal -x sh -c 'rosnode kill -a'");
@@ -327,7 +327,7 @@ void monitor_mrs::MainWindow::on_pushButton_nuvemInstantanea_clicked()
 
 void monitor_mrs::MainWindow::on_pushButton_reiniciarTudo_clicked()
 {
-  system("gnome-terminal -x sh -c 'rosservice call /joint_command raw 490 1660'"); //Posiciona o motor no minimo cuidadosamente ao desligar
+  system("gnome-terminal -x sh -c 'rosservice call /joint_command raw 537 1740'"); //Posiciona o motor no minimo cuidadosamente ao desligar
   sleep(5);
   int pid = getProcIdByName("play");
   if(pid!=-1)
