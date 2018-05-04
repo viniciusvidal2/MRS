@@ -180,12 +180,12 @@ int main(int argc, char **argv)
 
   PixhawkeMotor pxm;
 
-  ros::Rate rate(60);
+  ros::Rate rate(90);
 
   while(ros::ok())
   {
     pxm.ExecutarClasse(argc, argv);
-    rate.sleep();
+//    rate.sleep();
     ros::spinOnce();
   }
   return 0;
