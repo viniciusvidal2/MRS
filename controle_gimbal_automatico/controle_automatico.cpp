@@ -94,7 +94,7 @@ private:
     if(estamos_dentro == 0.0f){ // Se nao estamos dentro o offset vale, se estamos dentro so vale o automatico
       delta_yaw   = offset_ang;
       delta_pitch = offset_tilt_ang;
-      ROS_INFO("OFFSET DE TILT: %.2f", offset_tilt_ang);
+//      ROS_INFO("OFFSET DE TILT: %.2f", offset_tilt_ang);
 
     } else { // Dentro do controle automatico
 //      delta_yaw = (int)(delta_yaw/60) * 60; // Aqui arredonda para multiplos de 60, creio eu
@@ -129,16 +129,15 @@ private:
   }
 
   // Mantem o angulo de diferenca entre 180 da forma mais logica no algoritmo
-  // ALTERACAO: vamos limitar esse angulo entre -145 e +145, pois assim nao temos inversao forte de sentido
   float wrap180(float atual, float apontar)
   {
     float delta = atual - apontar;
 
-    if(delta >  180.0) delta = -(delta - 360.0);
-    if(delta < -180.0) delta = -(delta + 360.0);
+    if(delta >  180.0) delta = (delta - 360.0);
+    if(delta < -180.0) delta = (delta + 360.0);
 
-    delta = (delta > 145) ? 145 : delta;
-    delta = (delta < -145) ? -145 : delta;
+//    delta = (delta > 145) ? 145 : delta;
+//    delta = (delta < -145) ? -145 : delta;
 
     return delta;
   }
@@ -152,15 +151,15 @@ private:
     pitch_para_apontar = rad2deg(msg->airspeed);     // [RAD] -> [DEGREES]
     yaw_atual          = msg->groundspeed;           // [DEGREES]
     // Ajusta chegada desse angulo que vai de -180 a +180
-    yaw_para_apontar   = ((float)(msg->heading)*0.01 >= 0) ? (float)(msg->heading)*0.01 : (float)(msg->heading)*0.01 + 360.0f; // [DEGREES]
+    yaw_para_apontar   = ((float)(msg->heading) >= 0) ? (float)(msg->heading) : (float)(msg->heading) + 360.0f; // [DEGREES]
     std_msgs::Int8 msg_estamosdentro;
     msg_estamosdentro.data = (int)estamos_dentro;
     pub_estamosdentro.publish(msg_estamosdentro); // Daqui vou ler la na janela principal
-//    yaw_para_apontar = msg->heading*0.01;
+//    yaw_para_apontar = msg->heading;
     // Mostrando na tela se esta tudo ok
     //        ROS_INFO("Pitch: [%.2f]", pitch_para_apontar);
 //    ROS_INFO("Yaw:   [%.2f]", yaw_atual-yaw_para_apontar);
-    ROS_INFO("YAW_ATUAL [%.2f]\tAPONTAR:  [%.2f]", yaw_atual, yaw_para_apontar);
+    ROS_INFO("YAW_ATUAL [%.2f]\tAPONTAR: [%.2f]\tDELTA: [%.2f]", yaw_atual, yaw_para_apontar, wrap180(yaw_atual, yaw_para_apontar));
   }
 
   void escutarOffset(const std_msgs::Int8& msg)
