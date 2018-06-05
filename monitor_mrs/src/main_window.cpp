@@ -68,6 +68,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
   ui.verticalSlider_offset->setValue(59); // Posicionar em 59 que e aproximadamente a horizontal
   offset = 0;
   offset_tilt = 0;
+  esquema_apontar_caminho = 1; // Default olhar pra frente
 
   // Por que esse no nao funciona?
   qnode.init();
@@ -86,6 +87,7 @@ void MainWindow::receive_mat_image(Mat img, qint64 timestamp)
 
   mutex.lock();
    qt_image = QImage((const unsigned char*) (img.data), img.cols, img.rows, QImage::Format_RGB888);
+   qt_image.scaled(400, 300);
    ui.imagem_tab1->setPixmap(QPixmap::fromImage(qt_image));
    ui.imagem_tab1->resize(ui.imagem_tab1->pixmap()->size());
 
@@ -185,11 +187,11 @@ int MainWindow::getProcIdByName(string procName)
 
 void monitor_mrs::MainWindow::on_pushButton_motores_clicked()
 {
-  if(ui.radioButton_automatico->isChecked()){ // Aqui estamos com a pixhawk
+  if(ui.radioButton_automatico->isChecked()) { // Aqui estamos com a pixhawk
     system("gnome-terminal -x sh -c 'roslaunch automatico_mrs lancar_gimbal.launch'");
 //    system("gnome-terminal -x sh -c 'rosservice call /joint_command raw 490 2000'"); // Posiciona o robo olhando para frente
     ui.listWidget->addItem(QString::fromStdString("Motores ligados, controle automatico."));
-  }else if(ui.radioButton_manual->isChecked()){ // Aqui estamos com o joy
+  } else if(ui.radioButton_manual->isChecked()) { // Aqui estamos com o joy
     system("gnome-terminal -x sh -c 'roslaunch automatico_mrs lancar_gimbal.launch automatico:=false'");
     ui.listWidget->addItem(QString::fromStdString("Motores ligados, controle por Joystick."));
   }
@@ -258,6 +260,18 @@ void monitor_mrs::MainWindow::on_pushButton_iniciaStereo_clicked()
 void monitor_mrs::MainWindow::on_pushButton_cameratermica_clicked()
 {
   system("gnome-terminal -x sh -c 'rqt_image_view /termica/thermal/image_raw'");
+}
+
+void monitor_mrs::MainWindow::on_radioButton_pontosdeinteresse_clicked()
+{
+  esquema_apontar_caminho = 2;
+  gige_ir.set_esquema(esquema_apontar_caminho); // Aqui vamos setar o controle como esta
+}
+
+void monitor_mrs::MainWindow::on_radioButton_caminhocompleto_clicked()
+{
+  esquema_apontar_caminho = 1;
+  gige_ir.set_esquema(esquema_apontar_caminho); // Aqui vamos setar o controle como esta
 }
 
 void monitor_mrs::MainWindow::on_pushButton_salvaBag_clicked()
@@ -399,7 +413,7 @@ void monitor_mrs::MainWindow::on_pushButton_playBag_clicked()
  teste_comando.append("'");
  localstd = teste_comando.toStdString();
  system(localstd.c_str());
- sleep(8); // Para dar tempo do topico entrar ok
+// sleep(8); // Para dar tempo do topico entrar ok
  ui.listWidget_2->addItem(QString::fromStdString("Bag inicializada."));
  system("gnome-terminal -x sh -c 'roslaunch rustbot_bringup all.launch online_stereo:=false do_stereo:=true do_accumulation:=true'");
 
@@ -434,3 +448,7 @@ void monitor_mrs::MainWindow::on_pushButton_recAcumulada_clicked()
 {
  system("gnome-terminal -x sh -c 'rosrun rviz rviz -f left_optical -d $HOME/mrs_ws/src/MRS/monitor_mrs/resources/salvacao_do_mundo_2.rviz'");
 }
+
+
+
+

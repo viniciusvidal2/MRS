@@ -52,6 +52,7 @@ void GigeImageReader::init(){
   image_sub_ = it_.subscribe("/stereo/left/image_raw", 1, &GigeImageReader::imageCb, this);
   offset_pub      = nh_.advertise<std_msgs::Int8>("offset_pub", 100);
   offset_tilt_pub = nh_.advertise<std_msgs::Int8>("offset_tilt_pub", 100);
+  esquema_pub     = nh_.advertise<std_msgs::Int8>("esquema_pub", 100);
   offset = 0; // a ser publicado para alterar pan do motor
   offset_tilt = 0; // a ser publicado para alterar tilt do motor
   sub_estamosdentro = nh_.subscribe("/estamos_dentro", 10, &GigeImageReader::estamosdentroCb, this);
@@ -61,6 +62,8 @@ void GigeImageReader::init(){
   estado_anterior_gravar = 0.0f;
 
   raio_client = nh_.serviceClient<mavros_msgs::ParamSet>("/mavros/param/set");
+
+  msg_esq.data = 1; // Inicia com o caminho todo
 
   ros::spin();
 
@@ -88,6 +91,7 @@ void GigeImageReader::imageCb(const sensor_msgs::ImageConstPtr &msg)
   msg_off_tilt.data = offset_tilt;
   offset_pub.publish(msg_off);
   offset_tilt_pub.publish(msg_off_tilt);
+  esquema_pub.publish(msg_esq);
   mutex->unlock();
 
   // Update GUI Window
@@ -212,6 +216,10 @@ bool GigeImageReader::set_raio(float raio){
   ROS_INFO("Retorno do parametro: %d", raio_msg.response.success);
 
   return raio_msg.response.success;
+}
+
+void GigeImageReader::set_esquema(int esq){
+  msg_esq.data = esq;
 }
 
 }

@@ -55,6 +55,9 @@ private:
   ros::Subscriber subOffTilt;
   // Publicando se estamos dentro ou nao, para controle de gravacao de bag
   ros::Publisher pub_estamosdentro;
+  // Ler se e so apontar pra frente ou virar no ponto de interesse
+  ros::Subscriber subesquema;
+  int esquema = 1;
 
 public:
   PixhawkeMotor()
@@ -75,6 +78,8 @@ public:
     subOffTilt = nh_.subscribe("/offset_tilt_pub", 10, &PixhawkeMotor::escutarOffset_tilt, this);
     // Inicia publisher de estamos dentro ou fora do raio de interesse
     pub_estamosdentro = nh_.advertise<std_msgs::Int8>("/estamos_dentro", 10);
+    // Inicia o subscriber de ver se olha so para frente ou para os pontos de interesse
+    subesquema = nh_.subscribe("/esquema_pub", 10, &PixhawkeMotor::escutarEsquema, this);
   }
 
   int ExecutarClasse(int argc, char **argv)
@@ -88,27 +93,41 @@ private:
   {
     // Inserindo o offset vindo da GUI
     offset_ang = -300.0f*((float)offset + 48.0f)/97.0f + 300 - ang_yaw_frente; // Diferenca para o centro do range
-    offset_tilt_ang = (ang_pitch_range[0]-ang_pitch_range[1])*((float)offset_tilt - 48.0f)/-99.0f + ang_pitch_range[1] - ang_pitch_horizontal; // Diferenca para o centro do range
+    offset_tilt_ang = (ang_pitch_range[0]-ang_pitch_range[1])*((float)offset_tilt - 48.0f)/(-99.0f) + ang_pitch_range[1] - ang_pitch_horizontal; // Diferenca para o centro do range
 
-//    ROS_INFO("yaw ATUAL: %.2f\tyaw APONTAR: %.2f\tdelta yaw: %.2f", yaw_atual, yaw_para_apontar, delta_yaw);
-    if(estamos_dentro == 0.0f){ // Se nao estamos dentro o offset vale, se estamos dentro so vale o automatico
+    if (esquema == 2) { // Pegar os pontos de interesse
+
+      //    ROS_INFO("yaw ATUAL: %.2f\tyaw APONTAR: %.2f\tdelta yaw: %.2f", yaw_atual, yaw_para_apontar, delta_yaw);
+      if(estamos_dentro == 0.0f){ // Se nao estamos dentro o offset vale, se estamos dentro so vale o automatico
+        delta_yaw   = offset_ang;
+        delta_pitch = offset_tilt_ang;
+        //      ROS_INFO("OFFSET DE TILT: %.2f", offset_tilt_ang);
+
+      } else { // Dentro do controle automatico
+        //      delta_yaw = (int)(delta_yaw/60) * 60; // Aqui arredonda para multiplos de 60, creio eu
+        // Analisando diferenca de yaw
+        delta_yaw = wrap180(yaw_atual, yaw_para_apontar);
+        // Analisando diferenca de pitch -> somente a mesma sobre o pwm para manter horizontal
+        delta_pitch = pitch_para_apontar;
+      }
+      // Uma vez todos os angulos calculados, converter para valor de pwm para enviar aos motores
+      pwm_pan  = pwm_yaw_frente + delta_yaw*pwm_ang_yaw;
+      pwm_pan  = (pwm_pan > pwm_yaw_range[1]) ? pwm_yaw_range[1] : (pwm_pan < pwm_yaw_range[0] ? pwm_yaw_range[0] : pwm_pan); // Limitando em maximo e minimo aqui, mais seguro
+
+      pwm_tilt = pwm_pitch_horizontal + delta_pitch*pwm_ang_pitch;
+      pwm_tilt = (pwm_tilt > pwm_pitch_range[1]) ? pwm_pitch_range[1] : (pwm_tilt < pwm_pitch_range[0] ? pwm_pitch_range[0] : pwm_tilt); // Limitando em maximo e minimo aqui, mais seguro
+
+    } else if (esquema == 1) { // Apontar so para frente, a nao ser que queira mexer na camera
+
       delta_yaw   = offset_ang;
       delta_pitch = offset_tilt_ang;
-//      ROS_INFO("OFFSET DE TILT: %.2f", offset_tilt_ang);
 
-    } else { // Dentro do controle automatico
-//      delta_yaw = (int)(delta_yaw/60) * 60; // Aqui arredonda para multiplos de 60, creio eu
-      // Analisando diferenca de yaw
-      delta_yaw = wrap180(yaw_atual, yaw_para_apontar);
-      // Analisando diferenca de pitch -> somente a mesma sobre o pwm para manter horizontal
-      delta_pitch = pitch_para_apontar;
+      pwm_pan  = pwm_yaw_frente + delta_yaw*pwm_ang_yaw;
+      pwm_pan  = (pwm_pan > pwm_yaw_range[1]) ? pwm_yaw_range[1] : (pwm_pan < pwm_yaw_range[0] ? pwm_yaw_range[0] : pwm_pan); // Limitando em maximo e minimo aqui, mais seguro
+
+      pwm_tilt = pwm_pitch_horizontal + delta_pitch*pwm_ang_pitch;
+      pwm_tilt = (pwm_tilt > pwm_pitch_range[1]) ? pwm_pitch_range[1] : (pwm_tilt < pwm_pitch_range[0] ? pwm_pitch_range[0] : pwm_tilt); // Limitando em maximo e minimo aqui, mais seguro
     }
-    // Uma vez todos os angulos calculados, converter para valor de pwm para enviar aos motores
-    pwm_pan  = pwm_yaw_frente + delta_yaw*pwm_ang_yaw;
-    pwm_pan  = (pwm_pan > pwm_yaw_range[1]) ? pwm_yaw_range[1] : (pwm_pan < pwm_yaw_range[0] ? pwm_yaw_range[0] : pwm_pan); // Limitando em maximo e minimo aqui, mais seguro
-
-    pwm_tilt = pwm_pitch_horizontal + delta_pitch*pwm_ang_pitch;
-    pwm_tilt = (pwm_tilt > pwm_pitch_range[1]) ? pwm_pitch_range[1] : (pwm_tilt < pwm_pitch_range[0] ? pwm_pitch_range[0] : pwm_tilt); // Limitando em maximo e minimo aqui, mais seguro
   }
 
   void enviarAngulosMotores()
@@ -170,6 +189,11 @@ private:
   void escutarOffset_tilt(const std_msgs::Int8& msg)
   {
     offset_tilt = msg.data;
+  }
+
+  void escutarEsquema(const std_msgs::Int8& msg)
+  {
+    esquema = msg.data;
   }
 
 };

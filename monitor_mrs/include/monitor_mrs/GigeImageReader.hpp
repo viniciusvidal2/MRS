@@ -56,6 +56,7 @@ public:
   QMutex* mutex;
 
   void setOffset(int offp, int offt);
+  void set_esquema(int esq);
   void set_nomeDaPasta(std::string nome);
   void vamos_gravar(bool decisao);
   void ler_gps(const sensor_msgs::NavSatFixConstPtr& msg);
@@ -73,10 +74,12 @@ private:
 
   ros::Publisher offset_pub;
   ros::Publisher offset_tilt_pub;
+  ros::Publisher esquema_pub;
   int offset; // Para guardar os offsets a serem publicados
   int offset_tilt;
   std_msgs::Int8 msg_off;
   std_msgs::Int8 msg_off_tilt;
+  std_msgs::Int8 msg_esq;
 
   ros::Subscriber sub_estamosdentro;
   ros::Subscriber sub_gps;

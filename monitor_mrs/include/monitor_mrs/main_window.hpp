@@ -82,6 +82,7 @@ private Q_SLOTS:
         void on_horizontalSlider_offset_sliderMoved();
         void on_verticalSlider_offset_sliderMoved();
         void on_pushButton_enviaraio_clicked();
+        void on_radioButton_pontosdeinteresse_clicked();
 
         //Lucas, aba 2
         void on_pushButtonSelectBag_clicked();
@@ -90,6 +91,8 @@ private Q_SLOTS:
         void on_pushButton_paraBag_clicked();
         void on_pushButton_salvaNuvem_clicked();
         void on_pushButton_recAcumulada_clicked();
+
+        void on_radioButton_caminhocompleto_clicked();
 
 private:
         Ui::MainWindowDesign ui;
@@ -106,6 +109,7 @@ private:
         bool controle_gravacao;
         int offset;
         int offset_tilt;
+        int esquema_apontar_caminho; // 1 = apontar so em frente; 2 = apontar para os pontos de interesse automaticamente
 
         // Lucas, aba 2
         QString filename;
