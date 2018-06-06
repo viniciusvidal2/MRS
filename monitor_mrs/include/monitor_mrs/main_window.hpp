@@ -94,6 +94,10 @@ private Q_SLOTS:
 
         void on_radioButton_caminhocompleto_clicked();
 
+        void on_pushButton_reconstrucaoInstantaneaTermica_clicked();
+
+        void on_pushButton_recAcumuladaTermica_clicked();
+
 private:
         Ui::MainWindowDesign ui;
         std::string nome;

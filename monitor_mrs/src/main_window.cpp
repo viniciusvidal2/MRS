@@ -254,6 +254,11 @@ void monitor_mrs::MainWindow::on_pushButton_iniciaStereo_clicked()
 
     controle_stereo = false;
     gige_ir.vamos_gravar(false);
+
+    // TERMICA
+    sleep(10);
+    system("gnome-terminal -x sh -c 'roslaunch termica_reconstrucao reconstrucao_teste2.launch'");
+
   }
 }
 
@@ -338,6 +343,12 @@ void monitor_mrs::MainWindow::on_pushButton_nuvemInstantanea_clicked()
   system("gnome-terminal -x sh -c 'rosrun rviz rviz -f left_optical -d $HOME/mrs_ws/src/MRS/monitor_mrs/resources/salvacao_do_mundo.rviz'"); // Ja estamos por default no diretorio do ws
   ui.listWidget->addItem(QString::fromStdString("Abrindo visualizador para reconstrucao instantanea..."));
 }
+
+void monitor_mrs::MainWindow::on_pushButton_reconstrucaoInstantaneaTermica_clicked()
+{
+  system("gnome-terminal -x sh -c 'rosrun rviz rviz -f left_optical -d $HOME/mrs_ws/src/MRS/monitor_mrs/resources/salvacao_do_mundo_termica.rviz'"); // Ja estamos por default no diretorio do ws
+}
+
 
 void monitor_mrs::MainWindow::on_pushButton_reiniciarTudo_clicked()
 {
@@ -449,6 +460,7 @@ void monitor_mrs::MainWindow::on_pushButton_recAcumulada_clicked()
  system("gnome-terminal -x sh -c 'rosrun rviz rviz -f left_optical -d $HOME/mrs_ws/src/MRS/monitor_mrs/resources/salvacao_do_mundo_2.rviz'");
 }
 
-
-
-
+void monitor_mrs::MainWindow::on_pushButton_recAcumuladaTermica_clicked()
+{
+  system("gnome-terminal -x sh -c 'rosrun rviz rviz -f left_optical -d $HOME/mrs_ws/src/MRS/monitor_mrs/resources/salvacao_do_mundo_2_termica.rviz'");
+}

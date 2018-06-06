@@ -464,7 +464,7 @@
      </palette>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab_on">
      <property name="sizePolicy">
@@ -2345,6 +2345,13 @@
               </widget>
              </item>
              <item>
+              <widget class="QPushButton" name="pushButton_nuvemInstantanea">
+               <property name="text">
+                <string>Reconstrucao Visual</string>
+               </property>
+              </widget>
+             </item>
+             <item>
               <widget class="QPushButton" name="pushButton_cameratermica">
                <property name="text">
                 <string>Visao termica</string>
@@ -2352,9 +2359,9 @@
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="pushButton_nuvemInstantanea">
+              <widget class="QPushButton" name="pushButton_reconstrucaoInstantaneaTermica">
                <property name="text">
-                <string>Reconstrucao Instantanea</string>
+                <string>Reconstrucao termica</string>
                </property>
               </widget>
              </item>
@@ -2912,7 +2919,7 @@
       <property name="title">
        <string>Distancia de controle aos pontos de interesse - APOS CONECTADO!</string>
       </property>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -3864,11 +3871,11 @@
        <rect>
         <x>32</x>
         <y>80</y>
-        <width>571</width>
+        <width>761</width>
         <height>27</height>
        </rect>
       </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="2,2,4,2">
+      <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="2,2,4,0,2">
        <item>
         <widget class="QPushButton" name="pushButton_playBag">
          <property name="enabled">
@@ -3896,6 +3903,16 @@
          </property>
          <property name="text">
           <string>Reconstrucao Acumulada</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton_recAcumuladaTermica">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>Reconstrucao Termica</string>
          </property>
         </widget>
        </item>
