@@ -90,10 +90,14 @@ void MainWindow::receive_mat_image(Mat img, qint64 timestamp)
    qt_image.scaled(400, 300);
    ui.imagem_tab1->setPixmap(QPixmap::fromImage(qt_image));
    ui.imagem_tab1->resize(ui.imagem_tab1->pixmap()->size());
+   ui.imagem_tab1->setScaledContents(true);
+   ui.imagem_tab1->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 
    //Lucas, aba 2
    ui.imagem_tab2->setPixmap(QPixmap::fromImage(qt_image));
    ui.imagem_tab2->resize(ui.imagem_tab2->pixmap()->size());
+   ui.imagem_tab2->setScaledContents(true);
+   ui.imagem_tab2->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 
   mutex.unlock();
 
