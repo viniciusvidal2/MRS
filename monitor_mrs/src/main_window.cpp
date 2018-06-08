@@ -58,6 +58,9 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
   ui.horizontalSlider_offset->hide();
   ui.verticalSlider_offset->hide();
 
+  ui.radioButton_caminhocompleto->setChecked(true);
+  ui.radioButton_pontosdeinteresse->setChecked(false);
+
   ui.listWidget->addItem(QString::fromStdString("Iniciando o programa MRS monitor!"));
 
   QPixmap pix(":/images/mrs.jpg");
