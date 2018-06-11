@@ -39,6 +39,7 @@ class CameraRosBase {
         cnh_(pnh, prefix),
         it_(cnh_),
         camera_pub_(it_.advertiseCamera("image_raw", 1)),
+//        camera_pub_2_(it_.advertise("caramba", 1)), // vinicius
         cinfo_mgr_(cnh_, getParam<std::string>(cnh_, "camera_name"),
                    getParam<std::string>(cnh_, "calib_url")),
         fps_(10.0),
@@ -85,6 +86,7 @@ class CameraRosBase {
       // Update camera info header
       cinfo_msg->header = image_msg->header;
       camera_pub_.publish(image_msg, cinfo_msg);
+//      camera_pub_2_.publish(image_msg); // vinicius
       topic_diagnostic_.tick(image_msg->header.stamp);
     }
     diagnostic_updater_.update();
@@ -97,6 +99,7 @@ class CameraRosBase {
     image_msg->header.frame_id = frame_id_;
     cinfo_msg->header = image_msg->header;
     camera_pub_.publish(image_msg, cinfo_msg);
+//    camera_pub_2_.publish(image_msg); // vinicius
     topic_diagnostic_.tick(image_msg->header.stamp);
     diagnostic_updater_.update();
   }
@@ -114,6 +117,7 @@ class CameraRosBase {
   ros::NodeHandle cnh_;
   image_transport::ImageTransport it_;
   image_transport::CameraPublisher camera_pub_;
+//  image_transport::Publisher camera_pub_2_; // Vinicius
   camera_info_manager::CameraInfoManager cinfo_mgr_;
   double fps_;
   diagnostic_updater::Updater diagnostic_updater_;
