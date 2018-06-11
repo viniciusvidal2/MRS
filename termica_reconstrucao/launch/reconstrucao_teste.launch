@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!--This launches all the rustbot system-->
+<launch>
+  <!--arguments-->
+
+<!-- TERMICA -->
+    <node name="reconstrucao_termica" pkg="termica_reconstrucao" type="reconstrucao_online" output="screen">
+	<param name="topico_pc" value="/stereo/points2" /> <!-- Topico onde se le a point cloud stereo instantanea -->
+	<param name="topico_out" value="/termica/termica_pc" /> <!-- Tópico onde sera publicado a point cloud termica -->
+	<param name="topico_imagem" value="/termica/thermal/image_raw" /> <!-- Tópico contendo as imagens termicas publicadas-->
+	<param name="termica_calibration_yaml" value="file:///home/felipe/catkin_ws/src/RustBot/rustbot_calibration/calibration/termica"/> <!-- Diretorio que contem o arquivo .yaml da calibracao da camera termica -->
+    </node>
+<!--
+termica: termica.yaml
+right:   calibration_50-0536881129.yaml
+left:    calibration_50-0536881130.yaml
+ -->
+</launch>
