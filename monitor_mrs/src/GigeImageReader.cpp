@@ -49,7 +49,7 @@ void GigeImageReader::init(){
   image_transport::ImageTransport it_= image_transport::ImageTransport(nh_);
 
   //image_sub_ = it_.subscribe("/stereo/left/image_color", 1, &GigeImageReader::imageCb, this);
-  image_sub_ = it_.subscribe("/stereo/left/image_rect", 1, &GigeImageReader::imageCb, this);
+  image_sub_ = it_.subscribe("/stereo/left/image_rect_color", 1, &GigeImageReader::imageCb, this);
   offset_pub      = nh_.advertise<std_msgs::Int8>("offset_pub", 100);
   offset_tilt_pub = nh_.advertise<std_msgs::Int8>("offset_tilt_pub", 100);
   esquema_pub     = nh_.advertise<std_msgs::Int8>("esquema_pub", 100);

@@ -82,7 +82,8 @@ private Q_SLOTS:
         void on_horizontalSlider_offset_sliderMoved();
         void on_verticalSlider_offset_sliderMoved();
         void on_pushButton_enviaraio_clicked();
-        void on_radioButton_pontosdeinteresse_clicked();
+        void on_radioButton_pontosdeinteresse_clicked();        
+        void on_radioButton_caminhocompleto_clicked();
 
         //Lucas, aba 2
         void on_pushButtonSelectBag_clicked();
@@ -91,11 +92,6 @@ private Q_SLOTS:
         void on_pushButton_paraBag_clicked();
         void on_pushButton_salvaNuvem_clicked();
         void on_pushButton_recAcumulada_clicked();
-
-        void on_radioButton_caminhocompleto_clicked();
-
-        void on_pushButton_reconstrucaoInstantaneaTermica_clicked();
-
         void on_pushButton_recAcumuladaTermica_clicked();
 
 private:

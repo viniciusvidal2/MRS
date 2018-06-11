@@ -351,12 +351,6 @@ void monitor_mrs::MainWindow::on_pushButton_nuvemInstantanea_clicked()
   ui.listWidget->addItem(QString::fromStdString("Abrindo visualizador para reconstrucao instantanea..."));
 }
 
-void monitor_mrs::MainWindow::on_pushButton_reconstrucaoInstantaneaTermica_clicked()
-{
-  system("gnome-terminal -x sh -c 'rosrun rviz rviz -f left_optical -d $HOME/mrs_ws/src/MRS/monitor_mrs/resources/salvacao_do_mundo_termica.rviz'"); // Ja estamos por default no diretorio do ws
-}
-
-
 void monitor_mrs::MainWindow::on_pushButton_reiniciarTudo_clicked()
 {
   system("gnome-terminal -x sh -c 'rosservice call /joint_command raw 537 1740'"); //Posiciona o motor no minimo cuidadosamente ao desligar
@@ -438,6 +432,7 @@ void monitor_mrs::MainWindow::on_pushButton_playBag_clicked()
  ui.pushButton_paraBag->setEnabled(true);
  ui.pushButton_salvaNuvem->setEnabled(true);
  ui.pushButton_recAcumulada->setEnabled(true);
+ ui.pushButton_recAcumuladaTermica->setEnabled(true);
 }
 
 void monitor_mrs::MainWindow::on_pushButton_clear2_clicked()
@@ -469,5 +464,5 @@ void monitor_mrs::MainWindow::on_pushButton_recAcumulada_clicked()
 
 void monitor_mrs::MainWindow::on_pushButton_recAcumuladaTermica_clicked()
 {
-  system("gnome-terminal -x sh -c 'rosrun rviz rviz -f left_optical -d $HOME/mrs_ws/src/MRS/monitor_mrs/resources/salvacao_do_mundo_2_termica.rviz'");
+  system("gnome-terminal -x sh -c 'rosrun rviz rviz -f left_optical -d $HOME/mrs_ws/src/MRS/monitor_mrs/resources/salvacao_do_mundo_termica.rviz'");
 }

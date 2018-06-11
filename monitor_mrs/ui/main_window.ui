@@ -464,7 +464,7 @@
      </palette>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_on">
      <property name="sizePolicy">
@@ -2355,13 +2355,6 @@
               <widget class="QPushButton" name="pushButton_cameratermica">
                <property name="text">
                 <string>Visao termica</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="pushButton_reconstrucaoInstantaneaTermica">
-               <property name="text">
-                <string>Reconstrucao termica</string>
                </property>
               </widget>
              </item>
