@@ -2358,6 +2358,13 @@
                </property>
               </widget>
              </item>
+             <item>
+              <widget class="QPushButton" name="pushButton_reconstrucaoInstantaneaTermica">
+               <property name="text">
+                <string>Reconstrucao termica</string>
+               </property>
+              </widget>
+             </item>
             </layout>
            </widget>
            <widget class="QWidget" name="layoutWidget">

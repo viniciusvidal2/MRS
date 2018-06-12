@@ -245,6 +245,8 @@ void monitor_mrs::MainWindow::on_pushButton_iniciaStereo_clicked()
       ui.horizontalSlider_offset->show();
       ui.verticalSlider_offset->show();
     }
+    sleep(5);
+    system("gnome-terminal -x sh -c 'roslaunch termica_reconstrucao reconstrucao_teste2.launch do_accumulation:=false'");
     controle_stereo = true;
 
   } else {
@@ -261,17 +263,17 @@ void monitor_mrs::MainWindow::on_pushButton_iniciaStereo_clicked()
 
     controle_stereo = false;
     gige_ir.vamos_gravar(false);
-
-    // TERMICA
-    sleep(10);
-    system("gnome-terminal -x sh -c 'roslaunch termica_reconstrucao reconstrucao_teste2.launch'");
-
   }
 }
 
 void monitor_mrs::MainWindow::on_pushButton_cameratermica_clicked()
 {
   system("gnome-terminal -x sh -c 'rqt_image_view /termica/thermal/image_raw'");
+}
+void monitor_mrs::MainWindow::on_pushButton_reconstrucaoInstantaneaTermica_clicked()
+{
+  system("gnome-terminal -x sh -c 'rosrun rviz rviz -f left_optical -d $HOME/mrs_ws/src/MRS/monitor_mrs/resources/salvacao_do_mundo_termica_inst.rviz'"); // Ja estamos por default no diretorio do ws
+  ui.listWidget->addItem(QString::fromStdString("Abrindo visualizador para reconstrucao termica instantanea..."));
 }
 
 void monitor_mrs::MainWindow::on_radioButton_pontosdeinteresse_clicked()
@@ -348,7 +350,7 @@ void monitor_mrs::MainWindow::on_pushButton_salvaBag_clicked()
 void monitor_mrs::MainWindow::on_pushButton_nuvemInstantanea_clicked()
 {
   system("gnome-terminal -x sh -c 'rosrun rviz rviz -f left_optical -d $HOME/mrs_ws/src/MRS/monitor_mrs/resources/salvacao_do_mundo.rviz'"); // Ja estamos por default no diretorio do ws
-  ui.listWidget->addItem(QString::fromStdString("Abrindo visualizador para reconstrucao instantanea..."));
+  ui.listWidget->addItem(QString::fromStdString("Abrindo visualizador para reconstrucao visual instantanea..."));
 }
 
 void monitor_mrs::MainWindow::on_pushButton_reiniciarTudo_clicked()
@@ -418,6 +420,10 @@ void monitor_mrs::MainWindow::on_pushButton_playBag_clicked()
      break;
    }
  }
+ system("gnome-terminal -x sh -c 'roslaunch rustbot_bringup all.launch do_stereo:=true online_stereo:=false do_accumulation:=false'");
+ sleep(5);
+ system("gnome-terminal -x sh -c 'roslaunch termica_reconstrucao reconstrucao_teste2.launch do_accumulation:=true'");
+ sleep(5);
  QString teste_comando = "gnome-terminal -x sh -c 'roslaunch rustbot_bringup playback.launch bag:=";
  teste_comando.append(arquivo.left(arquivo.size()-4));
  teste_comando.append(" local:=");
@@ -427,7 +433,7 @@ void monitor_mrs::MainWindow::on_pushButton_playBag_clicked()
  system(localstd.c_str());
 // sleep(8); // Para dar tempo do topico entrar ok
  ui.listWidget_2->addItem(QString::fromStdString("Bag inicializada."));
- system("gnome-terminal -x sh -c 'roslaunch rustbot_bringup all.launch online_stereo:=false do_stereo:=true do_accumulation:=true'");
+
 
  ui.pushButton_paraBag->setEnabled(true);
  ui.pushButton_salvaNuvem->setEnabled(true);

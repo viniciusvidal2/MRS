@@ -75,6 +75,7 @@ private Q_SLOTS:
         void on_pushButton_resetaPX4_clicked();
         void on_pushButton_iniciaStereo_clicked();
         void on_pushButton_cameratermica_clicked();
+        void on_pushButton_reconstrucaoInstantaneaTermica_clicked();
         void on_pushButton_salvaBag_clicked();
         void on_pushButton_nuvemInstantanea_clicked();
         void on_pushButton_reiniciarTudo_clicked();
