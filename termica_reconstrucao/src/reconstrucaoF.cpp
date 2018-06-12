@@ -46,63 +46,31 @@ POINT_CLOUD_REGISTER_POINT_STRUCT (PointC,           // here we assume a XYZ + "
                                    (float, p, p)
 )
 
-/*
-struct PointC
-{
-    PCL_ADD_POINT4D;                  // preferred way of adding a XYZ+padding
-    float r;
-    float g;
-    float b;
-    float l;
-    float o;
-    float p;
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW   // make sure our new allocators are aligned
-    } EIGEN_ALIGN16;                    // enforce SSE padding for correct memory alignment
-
-    POINT_CLOUD_REGISTER_POINT_STRUCT (PointT,           // here we assume a XYZ + "test" (as fields)
-                                     (float, x, x)
-                                     (float, y, y)
-                                     (float, z, z)
-                                     (float, r, r)
-                                     (float, g, g)
-                                     (float, b, b)
-                                     (float, l, l)
-                                     (float, o, o)
-                                     (float, p, p)
-)*/
-
-
-// Definicoes
-//typedef pcl::PointCloud<MyPointType> PointT; //PointXYZRGBA
-//typedef pcl::PointXYZRGB PointT;
-//typedef pcl::PointXYZRGBA PointC;
-
 typedef pcl::PointXYZRGB PointT;
-
 
 
 // Classe reconstrucaoTermica
 class reconstrucaoTermica
 {
-	protected:
-		ros::NodeHandle nh_;
+        protected:
+                ros::NodeHandle nh_;
                 //image_transport::Subscriber image_sub_;
                 image_transport::CameraSubscriber image_sub_;
                 image_transport::ImageTransport it_;
-		std::string point_cloud_PLY_;
+                std::string point_cloud_PLY_;
                 ros::Publisher pc_pub_;
                 ros::Publisher pc_visual_pub_;
                 ros::Publisher pc_completa_pub_;
 
 
-	public:
+        public:
                 ros::Subscriber pc_sub_;
-		pcl::PointCloud<PointT> cloud_;
+                pcl::PointCloud<PointT> cloud_;
                 pcl::PointCloud<PointC> cloudCompleta_;
-		sensor_msgs::ImageConstPtr imgMsg_;
+                sensor_msgs::ImageConstPtr imgMsg_;
                 cv::Mat imgCv_;
                 cv::Mat imgGray_;
-		pcl::PointCloud<PointT> cloudTransformada_;
+                pcl::PointCloud<PointT> cloudTransformada_;
                 image_geometry::PinholeCameraModel camTermicaModelo_;
                 camera_info_manager::CameraInfoManager camInfo_;
                 sensor_msgs::PointCloud2 completa_out;
@@ -111,10 +79,10 @@ class reconstrucaoTermica
 
 
 
-		// Construtor reconstrucaoTermica
+                // Construtor reconstrucaoTermica
                 reconstrucaoTermica(ros::NodeHandle nh_, std::string termicaCalibrationYAML, std::string topico_imagem, std::string topico_pc, std::string topico_out)
                 : it_(nh_), camInfo_(nh_,"termica",termicaCalibrationYAML)
-		{
+                {
                         //image_sub_ = it_.subscribe(topico_imagem, 1, &reconstrucaoTermica::imageCallback, this);
                         image_sub_ = it_.subscribeCamera(topico_imagem, 1, &reconstrucaoTermica::imageCallback, this);
                         pc_pub_ = nh_.advertise<sensor_msgs::PointCloud2> (topico_out, 1000);
@@ -123,7 +91,7 @@ class reconstrucaoTermica
                         pc_sub_= nh_.subscribe(topico_pc, 1, &reconstrucaoTermica::pointCloudCallback, this);
                         camTermicaModelo_.fromCameraInfo(camInfo_.getCameraInfo());
                 } //fim reconstrucaoTermica()
-	
+
 
 
                 // Callback point cloud
@@ -138,54 +106,16 @@ class reconstrucaoTermica
                 } // fim pointCloudCallback()
 
 
-                // Callback da imagem termica - Recebe imagem termica
-                /*void imageCallback(const sensor_msgs::ImageConstPtr& msg)
-                {
-//                        camTermicaModelo_.fromCameraInfo(info_msg);
-                        cv::Mat img_g;
-                        cv::Mat imagem_termica_cor;
-                        imgMsg_ = msg;
-                        imgCv_ = cv_bridge::toCvShare(msg, "bgr8")->image;
-                        cv::cvtColor(imgCv_, img_g, CV_BGR2GRAY);
-                        cv::applyColorMap(img_g, imagem_termica_cor, cv::COLORMAP_JET);
-                        imgCv_ = imagem_termica_cor;
-                } // fim imageCallback()*/
-
 
                 // Callback da imagem termica - Recebe imagem termica
                void imageCallback(const sensor_msgs::ImageConstPtr& msg,
                                    const sensor_msgs::CameraInfoConstPtr& info_msg)
-		{
+                {
                         sensor_msgs::CameraInfo a = *info_msg; //->R[0] = 0;
-                        /*a.R[0] = 1;
-                        a.R[1] = 0;
-                        a.R[2] = 0;
-                        a.R[3] = 0;
-                        a.R[4] = 1;
-                        a.R[5] = 0;
-                        a.R[6] = 0;
-                        a.R[7] = 0;
-                        a.R[8] = 1;
-
-                        a.D[0] = -0.52910;
-                        a.D[1] = 2.240600;
-                        a.D[2] = 0;
-                        a.D[3] = 0;
-                        a.D[4] = 0;
-
-                        a.K[0] = 800;
-                        a.K[1] = 0;
-                        a.K[2] = -15;
-                        a.K[3] = 0;
-                        a.K[4] = 800;
-                        a.K[5] = 40;
-                        a.K[6] = 0;
-                        a.K[7] = 0;
-                        a.K[8] = 1;*/
 
                         a.P[0] = 1400;   // fx (800)
                         a.P[1] = 0;     // 0  (0)
-                        a.P[2] = 70;   // cx (-15)
+                        a.P[2] = 330;   // cx (-15)
                         a.P[3] = -50;   // Tx (-35)
                         a.P[4] = 0;     // 0  (0)
                         a.P[5] = 1400;   // fy (800)
@@ -201,7 +131,7 @@ class reconstrucaoTermica
                         camTermicaModelo_.fromCameraInfo(a);
                         cv::Mat img_g;
                         cv::Mat imagem_termica_cor;
-			imgMsg_ = msg;			
+                        imgMsg_ = msg;
                         imgCv_ = cv_bridge::toCvShare(msg, "bgr8")->image;
                         cv::cvtColor(imgCv_, img_g, CV_BGR2GRAY);
                         imgGray_ = img_g;
@@ -211,8 +141,8 @@ class reconstrucaoTermica
 
 
 
-		// Reconstrucao Termica	
-		void reconstrucao()
+                // Reconstrucao Termica
+                void reconstrucao()
                 {
                     cloudTransformada_ = cloud_;
 
@@ -234,16 +164,7 @@ class reconstrucaoTermica
                             ponto3D.x = cloudTransformada_.points[i].x;
                             ponto3D.y = cloudTransformada_.points[i].y;
                             ponto3D.z = cloudTransformada_.points[i].z;
-                            //
-                            /*
-                            std::cout << "x: " << cloud_.points[i].x << "\n";
-                            std::cout << "y: " << cloud_.points[i].y << "\n";
-                            std::cout << "z: " << cloud_.points[i].z << "\n";
-                            std::cout << "r: " << cloud_.points[i].r << "\n";
-                            std::cout << "g: " << cloud_.points[i].g << "\n";
-                            std::cout << "b: " << cloud_.points[i].b << "\n";
-                            std::cout << "a: " << cloud_.points[i].a << "\n";*/
-                            ///*
+
                             cloudCompleta_.points[i].x = cloudTransformada_.points[i].x;
                             cloudCompleta_.points[i].y = cloudTransformada_.points[i].y;
                             cloudCompleta_.points[i].z = cloudTransformada_.points[i].z;
@@ -262,36 +183,32 @@ class reconstrucaoTermica
                                 int r = imgCv_.at<cv::Vec3b>(int(pontoProjetado.y), int(pontoProjetado.x))[2];
                                 int gray = imgGray_.at<cv::Vec3b>(int(pontoProjetado.y), int(pontoProjetado.x))[0];
 
-                                //erroTotal += std::abs(b-cloudTransformada_.points[i].b) + std::abs(g-cloudTransformada_.points[i].g) + std::abs(r-cloudTransformada_.points[i].r);
-
                                 cloudTransformada_.points[i].b = b;
                                 cloudTransformada_.points[i].g = g;
                                 cloudTransformada_.points[i].r = r;
 
-                                //cloudCompleta_.points[i].a = gray;
                                 cloudCompleta_.points[i].l = r;
                                 cloudCompleta_.points[i].o = g;
                                 cloudCompleta_.points[i].p = b;
                             }
                             else
                             {
-                                /*cloudTransformada_.points[i].b = 40;
-                                cloudTransformada_.points[i].g = 40;
-                                cloudTransformada_.points[i].r = 40;*/
-                                //cloudCompleta_.points[i].a = -1;
-                                cloudCompleta_.points[i].l = nan("");;
-                                cloudCompleta_.points[i].o = nan("");;
-                                cloudCompleta_.points[i].p = nan("");;
+                                cloudTransformada_.points[i].b = nan("");
+                                cloudTransformada_.points[i].g = nan("");
+                                cloudTransformada_.points[i].r = nan("");
+                                cloudCompleta_.points[i].l = nan("");
+                                cloudCompleta_.points[i].o = nan("");
+                                cloudCompleta_.points[i].p = nan("");
                             }
 
 
                         }
 
-                        //ROS_INFO_STREAM("Erro total: " + std::to_string(erroTotal) + "\n");
+                        std::vector<int> indicesNAN2;
+                        pcl::removeNaNFromPointCloud(cloudTransformada_, cloudTransformada_, indicesNAN2);
                         pcl::toROSMsg (cloudTransformada_, msg_out);
                         pcl::toROSMsg (cloud_, visual_out);
                         pcl::toROSMsg (cloudCompleta_, completa_out);
-                        //std::cout << "wid: " << cloudTransformada_.width << ", hei: " <<cloudTransformada_.height << "\n";
 
 
                         pc_pub_.publish(msg_out);
@@ -300,9 +217,6 @@ class reconstrucaoTermica
                         completa_out.header.stamp = ros::Time::now();
                         pc_completa_pub_.publish(completa_out);
 
-
-                        // Limpar pontos que nao tenham reprojecao (TODO)
-                        // ...............................................
 
                 } // fim reconstrucao()
 
@@ -314,6 +228,7 @@ class reconstrucaoTermica
                     ros::spinOnce();
                     reconstrucao();
                 } // fim spinTermica()
+
 
 }; // fim classe reconstrucaoTermica
 
