@@ -154,6 +154,9 @@ private:
 
     if(delta >  180.0) delta = (delta - 360.0);
     if(delta < -180.0) delta = (delta + 360.0);
+    // Pequeno ajuste para nao ficar atrasado na pratica
+    if(delta > 0) delta+=5;
+    if(delta < 0) delta-=5;
 
 //    delta = (delta > 145) ? 145 : delta;
 //    delta = (delta < -145) ? -145 : delta;
