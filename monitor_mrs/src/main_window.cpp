@@ -455,6 +455,7 @@ void monitor_mrs::MainWindow::on_pushButton_paraBag_clicked()
  ui.pushButton_paraBag->setEnabled(false);
  ui.pushButton_salvaNuvem->setEnabled(false);
  ui.pushButton_recAcumulada->setEnabled(false);
+ ui.pushButton_recAcumuladaTermica->setEnabled(false);
 }
 
 void monitor_mrs::MainWindow::on_pushButton_salvaNuvem_clicked()
