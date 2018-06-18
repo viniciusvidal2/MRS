@@ -64,53 +64,8 @@ include_directories(
   ${Eigen_INCLUDE_DIRS}
 )
 
-add_executable(grabber src/grabber.cpp)
-add_dependencies(grabber ${catkin_EXPORTED_TARGETS})
-
-add_executable(reconstrucao_termica ${PROJECT_SOURCE_DIR}/src/reconstrucao_termica.cpp)
-add_dependencies(reconstrucao_termica ${catkin_EXPORTED_TARGETS})
-
-add_executable(reconstrucao ${PROJECT_SOURCE_DIR}/src/reconstrucao.cpp)
-add_dependencies(reconstrucao ${catkin_EXPORTED_TARGETS})
-
-add_executable(termica_cor ${PROJECT_SOURCE_DIR}/src/termica_cor.cpp)
-add_dependencies(termica_cor ${catkin_EXPORTED_TARGETS})
-
-add_executable(reconstrucao_online ${PROJECT_SOURCE_DIR}/src/reconstrucao_online.cpp)
-add_dependencies(reconstrucao_online ${catkin_EXPORTED_TARGETS})
-
 add_executable(reconstrucaoF ${PROJECT_SOURCE_DIR}/src/reconstrucaoF.cpp)
 add_dependencies(reconstrucaoF ${catkin_EXPORTED_TARGETS})
-
-target_link_libraries(grabber
-  ${catkin_LIBRARIES}
-  ${OpenCV_LIBS}
-  ${Eigen_LIBRARIES}
-)
-
-target_link_libraries(reconstrucao_termica
-  ${catkin_LIBRARIES}
-  ${OpenCV_LIBS}
-  ${Eigen_LIBRARIES}
-)
-
-target_link_libraries(reconstrucao
-  ${catkin_LIBRARIES}
-  ${OpenCV_LIBS}
-  ${Eigen_LIBRARIES}
-)
-
-target_link_libraries(termica_cor
-  ${catkin_LIBRARIES}
-  ${OpenCV_LIBS}
-  ${Eigen_LIBRARIES}
-)
-
-target_link_libraries(reconstrucao_online
-  ${catkin_LIBRARIES}
-  ${OpenCV_LIBS}
-  ${Eigen_LIBRARIES}
-)
 
 target_link_libraries(reconstrucaoF
   ${catkin_LIBRARIES}
