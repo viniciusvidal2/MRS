@@ -45,8 +45,10 @@ POINT_CLOUD_REGISTER_POINT_STRUCT (PointC,           // here we assume a XYZ + "
                                    (float, o, o)
                                    (float, p, p)
 )
-
 typedef pcl::PointXYZRGB PointT;
+
+
+
 
 
 // Classe reconstrucaoTermica
@@ -54,7 +56,6 @@ class reconstrucaoTermica
 {
         protected:
                 ros::NodeHandle nh_;
-                //image_transport::Subscriber image_sub_;
                 image_transport::CameraSubscriber image_sub_;
                 image_transport::ImageTransport it_;
                 std::string point_cloud_PLY_;
@@ -76,7 +77,6 @@ class reconstrucaoTermica
                 sensor_msgs::PointCloud2 completa_out;
                 std::string id_;
                 int nPontos_;
-
 
 
                 // Construtor reconstrucaoTermica
@@ -144,90 +144,87 @@ class reconstrucaoTermica
                 // Reconstrucao Termica
                 void reconstrucao()
                 {
-                    cloudTransformada_ = cloud_;
 
-                    if(nPontos_ > 0)
+                    if(nPontos_ > 0 && nPontos_ < 100000)
                     {
-                        //std::cout << nPontos_;
+                        cloudTransformada_ = cloud_;
                         cloudCompleta_.points.resize (nPontos_);
-                    }
-                    sensor_msgs::PointCloud2 msg_out;
-                    sensor_msgs::PointCloud2 visual_out;
 
-                // Projetando os pontos para a imagem
-                    //float erroTotal = 0;
-                    //std::cout << "size: " << nPontos_ << "\n";
-                        for(int i = 0; i < nPontos_; i++)
-                        {
-                            cv::Point3d ponto3D;
-                            cv::Point2d pontoProjetado;
-                            ponto3D.x = cloudTransformada_.points[i].x;
-                            ponto3D.y = cloudTransformada_.points[i].y;
-                            ponto3D.z = cloudTransformada_.points[i].z;
+                        sensor_msgs::PointCloud2 msg_out;
+                        sensor_msgs::PointCloud2 visual_out;
 
-                            cloudCompleta_.points[i].x = cloudTransformada_.points[i].x;
-                            cloudCompleta_.points[i].y = cloudTransformada_.points[i].y;
-                            cloudCompleta_.points[i].z = cloudTransformada_.points[i].z;
-                            cloudCompleta_.points[i].b = cloudTransformada_.points[i].b;
-                            cloudCompleta_.points[i].g = cloudTransformada_.points[i].g;
-                            cloudCompleta_.points[i].r = cloudTransformada_.points[i].r;//*/
-
-                            pontoProjetado = camTermicaModelo_.project3dToPixel(ponto3D);
-                            //std::cout << pontoProjetado << "\n";
-
-                            // Verificar se a projecao esta dentro da imagem
-                            if(pontoProjetado.x > 0  && pontoProjetado.x < imgCv_.cols && pontoProjetado.y > 0 && pontoProjetado.y < imgCv_.rows)
+                            // Projetando os pontos para a imagem
+                            for(int i = 0; i < nPontos_; i++)
                             {
-                                int b = imgCv_.at<cv::Vec3b>(int(pontoProjetado.y), int(pontoProjetado.x))[0];
-                                int g = imgCv_.at<cv::Vec3b>(int(pontoProjetado.y), int(pontoProjetado.x))[1];
-                                int r = imgCv_.at<cv::Vec3b>(int(pontoProjetado.y), int(pontoProjetado.x))[2];
-                                int gray = imgGray_.at<cv::Vec3b>(int(pontoProjetado.y), int(pontoProjetado.x))[0];
+                                cv::Point3d ponto3D;
+                                cv::Point2d pontoProjetado;
+                                ponto3D.x = cloudTransformada_.points[i].x;
+                                ponto3D.y = cloudTransformada_.points[i].y;
+                                ponto3D.z = cloudTransformada_.points[i].z;
 
-                                cloudTransformada_.points[i].b = b;
-                                cloudTransformada_.points[i].g = g;
-                                cloudTransformada_.points[i].r = r;
+                                cloudCompleta_.points[i].x = cloudTransformada_.points[i].x;
+                                cloudCompleta_.points[i].y = cloudTransformada_.points[i].y;
+                                cloudCompleta_.points[i].z = cloudTransformada_.points[i].z;
+                                cloudCompleta_.points[i].b = cloudTransformada_.points[i].b;
+                                cloudCompleta_.points[i].g = cloudTransformada_.points[i].g;
+                                cloudCompleta_.points[i].r = cloudTransformada_.points[i].r;//*/
 
-                                cloudCompleta_.points[i].l = r;
-                                cloudCompleta_.points[i].o = g;
-                                cloudCompleta_.points[i].p = b;
+                                pontoProjetado = camTermicaModelo_.project3dToPixel(ponto3D);
+                                //std::cout << pontoProjetado << "\n";
+
+                                // Verificar se a projecao esta dentro da imagem
+                                if(pontoProjetado.x > 0  && pontoProjetado.x < imgCv_.cols && pontoProjetado.y > 0 && pontoProjetado.y < imgCv_.rows)
+                                {
+                                    int b = imgCv_.at<cv::Vec3b>(int(pontoProjetado.y), int(pontoProjetado.x))[0];
+                                    int g = imgCv_.at<cv::Vec3b>(int(pontoProjetado.y), int(pontoProjetado.x))[1];
+                                    int r = imgCv_.at<cv::Vec3b>(int(pontoProjetado.y), int(pontoProjetado.x))[2];
+                                    int gray = imgGray_.at<cv::Vec3b>(int(pontoProjetado.y), int(pontoProjetado.x))[0];
+
+                                    cloudTransformada_.points[i].b = b;
+                                    cloudTransformada_.points[i].g = g;
+                                    cloudTransformada_.points[i].r = r;
+
+                                    cloudCompleta_.points[i].l = r;
+                                    cloudCompleta_.points[i].o = g;
+                                    cloudCompleta_.points[i].p = b;
+                                }
+                                else
+                                {
+                                    cloudTransformada_.points[i].b = nan("");
+                                    cloudTransformada_.points[i].g = nan("");
+                                    cloudTransformada_.points[i].r = nan("");
+                                    cloudCompleta_.points[i].l = nan("");
+                                    cloudCompleta_.points[i].o = nan("");
+                                    cloudCompleta_.points[i].p = nan("");
+                                }
+
+
                             }
-                            else
-                            {
-                                cloudTransformada_.points[i].b = nan("");
-                                cloudTransformada_.points[i].g = nan("");
-                                cloudTransformada_.points[i].r = nan("");
-                                cloudCompleta_.points[i].l = nan("");
-                                cloudCompleta_.points[i].o = nan("");
-                                cloudCompleta_.points[i].p = nan("");
-                            }
 
+                            std::vector<int> indicesNAN2;
+                            pcl::removeNaNFromPointCloud(cloudTransformada_, cloudTransformada_, indicesNAN2);
+                            pcl::toROSMsg (cloudTransformada_, msg_out);
+                            pcl::toROSMsg (cloud_, visual_out);
+                            pcl::toROSMsg (cloudCompleta_, completa_out);
+
+
+                            pc_pub_.publish(msg_out);
+                            pc_visual_pub_.publish(visual_out);
+                            completa_out.header.frame_id = id_;
+                            completa_out.header.stamp = ros::Time::now();
+                            pc_completa_pub_.publish(completa_out);
 
                         }
-
-                        std::vector<int> indicesNAN2;
-                        pcl::removeNaNFromPointCloud(cloudTransformada_, cloudTransformada_, indicesNAN2);
-                        pcl::toROSMsg (cloudTransformada_, msg_out);
-                        pcl::toROSMsg (cloud_, visual_out);
-                        pcl::toROSMsg (cloudCompleta_, completa_out);
-
-
-                        pc_pub_.publish(msg_out);
-                        pc_visual_pub_.publish(visual_out);
-                        completa_out.header.frame_id = id_;
-                        completa_out.header.stamp = ros::Time::now();
-                        pc_completa_pub_.publish(completa_out);
-
-
-                } // fim reconstrucao()
+                    } // fim reconstrucao()
 
 
 
-                // Recebe imagem e point cloud, em seguida, processa info
-                void spinTermica()
-                {
-                    ros::spinOnce();
-                    reconstrucao();
-                } // fim spinTermica()
+                    // Recebe imagem e point cloud, em seguida, processa info
+                    void spinTermica()
+                    {
+                        ros::spinOnce();
+                        reconstrucao();
+                    } // fim spinTermica()
 
 
 }; // fim classe reconstrucaoTermica
