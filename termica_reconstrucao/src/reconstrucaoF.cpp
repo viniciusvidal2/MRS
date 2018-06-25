@@ -145,7 +145,7 @@ class reconstrucaoTermica
                 void reconstrucao()
                 {
 
-                    if(nPontos_ > 0 && nPontos_ < 100000)
+                    if(nPontos_ > 0 && nPontos_ < 1000000)
                     {
                         cloudTransformada_ = cloud_;
                         cloudCompleta_.points.resize (nPontos_);
