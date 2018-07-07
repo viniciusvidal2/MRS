@@ -11,6 +11,7 @@
 #include <mavros/mavros.h>
 #include <mavros_msgs/mavlink_convert.h>
 #include <mavros_msgs/VFR_HUD.h>
+#include <mavros_msgs/StreamRate.h>
 
 #include <std_msgs/Float32.h>
 
@@ -80,6 +81,17 @@ public:
     pub_estamosdentro = nh_.advertise<std_msgs::Int8>("/estamos_dentro", 10);
     // Inicia o subscriber de ver se olha so para frente ou para os pontos de interesse
     subesquema = nh_.subscribe("/esquema_pub", 10, &PixhawkeMotor::escutarEsquema, this);
+
+    // Chama o servico que altera a taxa de transferencia do mavros
+    ros::ServiceClient srvRate = nh_.serviceClient<mavros_msgs::StreamRate>("/mavros/set_stream_rate");
+    mavros_msgs::StreamRate rate;
+    rate.request.stream_id = 0;
+    rate.request.message_rate = 10; // X Hz das mensagens que vem
+    rate.request.on_off = 1; // Nao sei
+    if(srvRate.call(rate))
+      ROS_INFO("Taxado mavros mudada para %d Hz", rate.request.message_rate);
+    else
+      ROS_INFO("Nao pode chamar o servico, taxa nao mudada.");
   }
 
   int ExecutarClasse(int argc, char **argv)
@@ -181,7 +193,8 @@ private:
     // Mostrando na tela se esta tudo ok
     //        ROS_INFO("Pitch: [%.2f]", pitch_para_apontar);
 //    ROS_INFO("Yaw:   [%.2f]", yaw_atual-yaw_para_apontar);
-    ROS_INFO("YAW_ATUAL [%.2f]\tAPONTAR: [%.2f]\tDELTA: [%.2f]", yaw_atual, yaw_para_apontar, wrap180(yaw_atual, yaw_para_apontar));
+//    ROS_INFO("YAW_ATUAL [%.2f]\tAPONTAR: [%.2f]\tDELTA: [%.2f]", yaw_atual, yaw_para_apontar, wrap180(yaw_atual, yaw_para_apontar));
+    ROS_INFO("Perseguindo orientacao OK!!!");
   }
 
   void escutarOffset(const std_msgs::Int8& msg)
