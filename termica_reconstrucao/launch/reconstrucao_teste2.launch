@@ -21,7 +21,7 @@
 </group>
 
 <!-- Escala de temperatura na imagem térmica -->
-<node name="reconstrucao_termica" pkg="termica_reconstrucao" type="imTermicaScaled.py" output="screen">
+<node name="reconstrucao_termica_escala" pkg="termica_reconstrucao" type="imTermicaScaled.py" output="screen">
 </node>      
 
 <!---->

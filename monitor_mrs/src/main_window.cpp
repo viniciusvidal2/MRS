@@ -272,7 +272,7 @@ void monitor_mrs::MainWindow::on_pushButton_cameratermica_clicked()
 }
 void monitor_mrs::MainWindow::on_pushButton_reconstrucaoInstantaneaTermica_clicked()
 {
-  system("gnome-terminal -x sh -c 'rosrun rviz rviz -f left_optical -d $HOME/mrs_ws/src/MRS/monitor_mrs/resources/salvacao_do_mundo_termica_inst.rviz'"); // Ja estamos por default no diretorio do ws
+  system("gnome-terminal -x sh -c 'rosrun rviz rviz -f odom -d $HOME/mrs_ws/src/MRS/monitor_mrs/resources/salvacao_do_mundo_termica_inst.rviz'"); // Ja estamos por default no diretorio do ws
   ui.listWidget->addItem(QString::fromStdString("Abrindo visualizador para reconstrucao termica instantanea..."));
 }
 
@@ -349,7 +349,7 @@ void monitor_mrs::MainWindow::on_pushButton_salvaBag_clicked()
 
 void monitor_mrs::MainWindow::on_pushButton_nuvemInstantanea_clicked()
 {
-  system("gnome-terminal -x sh -c 'rosrun rviz rviz -f left_optical -d $HOME/mrs_ws/src/MRS/monitor_mrs/resources/salvacao_do_mundo.rviz'"); // Ja estamos por default no diretorio do ws
+  system("gnome-terminal -x sh -c 'rosrun rviz rviz -f odom -d $HOME/mrs_ws/src/MRS/monitor_mrs/resources/salvacao_do_mundo.rviz'"); // Ja estamos por default no diretorio do ws
   ui.listWidget->addItem(QString::fromStdString("Abrindo visualizador para reconstrucao visual instantanea..."));
 }
 
@@ -466,10 +466,10 @@ void monitor_mrs::MainWindow::on_pushButton_salvaNuvem_clicked()
 
 void monitor_mrs::MainWindow::on_pushButton_recAcumulada_clicked()
 {
- system("gnome-terminal -x sh -c 'rosrun rviz rviz -f left_optical -d $HOME/mrs_ws/src/MRS/monitor_mrs/resources/salvacao_do_mundo_2.rviz'");
+ system("gnome-terminal -x sh -c 'rosrun rviz rviz -f odom -d $HOME/mrs_ws/src/MRS/monitor_mrs/resources/salvacao_do_mundo_2.rviz'");
 }
 
 void monitor_mrs::MainWindow::on_pushButton_recAcumuladaTermica_clicked()
 {
-  system("gnome-terminal -x sh -c 'rosrun rviz rviz -f left_optical -d $HOME/mrs_ws/src/MRS/monitor_mrs/resources/salvacao_do_mundo_termica.rviz'");
+  system("gnome-terminal -x sh -c 'rosrun rviz rviz -f odom -d $HOME/mrs_ws/src/MRS/monitor_mrs/resources/salvacao_do_mundo_termica.rviz'");
 }

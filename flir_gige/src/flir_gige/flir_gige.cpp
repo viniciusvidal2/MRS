@@ -28,7 +28,7 @@ FlirGige::FlirGige(const std::string &mac_address)
   }
 }
 
-void FlirGige::Connect() {mo
+void FlirGige::Connect() {
   ConnectDevice();
   OpenStream();
   ConfigureStream();
