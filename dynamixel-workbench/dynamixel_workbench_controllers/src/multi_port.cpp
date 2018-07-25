@@ -170,8 +170,8 @@ bool MultiPort::checkLoadDynamixel()
 
 bool MultiPort::initDynamixelStatePublisher()
 {
-  pan_state_pub_  = node_handle_.advertise<dynamixel_workbench_msgs::DynamixelState>("/multi_port/pan_state", 10);
-  tilt_state_pub_ = node_handle_.advertise<dynamixel_workbench_msgs::DynamixelState>("/multi_port/tilt_state", 10);
+  pan_state_pub_  = node_handle_.advertise<dynamixel_workbench_msgs::DynamixelState>("/multi_port/pan_state", 100);
+  tilt_state_pub_ = node_handle_.advertise<dynamixel_workbench_msgs::DynamixelState>("/multi_port/tilt_state", 100);
 }
 
 bool MultiPort::initDynamixelInfoServer()
@@ -204,28 +204,28 @@ bool MultiPort::readDynamixelState(uint8_t motor)
   else if (motor == TILT)
     dynamixel_driver = tilt_driver_;
 
-  readValue(motor, "torque_enable");
+//  readValue(motor, "torque_enable");
 
   readValue(motor, "present_position");
 
   readValue(motor, "goal_position");
-  readValue(motor, "moving");
+//  readValue(motor, "moving");
 
   if (dynamixel_driver->getProtocolVersion() == 2.0)
   {
     if (dynamixel_driver->dynamixel_->model_name_.find("XM") != std::string::npos)
     {
-      readValue(motor, "goal_current");
-      readValue(motor, "present_current");
+//      readValue(motor, "goal_current");
+//      readValue(motor, "present_current");
     }
 
-    readValue(motor, "goal_velocity");
+//    readValue(motor, "goal_velocity");
     readValue(motor, "present_velocity");
   }
   else
   {
-    readValue(motor, "moving_speed");
-    readValue(motor, "present_speed");
+//    readValue(motor, "moving_speed");
+//    readValue(motor, "present_speed");
   }
 }
 
@@ -252,27 +252,27 @@ bool MultiPort::dynamixelStatePublish(uint8_t motor)
 
   dynamixel_state.model_name          = dynamixel_driver->dynamixel_->model_name_;
   dynamixel_state.id                  = dynamixel_driver->dynamixel_->id_;
-  dynamixel_state.torque_enable       = read_data["torque_enable"];
+//  dynamixel_state.torque_enable       = read_data["torque_enable"];
   dynamixel_state.present_position    = read_data["present_position"];
   dynamixel_state.goal_position       = read_data["goal_position"];
-  dynamixel_state.moving              = read_data["moving"];
+//  dynamixel_state.moving              = read_data["moving"];
 
-  if (dynamixel_driver->getProtocolVersion() == 2.0)
-  {
-    if (dynamixel_driver->dynamixel_->model_name_.find("XM") != std::string::npos)
-    {
-      dynamixel_state.goal_current    = read_data["goal_current"];
-      dynamixel_state.present_current = read_data["present_current"];
-    }
+//  if (dynamixel_driver->getProtocolVersion() == 2.0)
+//  {
+//    if (dynamixel_driver->dynamixel_->model_name_.find("XM") != std::string::npos)
+//    {
+//      dynamixel_state.goal_current    = read_data["goal_current"];
+//      dynamixel_state.present_current = read_data["present_current"];
+//    }
 
-    dynamixel_state.goal_velocity    = read_data["goal_velocity"];
-    dynamixel_state.present_velocity = read_data["present_velocity"];
-  }
-  else
-  {
-    dynamixel_state.goal_velocity    = read_data["moving_speed"];
-    dynamixel_state.present_velocity = read_data["present_speed"];
-  }
+//    dynamixel_state.goal_velocity    = read_data["goal_velocity"];
+//    dynamixel_state.present_velocity = read_data["present_velocity"];
+//  }
+//  else
+//  {
+//    dynamixel_state.goal_velocity    = read_data["moving_speed"];
+//    dynamixel_state.present_velocity = read_data["present_speed"];
+//  }
 
   if (motor == PAN)
   {
@@ -361,7 +361,7 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "multi_port");
   MultiPort multi;
 
-  ros::Rate loop_rate(250);
+  ros::Rate loop_rate(6);
 
   while (ros::ok())
   {
