@@ -14,10 +14,12 @@
 #include <mavros_msgs/StreamRate.h>
 
 #include <std_msgs/Float32.h>
+#include <nav_msgs/Odometry.h>
 
 #include <dynamixel_workbench_toolbox/dynamixel_multi_driver.h>
 #include <dynamixel_workbench_msgs/JointCommand.h>
 #include <dynamixel_workbench_msgs/DynamixelStateList.h>
+#include <dynamixel_workbench_msgs/DynamixelState.h>
 
 class PixhawkeMotor
 {
@@ -59,6 +61,12 @@ private:
   // Ler se e so apontar pra frente ou virar no ponto de interesse
   ros::Subscriber subesquema;
   int esquema = 1;
+  // Subscribers para o estado do motor atual e publisher para enviar as duas informacoes de uma vez so sincronizadas
+  ros::Subscriber subpandyn;
+  ros::Subscriber subtiltdyn;
+  ros::Publisher  pubdyn;
+  // Mensagem sobre os dados dos motores a ser preenchida
+  nav_msgs::Odometry dyn_msg;
 
 public:
   PixhawkeMotor()
@@ -81,6 +89,11 @@ public:
     pub_estamosdentro = nh_.advertise<std_msgs::Int8>("/estamos_dentro", 10);
     // Inicia o subscriber de ver se olha so para frente ou para os pontos de interesse
     subesquema = nh_.subscribe("/esquema_pub", 10, &PixhawkeMotor::escutarEsquema, this);
+    // Inicia subscribers dos motores
+    subpandyn  = nh_.subscribe("/multi_port/pan_state" , 100, &PixhawkeMotor::escutarPan , this);
+    subtiltdyn = nh_.subscribe("/multi_port/tilt_state", 100, &PixhawkeMotor::escutarTilt, this);
+    // Publisher dos motores sincronizados
+    pubdyn     = nh_.advertise<nav_msgs::Odometry>("/dynamixel_sync", 100);
 
     // Chama o servico que altera a taxa de transferencia do mavros
     ros::ServiceClient srvRate = nh_.serviceClient<mavros_msgs::StreamRate>("/mavros/set_stream_rate");
@@ -98,6 +111,7 @@ public:
   {
     calcularAngulosMotores();
     enviarAngulosMotores();
+    pubdyn.publish(dyn_msg); // Checar a taxa que consegue publicar
   }
 
 private:
@@ -210,6 +224,14 @@ private:
   void escutarEsquema(const std_msgs::Int8& msg)
   {
     esquema = msg.data;
+  }
+
+  void escutarPan(const dynamixel_workbench_msgs::DynamixelStateConstPtr msg){
+    dyn_msg.pose.pose.position.x = (double)msg->present_position; // O PAN estara na posicao X da mensagem
+  }
+
+  void escutarTilt(const dynamixel_workbench_msgs::DynamixelStateConstPtr msg){
+    dyn_msg.pose.pose.position.y = (double)msg->present_position; // O TILT estara na posicao Y da mensagem
   }
 
 };
