@@ -311,7 +311,7 @@ void monitor_mrs::MainWindow::on_pushButton_salvaBag_clicked()
     // COmeca gravacao segundo nome do bag
     if(ui.radioButton_caminhocompleto->isChecked()){
     nome = ui.lineEdit_nomeBag->text().toStdString();
-    std::string comando_full = "gnome-terminal -x sh -c 'roslaunch rustbot_bringup record_raw.launch only_raw_data:=true bag:=";
+    std::string comando_full = "gnome-terminal -x sh -c 'roslaunch rustbot_bringup record_raw.launch only_raw_data:=false bag:=";
     if(nome.length() == 0){
       nome = "mrs_"+date+".bag";
       system((comando_full+=(nome+"'")).c_str());

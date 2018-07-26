@@ -105,13 +105,17 @@ public:
       ROS_INFO("Taxado mavros mudada para %d Hz", rate.request.message_rate);
     else
       ROS_INFO("Nao pode chamar o servico, taxa nao mudada.");
+
+    dyn_msg.header.frame_id = "odom"; // Por desencargo
   }
 
   int ExecutarClasse(int argc, char **argv)
   {
     calcularAngulosMotores();
     enviarAngulosMotores();
-    pubdyn.publish(dyn_msg); // Checar a taxa que consegue publicar
+
+//    dyn_msg.header.stamp = ros::Time::now(); // Colocar o tempo para sincronizar a frente
+    pubdyn.publish(dyn_msg); // Consegue publicar a 6 Hz, por sorte
   }
 
 private:
@@ -227,6 +231,7 @@ private:
   }
 
   void escutarPan(const dynamixel_workbench_msgs::DynamixelStateConstPtr msg){
+    dyn_msg.header.stamp = ros::Time::now();
     dyn_msg.pose.pose.position.x = (double)msg->present_position; // O PAN estara na posicao X da mensagem
   }
 
