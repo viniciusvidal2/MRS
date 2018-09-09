@@ -25,6 +25,7 @@
 
 #include <dynamixel_workbench_msgs/DynamixelState.h>
 #include <dynamixel_workbench_msgs/JointCommand.h>
+#include <nav_msgs/Odometry.h> // Para enviar de forma sincronizada - Vinicius
 
 namespace multi_port
 {
@@ -70,6 +71,11 @@ class MultiPort
 
   std::map<std::string, int32_t> pan_data_;
   std::map<std::string, int32_t> tilt_data_;
+
+  // Vinicius - publicar os angulos de forma sincrona a partir daqui
+  nav_msgs::Odometry angulos_sincronizados_msg;
+  ros::Publisher angulos_sincronizados_pub;
+  double pan_sincronizado, tilt_sincronizado;
 
  public:
   MultiPort();
