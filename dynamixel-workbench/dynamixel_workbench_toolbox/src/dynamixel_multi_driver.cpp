@@ -158,7 +158,7 @@ bool DynamixelMultiDriver::syncWritePosition(std::vector<uint32_t> pos)
   dynamixel_comm_result_ = groupSyncWritePosition_->txPacket();
   if (dynamixel_comm_result_ != COMM_SUCCESS)
   {
-    packetHandler_->printTxRxResult(dynamixel_comm_result_);
+//    packetHandler_->printTxRxResult(dynamixel_comm_result_);
     return false;
   }
   groupSyncWritePosition_->clearParam();
@@ -190,7 +190,7 @@ bool DynamixelMultiDriver::syncWriteVelocity(std::vector<int32_t> vel)
   dynamixel_comm_result_ = groupSyncWriteVelocity_->txPacket();
   if (dynamixel_comm_result_ != COMM_SUCCESS)
   {
-    packetHandler_->printTxRxResult(dynamixel_comm_result_);
+//    packetHandler_->printTxRxResult(dynamixel_comm_result_);
     return false;
   }
   groupSyncWriteVelocity_->clearParam();
@@ -222,7 +222,7 @@ bool DynamixelMultiDriver::syncWriteMovingSpeed(std::vector<uint16_t> spd)
   dynamixel_comm_result_ = groupSyncWriteMovingSpeed_->txPacket();
   if (dynamixel_comm_result_ != COMM_SUCCESS)
   {
-    packetHandler_->printTxRxResult(dynamixel_comm_result_);
+//    packetHandler_->printTxRxResult(dynamixel_comm_result_);
     return false;
   }
   groupSyncWriteMovingSpeed_->clearParam();
@@ -254,7 +254,7 @@ bool DynamixelMultiDriver::syncWriteCurrent(std::vector<int16_t> cur)
   dynamixel_comm_result_ = groupSyncWriteCurrent_->txPacket();
   if (dynamixel_comm_result_ != COMM_SUCCESS)
   {
-    packetHandler_->printTxRxResult(dynamixel_comm_result_);
+//    packetHandler_->printTxRxResult(dynamixel_comm_result_);
     return false;
   }
   groupSyncWriteCurrent_->clearParam();
@@ -286,7 +286,7 @@ bool DynamixelMultiDriver::syncWriteTorque(std::vector<uint8_t> &onoff)
   dynamixel_comm_result_ = groupSyncWriteTorque_->txPacket();
   if (dynamixel_comm_result_ != COMM_SUCCESS)
   {
-    packetHandler_->printTxRxResult(dynamixel_comm_result_);
+//    packetHandler_->printTxRxResult(dynamixel_comm_result_);
     return false;
   }
   groupSyncWriteTorque_->clearParam();
@@ -318,7 +318,7 @@ bool DynamixelMultiDriver::syncWriteProfileVelocity(std::vector<uint32_t> vel)
   dynamixel_comm_result_ = groupSyncWriteProfileVelocity_->txPacket();
   if (dynamixel_comm_result_ != COMM_SUCCESS)
   {
-    packetHandler_->printTxRxResult(dynamixel_comm_result_);
+//    packetHandler_->printTxRxResult(dynamixel_comm_result_);
     return false;
   }
   groupSyncWriteProfileVelocity_->clearParam();
@@ -350,7 +350,7 @@ bool DynamixelMultiDriver::syncWriteProfileVelocity(std::vector<uint32_t> vel)
   dynamixel_comm_result_ = groupSyncWriteProfileAcceleration_->txPacket();
   if (dynamixel_comm_result_ != COMM_SUCCESS)
   {
-    packetHandler_->printTxRxResult(dynamixel_comm_result_);
+//    packetHandler_->printTxRxResult(dynamixel_comm_result_);
     return false;
   }
   groupSyncWriteProfileAcceleration_->clearParam();
@@ -380,7 +380,7 @@ bool DynamixelMultiDriver::syncReadPosition(std::vector<uint32_t> &pos)
 
   dxl_comm_result = groupSyncReadPosition_->txRxPacket();
   if (dxl_comm_result != COMM_SUCCESS)
-    packetHandler_->printTxRxResult(dxl_comm_result);
+//    packetHandler_->printTxRxResult(dxl_comm_result);
 
   for (std::vector<dynamixel_tool::DynamixelTool *>::size_type num = 0; num < multi_dynamixel_.size(); ++num)
   {

@@ -142,13 +142,13 @@ bool DynamixelDriver::writeRegister(std::string addr_name, uint32_t value)
   {
     if (error != 0)
     {
-      packetHandler_->printRxPacketError(error);
+//      packetHandler_->printRxPacketError(error);
     }
     return true;
   }
   else
   {
-    packetHandler_->printTxRxResult(comm_result);
+//    packetHandler_->printTxRxResult(comm_result);
 
     ROS_ERROR("[ID] %u, Fail to write!", dynamixel_->id_);
   }
@@ -185,7 +185,7 @@ bool DynamixelDriver::readRegister(std::string addr_name, int32_t *value)
   {
     if (error != 0)
     {
-      packetHandler_->printRxPacketError(error);
+//      packetHandler_->printRxPacketError(error);
     }
 
     if (addr_item->data_length == 1)
@@ -207,7 +207,7 @@ bool DynamixelDriver::readRegister(std::string addr_name, int32_t *value)
   }
   else
   {
-    packetHandler_->printTxRxResult(comm_result);
+//    packetHandler_->printTxRxResult(comm_result);
 
     ROS_ERROR("[ID] %u, Fail to read!(%s)", dynamixel_->id_, addr_item->item_name.c_str());
     return false;
@@ -234,7 +234,7 @@ bool DynamixelDriver::reboot()
     {
       if (error != 0)
       {
-        packetHandler_->printRxPacketError(error);
+//        packetHandler_->printRxPacketError(error);
       }
       ROS_INFO("Success to reboot!");
       ROS_INFO("[ID] %u, [Model Name] %s, [BAUD RATE] %d", dynamixel_->id_, dynamixel_->model_name_.c_str(), portHandler_->getBaudRate());
@@ -243,7 +243,7 @@ bool DynamixelDriver::reboot()
     }
     else
     {
-      packetHandler_->printTxRxResult(comm_result);
+//      packetHandler_->printTxRxResult(comm_result);
       ROS_ERROR("Fail to reboot!");
 
       return false;
@@ -269,7 +269,7 @@ bool DynamixelDriver::reset()
     {
       if (error != 0)
       {
-        packetHandler_->printRxPacketError(error);
+//        packetHandler_->printRxPacketError(error);
       }
       ROS_INFO("Success to reset!");
 
@@ -297,7 +297,7 @@ bool DynamixelDriver::reset()
     }
     else
     {
-      packetHandler_->printTxRxResult(comm_result);
+//      packetHandler_->printTxRxResult(comm_result);
       ROS_ERROR("Fail to reset!");
 
       return false;
@@ -312,7 +312,7 @@ bool DynamixelDriver::reset()
     {
       if (error != 0)
       {
-        packetHandler_->printRxPacketError(error);
+//        packetHandler_->printRxPacketError(error);
       }
       ROS_INFO("Success to reset!");
 
@@ -334,7 +334,7 @@ bool DynamixelDriver::reset()
     }
     else
     {
-      packetHandler_->printTxRxResult(comm_result);
+//      packetHandler_->printTxRxResult(comm_result);
       ROS_ERROR("Fail to reset!");
 
       return false;
