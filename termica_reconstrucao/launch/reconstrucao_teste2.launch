@@ -5,10 +5,16 @@
   <arg name="do_accumulation" default="true"/>
 
 <!-- TERMICA -->
-    <node name="reconstrucao_termica" pkg="termica_reconstrucao" type="reconstrucaoF" output="screen">
-	<param name="topico_pc" value="/stereo/points2" /> <!-- Topico onde se le a point cloud stereo instantanea -->
-	<param name="topico_out" value="/termica/termica_pc" /> <!-- Tópico onde sera publicado a point cloud termica -->
-	<param name="topico_imagem" value="/termica/thermal/image_raw" /> <!-- Tópico contendo as imagens termicas publicadas-->
+<!--    <node name="reconstrucao_termica" pkg="termica_reconstrucao" type="reconstrucaoF" output="screen">
+        <param name="topico_pc" value="/stereo/points2" />
+        <param name="topico_out" value="/termica/termica_pc" />
+        <param name="topico_imagem" value="/termica/thermal/image_raw" />
+        <param name="termica_calibration_yaml" value="file://$(find rustbot_calibration)/calibration/termica"/>
+    </node>-->
+
+<!-- TERMICA VINICIUS -->
+    <node name="reconstrucao_termica" pkg="termica_reconstrucao" type="reconstrucao" output="screen">
+        <param name="topico_out" value="/termica/termica_pc" /> <!-- Tópico onde sera publicado a point cloud termica -->
         <param name="termica_calibration_yaml" value="file://$(find rustbot_calibration)/calibration/termica"/> <!-- Diretorio que contem o arquivo .yaml da calibracao da camera termica -->
     </node>
 
@@ -21,8 +27,8 @@
 </group>
 
 <!-- Escala de temperatura na imagem térmica -->
-<node name="reconstrucao_termica_escala" pkg="termica_reconstrucao" type="imTermicaScaled.py" output="screen">
-</node>      
+<!--<node name="reconstrucao_termica_escala" pkg="termica_reconstrucao" type="imTermicaScaled.py" output="screen">
+</node> -->
 
 <!---->
 

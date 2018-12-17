@@ -72,3 +72,9 @@ target_link_libraries(reconstrucaoF
   ${OpenCV_LIBS}
   ${Eigen_LIBRARIES}
 )
+
+## Vinicius
+add_executable(reconstrucao ${PROJECT_SOURCE_DIR}/src/reconstrucao.cpp)
+add_dependencies(reconstrucao ${catkin_EXPORTED_TARGETS})
+target_link_libraries (reconstrucao ${OpenCV_LIBS} ${Eigen_LIBRARIES} ${PCL_LIBRARIES} ${catkin_LIBRARIES} )
+
