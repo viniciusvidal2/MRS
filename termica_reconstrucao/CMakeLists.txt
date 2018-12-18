@@ -33,7 +33,6 @@ set(${PROJECT_NAME}_CATKIN_COMPONENTS
   camera_calibration_parsers
   camera_info_manager
   image_geometry
- # highgui
 )
 
 find_package(catkin REQUIRED COMPONENTS
