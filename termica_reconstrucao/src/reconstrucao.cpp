@@ -55,9 +55,9 @@ POINT_CLOUD_REGISTER_POINT_STRUCT (PointC,           // here we assume a XYZ + "
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Variaveis globais ///
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-pcl::PointCloud<PointT>::Ptr cloud_;
-pcl::PointCloud<PointC>::Ptr cloudCompleta;
-pcl::PointCloud<PointT>::Ptr cloudTransformada;
+//pcl::PointCloud<PointT>::Ptr cloud_;
+pcl::PointCloud<PointT>::Ptr cloud_visual_instantanea;
+pcl::PointCloud<PointT>::Ptr cloud_termica_instantanea;
 image_geometry::PinholeCameraModel camTermicaModelo_;
 
 ros::Publisher pc_termica_pub;
@@ -88,35 +88,39 @@ void projecao_callback(const sensor_msgs::ImageConstPtr imagem_input, sensor_msg
 
   // Nuvens de pontos
   std::string id = cloud_input->header.frame_id;
-  pcl::fromROSMsg(*cloud_input, *cloud_);
+  pcl::fromROSMsg(*cloud_input, *cloud_visual_instantanea);
   std::vector<int> indicesNAN;
-  pcl::removeNaNFromPointCloud(*cloud_, *cloud_, indicesNAN);
-  nPontos = int(cloud_->size());
+  pcl::removeNaNFromPointCloud(*cloud_visual_instantanea, *cloud_visual_instantanea, indicesNAN);
+  nPontos = int(cloud_visual_instantanea->size());
 
   ////// Aqui o processo de projecao propriamente dito com filtragem
   if(nPontos > 0 && nPontos < 1000000)
   {
-    cloudTransformada = cloud_;
-    cloudCompleta->resize(nPontos);
+//    cloud_termica_instantanea = cloud_;
+//    cloud_visual_instantanea->resize(nPontos);
 
     sensor_msgs::PointCloud2 termica_out;
     sensor_msgs::PointCloud2 visual_out;
+
+    // Pontos que serao validos se projetados corretamente
+//    PointC point_completa;
+    PointT point_termica;
 
     // Projetando os pontos para a imagem
     for(int i = 0; i < nPontos; i++)
     {
       cv::Point3d ponto3D;
       cv::Point2d pontoProjetado;
-      ponto3D.x = cloudTransformada->points[i].x;
-      ponto3D.y = cloudTransformada->points[i].y;
-      ponto3D.z = cloudTransformada->points[i].z;
+      ponto3D.x = cloud_visual_instantanea->points[i].x;
+      ponto3D.y = cloud_visual_instantanea->points[i].y;
+      ponto3D.z = cloud_visual_instantanea->points[i].z;
 
-      cloudCompleta->points[i].x = cloudTransformada->points[i].x;
-      cloudCompleta->points[i].y = cloudTransformada->points[i].y;
-      cloudCompleta->points[i].z = cloudTransformada->points[i].z;
-      cloudCompleta->points[i].b = cloudTransformada->points[i].b;
-      cloudCompleta->points[i].g = cloudTransformada->points[i].g;
-      cloudCompleta->points[i].r = cloudTransformada->points[i].r;
+//      cloud_visual_instantanea->points[i].x = cloud_termica_instantanea->points[i].x;
+//      cloud_visual_instantanea->points[i].y = cloud_termica_instantanea->points[i].y;
+//      cloud_visual_instantanea->points[i].z = cloud_termica_instantanea->points[i].z;
+//      cloud_visual_instantanea->points[i].b = cloud_termica_instantanea->points[i].b;
+//      cloud_visual_instantanea->points[i].g = cloud_termica_instantanea->points[i].g;
+//      cloud_visual_instantanea->points[i].r = cloud_termica_instantanea->points[i].r;
 
       pontoProjetado = camTermicaModelo_.project3dToPixel(ponto3D);
 
@@ -126,45 +130,70 @@ void projecao_callback(const sensor_msgs::ImageConstPtr imagem_input, sensor_msg
         int b = imgCv_.at<cv::Vec3b>(int(pontoProjetado.y), int(pontoProjetado.x))[0];
         int g = imgCv_.at<cv::Vec3b>(int(pontoProjetado.y), int(pontoProjetado.x))[1];
         int r = imgCv_.at<cv::Vec3b>(int(pontoProjetado.y), int(pontoProjetado.x))[2];
-        int gray = img_g.at<cv::Vec3b>(int(pontoProjetado.y), int(pontoProjetado.x))[0];
 
-        cloudTransformada->points[i].b = b;
-        cloudTransformada->points[i].g = g;
-        cloudTransformada->points[i].r = r;
+//        point_completa.x = ponto3D.x;
+//        point_completa.y = ponto3D.y;
+//        point_completa.z = ponto3D.z;
+//        point_completa.r = cloud_->points[i].r;
+//        point_completa.g = cloud_->points[i].g;
+//        point_completa.b = cloud_->points[i].b;
+//        point_completa.l = r;
+//        point_completa.o = g;
+//        point_completa.p = b;
 
-        cloudCompleta->points[i].l = r;
-        cloudCompleta->points[i].o = g;
-        cloudCompleta->points[i].p = b;
-      }
-      else
-      {
-        cloudTransformada->points[i].b = nan("");
-        cloudTransformada->points[i].g = nan("");
-        cloudTransformada->points[i].r = nan("");
-        cloudCompleta->points[i].l = nan("");
-        cloudCompleta->points[i].o = nan("");
-        cloudCompleta->points[i].p = nan("");
+        point_termica.x = ponto3D.x;
+        point_termica.y = ponto3D.y;
+        point_termica.z = ponto3D.z;
+        point_termica.r = r;
+        point_termica.g = g;
+        point_termica.b = b;
+
+        cloud_termica_instantanea->push_back(point_termica);
+//        cloud_visual_instantanea->push_back(point_completa);
+
+
+
+//        cloud_termica_instantanea->points[i].b = b;
+//        cloud_termica_instantanea->points[i].g = g;
+//        cloud_termica_instantanea->points[i].r = r;
+
+//        cloud_visual_instantanea->points[i].l = r;
+//        cloud_visual_instantanea->points[i].o = g;
+//        cloud_visual_instantanea->points[i].p = b;
+//      }
+//      else
+//      {
+//        cloud_termica_instantanea->points[i].b = nan("");
+//        cloud_termica_instantanea->points[i].g = nan("");
+//        cloud_termica_instantanea->points[i].r = nan("");
+//        cloud_visual_instantanea->points[i].l = nan("");
+//        cloud_visual_instantanea->points[i].o = nan("");
+//        cloud_visual_instantanea->points[i].p = nan("");
       }
     } // fim do for
   } // fim do if
 
   // Filtro final
-  std::vector<int> indicesNAN2;
-  pcl::removeNaNFromPointCloud(*cloudTransformada, *cloudTransformada, indicesNAN2);
-  pcl::removeNaNFromPointCloud(*cloudCompleta, *cloudCompleta, indicesNAN2);
+//  std::vector<int> indicesNAN2;
+//  pcl::removeNaNFromPointCloud(*cloud_termica_instantanea, *cloud_termica_instantanea, indicesNAN2);
+//  pcl::removeNaNFromPointCloud(*cloud_visual_instantanea, *cloud_visual_instantanea, indicesNAN2);
 
   // Empacota e publica novamente
   sensor_msgs::PointCloud2 termica_out;
-  sensor_msgs::PointCloud2 completa_out;
-  pcl::toROSMsg (*cloudTransformada, termica_out);
-  pcl::toROSMsg (*cloudCompleta, completa_out);
+  sensor_msgs::PointCloud2 visual_out;
+  pcl::toROSMsg (*cloud_termica_instantanea, termica_out);
+  pcl::toROSMsg (*cloud_visual_instantanea, visual_out);
 
   termica_out.header.frame_id = id;
   termica_out.header.stamp = cloud_input->header.stamp;
   pc_termica_pub.publish(termica_out);
-  completa_out.header.frame_id = id;
-  completa_out.header.stamp = cloud_input->header.stamp;
-  pc_completa_pub.publish(completa_out);
+  visual_out.header.frame_id = id;
+  visual_out.header.stamp = cloud_input->header.stamp;
+  pc_completa_pub.publish(visual_out);
+
+  // Liberando as nuvens, importante demais
+  cloud_termica_instantanea->clear();
+  cloud_visual_instantanea->clear();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -179,25 +208,23 @@ int main(int argc, char **argv)
   std::string termicaCalibrationYAML;
   nh.getParam("termica_calibration_yaml", termicaCalibrationYAML);
   termicaCalibrationYAML = termicaCalibrationYAML + std::string(".yaml");
-//  camera_info_manager::CameraInfoManager camInfo;
-//  camInfo.loadCameraInfo(termicaCalibrationYAML);
-//  camTermicaModelo_.fromCameraInfo(camInfo.getCameraInfo()); // So iniciando
 
   // Inicia nuvens de pontos alocando memoria
-  cloud_            = (PointCloud<PointT>::Ptr) new PointCloud<PointT>;
-  cloudCompleta     = (PointCloud<PointC>::Ptr) new PointCloud<PointC>;
-  cloudTransformada = (PointCloud<PointT>::Ptr) new PointCloud<PointT>;
+//  cloud_            = (PointCloud<PointT>::Ptr) new PointCloud<PointT>;
+  cloud_visual_instantanea     = (PointCloud<PointT>::Ptr) new PointCloud<PointT>;
+  cloud_termica_instantanea = (PointCloud<PointT>::Ptr) new PointCloud<PointT>;
 
   // Publicadores
   std::string topico_out;
   nh.getParam("topico_out", topico_out);
 
   pc_termica_pub  = nh.advertise<sensor_msgs::PointCloud2> ("/termica/termica_pc", 1000);
-  pc_completa_pub = nh.advertise<sensor_msgs::PointCloud2> ("/completa_pc"       , 1000);
+  pc_completa_pub = nh.advertise<sensor_msgs::PointCloud2> ("/visual_pc"       , 1000);
 
   // Iniciando o subscriber sincronizado
   message_filters::Subscriber<sensor_msgs::Image>       image_sub(  nh, "termica/thermal/image_raw"  , 200);
   message_filters::Subscriber<sensor_msgs::CameraInfo>  camera_sub( nh, "termica/thermal/camera_info", 200);
+//  message_filters::Subscriber<sensor_msgs::PointCloud2> cloud_sub(  nh, "/loop_closure_cloud"        , 200);
   message_filters::Subscriber<sensor_msgs::PointCloud2> cloud_sub(  nh, "stereo/points2"             , 200);
 
   Synchronizer<syncPolicy> sync(syncPolicy(200), image_sub, camera_sub, cloud_sub);
