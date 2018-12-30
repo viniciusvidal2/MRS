@@ -1,0 +1,25 @@
+<launch>
+<!--parametros de topicos e taxas-->
+<arg name="arg_camera_calibration_yaml" default="file://$(find rustbot_calibration)/calibration/calibration_50-0536881130"                  />
+<arg name="arg_cloud_topic_in"  default="/stereo/points2"           />
+<arg name="arg_cloud_topic_out" default="/overlap/termica_cloud"                          />
+<arg name="arg_image_topic_in"  default="/termica/thermal/image_raw"    />
+<arg name="arg_image_topic_out" default="/overlap/image"            />
+<arg name="arg_odom_topic_in"   default="/stereo_odometer/odometry" />
+<arg name="arg_odom_topic_out"  default="/overlap/odometry"         />
+<arg name="arg_camera_type"     default="termica"                          />
+<arg name="arg_overlap_rate"    default="90"                        />
+
+<!--Lancar aqui o no com os parametros vindos do usuario-->
+<node name="projecao_overlap" pkg="projecao_overlap" type="projecao_overlap_node" output="screen">
+   <param name="camera_calibration_yaml" value="$(arg arg_camera_calibration_yaml)"/>
+   <param name="cloud_topic_in"  value="$(arg arg_cloud_topic_in)" />
+   <param name="cloud_topic_out" value="$(arg arg_cloud_topic_out)"/>
+   <param name="image_topic_in"  value="$(arg arg_image_topic_in)" />
+   <param name="image_topic_out" value="$(arg arg_image_topic_out)"/>
+   <param name="odom_topic_in"   value="$(arg arg_odom_topic_in)"  />
+   <param name="odom_topic_out"  value="$(arg arg_odom_topic_out)" />
+   <param name="camera_type"     value="$(arg arg_camera_type)"    />
+   <param name="overlap_rate"    value="$(arg arg_overlap_rate)"   />
+</node>
+</launch>

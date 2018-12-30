@@ -73,7 +73,11 @@ target_link_libraries(reconstrucaoF
 )
 
 ## Vinicius
-add_executable(reconstrucao ${PROJECT_SOURCE_DIR}/src/reconstrucao.cpp)
-add_dependencies(reconstrucao ${catkin_EXPORTED_TARGETS})
-target_link_libraries (reconstrucao ${OpenCV_LIBS} ${Eigen_LIBRARIES} ${PCL_LIBRARIES} ${catkin_LIBRARIES} )
+add_executable(projeta_termica ${PROJECT_SOURCE_DIR}/src/projeta_termica.cpp)
+add_dependencies(projeta_termica ${catkin_EXPORTED_TARGETS})
+target_link_libraries (projeta_termica ${OpenCV_LIBS} ${Eigen_LIBRARIES} ${PCL_LIBRARIES} ${catkin_LIBRARIES} )
+
+add_executable(acumula_termica ${PROJECT_SOURCE_DIR}/src/acumula_termica.cpp)
+add_dependencies(acumula_termica ${catkin_EXPORTED_TARGETS})
+target_link_libraries (acumula_termica ${OpenCV_LIBS} ${Eigen_LIBRARIES} ${PCL_LIBRARIES} ${catkin_LIBRARIES} )
 
