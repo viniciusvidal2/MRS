@@ -27,7 +27,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: PointCloud2
+    SyncSource: ""
 Visualization Manager:
   Class: ""
   Displays:
@@ -74,7 +74,7 @@ Visualization Manager:
       Size (Pixels): 3
       Size (m): 0.00999999978
       Style: Points
-      Topic: /termica/termica_pc
+      Topic: /termica/cloud_inst
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
@@ -119,10 +119,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: -1.53960156
+      Pitch: -1.23979664
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 4.70858097
+      Yaw: 5.36858511
     Saved: ~
 Window Geometry:
   Displays:
@@ -140,5 +140,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1200
-  X: 1218
+  X: 720
   Y: 160

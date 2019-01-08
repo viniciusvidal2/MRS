@@ -286,8 +286,8 @@ bool FlirGige::GrabImage(sensor_msgs::Image &image_msg,
   image_msg.height = cache_.height;
   image_msg.width = cache_.width;
   if (cache_.bit == 2) {
-    image_msg.encoding = sensor_msgs::image_encodings::MONO16; // alterado de forma que seja possivel pegar a temperatura a partir do valor do pixel
-    image_msg.step = image_msg.width * 2;
+    image_msg.encoding = sensor_msgs::image_encodings::MONO8; // alterado de forma que seja possivel pegar a temperatura a partir do valor do pixel
+    image_msg.step = image_msg.width;// * 2;
   } else {
     image_msg.encoding = sensor_msgs::image_encodings::MONO16;
     image_msg.step = image_msg.width * 2;
