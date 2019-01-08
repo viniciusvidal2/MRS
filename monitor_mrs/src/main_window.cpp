@@ -246,7 +246,7 @@ void monitor_mrs::MainWindow::on_pushButton_iniciaStereo_clicked()
       ui.verticalSlider_offset->show();
     }
     sleep(5);
-    system("gnome-terminal -x sh -c 'roslaunch termica_reconstrucao reconstrucao_teste2.launch do_accumulation:=false'");
+//    system("gnome-terminal -x sh -c 'roslaunch termica_reconstrucao reconstrucao_teste2.launch do_accumulation:=false'");
     controle_stereo = true;
 
   } else {
@@ -420,10 +420,10 @@ void monitor_mrs::MainWindow::on_pushButton_playBag_clicked()
      break;
    }
  }
- system("gnome-terminal -x sh -c 'roslaunch rustbot_bringup all.launch do_stereo:=true online_stereo:=false do_accumulation:=false'");
+ system("gnome-terminal -x sh -c 'roslaunch rustbot_bringup all.launch do_stereo:=true online_stereo:=false do_accumulation:=true'");
  sleep(5);
- system("gnome-terminal -x sh -c 'roslaunch termica_reconstrucao reconstrucao_teste2.launch do_accumulation:=true'");
- sleep(5);
+// system("gnome-terminal -x sh -c 'roslaunch termica_reconstrucao reconstrucao_teste2.launch do_accumulation:=true'");
+// sleep(5);
  QString teste_comando = "gnome-terminal -x sh -c 'roslaunch rustbot_bringup playback.launch bag:=";
  teste_comando.append(arquivo.left(arquivo.size()-4));
  teste_comando.append(" local:=");

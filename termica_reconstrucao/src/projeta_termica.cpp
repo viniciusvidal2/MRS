@@ -141,8 +141,12 @@ int main(int argc, char **argv)
   ros::NodeHandle n_("~");
 
   // Modelo de camera
-  std::string termicaCalibrationYAML;
+  std::string termicaCalibrationYAML, input_cloud, input_image, input_odom;
+  n_.getParam("input_cloud", input_cloud);
+  n_.getParam("input_image", input_image);
+  n_.getParam("input_odom" , input_odom );
   n_.getParam("termica_calibration_yaml", termicaCalibrationYAML);
+
   termicaCalibrationYAML = termicaCalibrationYAML + std::string(".yaml");
   camera_info_manager::CameraInfoManager cam_info(n_, "termica", termicaCalibrationYAML);
   inicia_modelo_camera(cam_info.getCameraInfo());
@@ -156,9 +160,9 @@ int main(int argc, char **argv)
   odom_pub       = nh.advertise<nav_msgs::Odometry      > ("/termica/odometry"  , 1000);
 
   // Iniciando o subscriber sincronizado
-  message_filters::Subscriber<sensor_msgs::Image>       image_sub(nh, "/overlap/image"        , 200);
-  message_filters::Subscriber<sensor_msgs::PointCloud2> cloud_sub(nh, "/overlap/termica_cloud", 200);
-  message_filters::Subscriber<nav_msgs::Odometry>       odom_sub (nh, "/overlap/odometry"     , 200);
+  message_filters::Subscriber<sensor_msgs::Image>       image_sub(nh, input_image, 200);
+  message_filters::Subscriber<sensor_msgs::PointCloud2> cloud_sub(nh, input_cloud, 200);
+  message_filters::Subscriber<nav_msgs::Odometry>       odom_sub (nh, input_odom , 200);
 
   Synchronizer<syncPolicy> sync(syncPolicy(200), image_sub, cloud_sub, odom_sub);
   sync.registerCallback( boost::bind(&projecao_callback, _1, _2, _3) );

@@ -3,6 +3,9 @@
 <launch>
   <!--arguments-->
   <arg name="do_accumulation" default="true"/>
+  <arg name="input_cloud" default=""/>
+  <arg name="input_image" default=""/>
+  <arg name="input_odom"  default=""/>
 
 <!-- TERMICA -->
 <!--    <node name="reconstrucao_termica" pkg="termica_reconstrucao" type="reconstrucaoF" output="screen">
@@ -15,6 +18,9 @@
 <!-- TERMICA VINICIUS -->
     <node name="projeta_termica" pkg="termica_reconstrucao" type="projeta_termica" output="screen">
         <param name="termica_calibration_yaml" value="file://$(find rustbot_calibration)/calibration/termica"/> <!-- Diretorio que contem o arquivo .yaml da calibracao da camera termica -->
+        <param name="input_cloud" value="$(arg input_cloud)"/>
+        <param name="input_image" value="$(arg input_image)"/>
+        <param name="input_odom"  value="$(arg input_odom) "/>
     </node>
 
 
