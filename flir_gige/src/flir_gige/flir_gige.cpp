@@ -38,6 +38,11 @@ void FlirGige::Connect() {
   param_array_->SetEnumValue( "AcquisitionMode", 1 );
   param_array_->SetBooleanValue( "GrbCh0TrigCfgPLCTriggerable", true );
   param_array_->SetEnumValue ("PLC_Q14_Variable0", "PLC_I0" );
+
+
+  // Temperatura CONFIG
+    param_array_->SetEnumValue( "TemperatureLinearMode", 1 );
+    param_array_->SetEnumValue( "TemperatureLinearResolution", 1 );
 }
 
 void FlirGige::Disconnect() {
@@ -64,7 +69,9 @@ void FlirGige::StopAcquisition() {
 }
 
 void FlirGige::Configure(FlirGigeDynConfig &config) {
-  SetPixelFormat(config.raw);
+  //SetPixelFormat(config.raw);
+  // Temperatura CONFIG
+  SetPixelFormat(1);
   SetNucMode(config.nuc_mode);
   DoNuc(config.nuc_action);
 }
@@ -285,6 +292,11 @@ bool FlirGige::GrabImage(sensor_msgs::Image &image_msg,
   // Assemble image msg
   image_msg.height = cache_.height;
   image_msg.width = cache_.width;
+
+  // Temperatura CONFIG
+  image_msg.encoding = sensor_msgs::image_encodings::MONO16;
+  image_msg.step = image_msg.width * 2;
+  /*
   if (cache_.bit == 2) {
     image_msg.encoding = sensor_msgs::image_encodings::MONO8; // alterado de forma que seja possivel pegar a temperatura a partir do valor do pixel
     image_msg.step = image_msg.width;// * 2;
@@ -292,6 +304,7 @@ bool FlirGige::GrabImage(sensor_msgs::Image &image_msg,
     image_msg.encoding = sensor_msgs::image_encodings::MONO16;
     image_msg.step = image_msg.width * 2;
   }
+  */
 
   const size_t data_size = image->GetImageSize();
   if (image_msg.data.size() != data_size) {
@@ -303,6 +316,7 @@ bool FlirGige::GrabImage(sensor_msgs::Image &image_msg,
   pipeline_->ReleaseBuffer(buffer);
   //FlirGige::StartAcquisition();
   param_array_->ExecuteCommand("AcquisitionStart");
+  //std::cout << "enc: " << image_msg.encoding.c_str() << std::endl;
   return true;
 }
 
