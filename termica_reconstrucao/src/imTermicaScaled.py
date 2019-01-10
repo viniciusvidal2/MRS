@@ -20,6 +20,7 @@ class imScale():
 
 	def __init__(self):
 		self.image_pub = rospy.Publisher("termica/thermal/image_scaled", Image, queue_size = 10)
+                self.image_pub_8bit = rospy.Publisher("termica/thermal/image_8bit", Image, queue_size = 10)
 		self.subscriber = rospy.Subscriber("termica/thermal/image_raw", Image, self.imageCallback,  queue_size = 1)
 		self.bridge = CvBridge()
 
@@ -28,23 +29,18 @@ class imScale():
 		#print "callback"
 
 		# msg to opencv
-                #cv_image = self.bridge.imgmsg_to_cv2(data, 'mono16')
                 cv_image = self.bridge.imgmsg_to_cv2(data, desired_encoding="passthrough")
-                #cv_image = cv2.cvtColor(cv_image_cl, cv2.COLOR_BGR2GRAY)
-                #temp_0 = cv_image[100, 100]*0.04 - 273.15;
-                #print temp_0
-                print cv_image[50, 300]*0.04-273.15
-                print '---'
+                #cv_image_t = self.bridge.imgmsg_to_cv2(data, desired_encoding="mono8")
 
 		# colorbar
 		fig, ax = plt.subplots()
 		data = cv_image
                 dataMax = cv_image.max()
                 dataMin = cv_image.min()
-                print dataMax
-                print dataMin
+                #print dataMax
+                #print dataMin
                 dataStep = 12.5 # (0.5)/0.04  -- resolucao de 0.5 grau
-		cax = ax.imshow(data, interpolation = 'nearest', cmap = 'jet_r')
+                cax = ax.imshow(data, interpolation = 'none', cmap = 'jet_r')
                 cbar = fig.colorbar(cax, ticks = np.arange(0, dataMax + dataStep, dataStep), orientation='vertical')
                 cbar.ax.set_yticklabels(['{:.0f}'.format(x*0.04-273.15) for x in np.arange(dataMin, dataMax+dataStep, dataStep)])
                 ax.yaxis.set_major_locator(plt.NullLocator())
@@ -62,7 +58,22 @@ class imScale():
                 msg.data = np.array(cv2.imencode('.jpeg', data2)[1]).tostring()
 	     
 		# Publish new image
-		self.image_pub.publish ( self.bridge.cv2_to_imgmsg(data2, "bgr8") ) 
+		self.image_pub.publish ( self.bridge.cv2_to_imgmsg(data2, "bgr8") )                 
+
+                # Publish 8bit thermal image
+                fig8, ax8 = plt.subplots()
+                data8 = cv_image
+                print data8.shape
+                cax8 = ax8.imshow(data8, interpolation = 'none', cmap = 'jet_r')
+                ax8.yaxis.set_major_locator(plt.NullLocator())
+                ax8.xaxis.set_major_locator(plt.NullLocator())
+                fig8.canvas.draw()
+                data8 = np.fromstring(fig8.canvas.tostring_rgb(), dtype=np.uint8, sep='')
+                data8 = data8.reshape(fig8.canvas.get_width_height()[::-1] + (3,))
+                print data8.shape
+                print "----"
+                self.image_pub_8bit.publish ( self.bridge.cv2_to_imgmsg(data8, "bgr8") )
+
 
 
 ############################################################################################################################################
