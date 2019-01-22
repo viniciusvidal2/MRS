@@ -1,0 +1,135 @@
+#include <pcl_conversions/pcl_conversions.h>
+#include <pcl/point_cloud.h>
+#include <pcl/point_types.h>
+#include <pcl/point_types_conversion.h>
+#include <pcl/io/vtk_lib_io.h>
+#include <pcl/io/ply_io.h>
+#include <pcl/visualization/pcl_visualizer.h>
+
+#include <image_transport/image_transport.h>
+#include <cv_bridge/cv_bridge.h>
+#include <nav_msgs/Odometry.h>
+
+#include <boost/thread/thread.hpp>
+#include <iostream>
+#include <string>
+#include <numeric>
+#include <ros/ros.h>
+#include <string>
+
+#include <message_filters/subscriber.h>
+#include <message_filters/time_synchronizer.h>
+#include <message_filters/sync_policies/approximate_time.h>
+
+#include <tf/LinearMath/Quaternion.h>
+#include <tf/LinearMath/Matrix3x3.h>
+
+/// Namespaces
+using namespace pcl;
+using namespace std;
+using namespace message_filters;
+using namespace nav_msgs;
+using namespace geometry_msgs;
+using namespace cv;
+
+/// Definitions
+typedef PointXYZRGBNormal PointT;
+typedef sync_policies::ApproximateTime<sensor_msgs::Image, Odometry, Odometry> syncPolicy;
+
+// Variaveis globais
+PointCloud<PointT> caminho_zed;
+PointCloud<PointT> caminho_odo;
+int cont = 0, iteracoes = 100;
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+void visualizar_nuvem(){
+  boost::shared_ptr<pcl::visualization::PCLVisualizer> vis_placa (new PCLVisualizer("caminhos"));
+  vis_placa->addPointCloud<PointT>(caminho_zed, "caminhos");
+  vis_placa->addPointCloud<PointT>(caminho_odo, "caminhos");
+  vis_placa->spin();
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void atualizar_nuvem(const OdometryConstPtr& odom, string nome){
+  // Salvar cada odometria na nuvem
+  PointT point;
+  tf::Quaternion q_atual;
+  tf::Matrix3x3 m;
+  double roll, pitch, yaw;
+
+  q_atual.setX((double)odom->pose.pose.orientation.x);
+  q_atual.setY((double)odom->pose.pose.orientation.y);
+  q_atual.setZ((double)odom->pose.pose.orientation.z);
+  q_atual.setW((double)odom->pose.pose.orientation.w);
+//  q_atual.x() = (double)odom->pose.pose.orientation.x;
+//  q_atual.y() = (double)odom->pose.pose.orientation.y;
+//  q_atual.z() = (double)odom->pose.pose.orientation.z;
+//  q_atual.w() = (double)odom->pose.pose.orientation.w;
+  m.setRotation(q_atual);
+  m.getRPY(roll, pitch, yaw);
+
+  point.x        = odom->pose.pose.position.x;
+  point.y        = odom->pose.pose.position.y;
+  point.z        = odom->pose.pose.position.z;
+  point.normal_x = roll;
+  point.normal_y = pitch;
+  point.normal_z = yaw;
+
+  // Acumular na nuvem certa
+  if(nome == "zed"){
+    point.r = 0.0f; point.g = 250.0f; point.b = 0.0f; // Verde para referencia
+    caminho_zed.push_back(point);
+  } else {
+    point.r = 0.0f; point.g = 0.0f; point.b = 250.0f; // Azul para o testado
+    caminho_odo.push_back(point);
+  }
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void odoms_callback(const sensor_msgs::ImageConstPtr& msg_im,
+                    const OdometryConstPtr& msg_zed, const OdometryConstPtr& msg_odo){
+  if(cont < iteracoes){
+    cout << "\nOdometria salva para o ponto " << cont << "." << endl;
+    atualizar_nuvem(msg_zed, "zed");
+    atualizar_nuvem(msg_odo, "stereo");
+    cont++;
+  } else {
+    ROS_INFO("Salvando o arquivo com a odometria para ser guardado...");
+    time_t t = time(0);
+    struct tm * now = localtime( & t );
+    std::string month, day, hour, minutes;
+    month   = boost::lexical_cast<std::string>(now->tm_mon );
+    day     = boost::lexical_cast<std::string>(now->tm_mday);
+    hour    = boost::lexical_cast<std::string>(now->tm_hour);
+    minutes = boost::lexical_cast<std::string>(now->tm_min );
+    string date = "_" + month + "_" + day + "_" + hour + "h_" + minutes + "m";
+    string filename1 = "/home/mrs/Desktop/stereo_"+date+".ply";
+    string filename2 = "/home/mrs/Desktop/zed_"+date+".ply";
+    // Salvando com o nome diferenciado
+    if(!io::savePLYFileASCII(filename1, caminho_odo))
+      cout << "\n\nSalvo stereo na pasta caminhos com o nome stereo_"+date+".ply" << endl;
+    if(!io::savePLYFileASCII(filename2, caminho_zed))
+      cout << "\n\nSalvo zed    na pasta caminhos com o nome zed_"+date+".ply" << endl;
+
+    if(true){
+      visualizar_nuvem();
+    }
+    ros::shutdown();
+  }
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int main(int argc, char **argv)
+{
+  ros::init(argc, argv, "sincroniza_odometrias");
+  ros::NodeHandle nh;
+
+  // Subscriber para a imagem instantanea e odometrias
+  message_filters::Subscriber<sensor_msgs::Image> subima(nh, "/stereo/left/image_raw", 100);
+  message_filters::Subscriber<Odometry>           subzed(nh, "/zed/odom"             , 100);
+  message_filters::Subscriber<Odometry>           subodo(nh, "/stereo/odom/odometry" , 100);
+
+  // Sincroniza as leituras dos topicos
+  Synchronizer<syncPolicy> sync(syncPolicy(100), subima, subzed, subodo);
+  sync.registerCallback(boost::bind(&odoms_callback, _1, _2, _3));
+
+  ros::spin();
+}
