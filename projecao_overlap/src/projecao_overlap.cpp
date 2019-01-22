@@ -199,6 +199,9 @@ void loop_closure_callback(const sensor_msgs::ImageConstPtr& msg_ima,
 
     primeira_vez = false;
     podemos_publicar = true;
+
+    ros::Rate rate(1);
+    rate.sleep(); // Para dar tempo do no acumulador comecar
   } // fim do if
 
   // Publica tudo aqui a depender da camera e do resultado da avaliacao do overlap
