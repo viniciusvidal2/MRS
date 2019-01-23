@@ -85,6 +85,28 @@ void atualizar_nuvem(const OdometryConstPtr& odom, string nome){
   }
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void salvar_nuvens(){
+  ROS_INFO("Salvando o arquivo com a odometria para ser guardado...");
+  time_t t = time(0);
+  struct tm * now = localtime( & t );
+  std::string month, day, hour, minutes;
+  month   = boost::lexical_cast<std::string>(now->tm_mon );
+  day     = boost::lexical_cast<std::string>(now->tm_mday);
+  hour    = boost::lexical_cast<std::string>(now->tm_hour);
+  minutes = boost::lexical_cast<std::string>(now->tm_min );
+  string date = "_" + month + "_" + day + "_" + hour + "h_" + minutes + "m";
+  string home = getenv("HOME");
+  string filename1 = (home+"/Desktop/stereo_"+date+".ply").c_str();
+  string filename2 = (home+"/Desktop/zed_"+date+".ply").c_str();
+  // Salvando com o nome diferenciado
+  if(!io::savePLYFileASCII(filename1, *caminho_odo))
+    cout << "\n\nSalvo stereo na pasta caminhos com o nome stereo_"+date+".ply" << endl;
+  if(!io::savePLYFileASCII(filename2, *caminho_zed))
+    cout << "\n\nSalvo zed    na pasta caminhos com o nome zed_"+date+".ply" << endl;
+
+  ros::shutdown();
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void odoms_callback(const sensor_msgs::ImageConstPtr& msg_im,
                     const OdometryConstPtr& msg_zed, const OdometryConstPtr& msg_odo){
   if(cont < iteracoes){
@@ -93,29 +115,11 @@ void odoms_callback(const sensor_msgs::ImageConstPtr& msg_im,
     atualizar_nuvem(msg_odo, "stereo");
     cont++;
   } else {
-    ROS_INFO("Salvando o arquivo com a odometria para ser guardado...");
-    time_t t = time(0);
-    struct tm * now = localtime( & t );
-    std::string month, day, hour, minutes;
-    month   = boost::lexical_cast<std::string>(now->tm_mon );
-    day     = boost::lexical_cast<std::string>(now->tm_mday);
-    hour    = boost::lexical_cast<std::string>(now->tm_hour);
-    minutes = boost::lexical_cast<std::string>(now->tm_min );
-    string date = "_" + month + "_" + day + "_" + hour + "h_" + minutes + "m";
-    string filename1 = "/home/mrs/Desktop/stereo_"+date+".ply";
-    string filename2 = "/home/mrs/Desktop/zed_"+date+".ply";
-    // Salvando com o nome diferenciado
-    if(!io::savePLYFileASCII(filename1, *caminho_odo))
-      cout << "\n\nSalvo stereo na pasta caminhos com o nome stereo_"+date+".ply" << endl;
-    if(!io::savePLYFileASCII(filename2, *caminho_zed))
-      cout << "\n\nSalvo zed    na pasta caminhos com o nome zed_"+date+".ply" << endl;
-
-    if(true){
+    salvar_nuvens();
+    if(true)
       visualizar_nuvem();
-    }
-
-    ros::shutdown();
   }
+
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -142,5 +146,11 @@ int main(int argc, char **argv)
   Synchronizer<syncPolicy> sync(syncPolicy(100), subima, subzed, subodo);
   sync.registerCallback(boost::bind(&odoms_callback, _1, _2, _3));
 
-  ros::spin();
+  while(ros::ok()){
+    ros::spinOnce();
+  }
+//  if(!ros::ok())
+  salvar_nuvens();
+
+  return 0;
 }
