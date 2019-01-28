@@ -220,8 +220,10 @@ void loop_closure_callback(const sensor_msgs::ImageConstPtr& msg_ima,
 
     if(camera_type == "termica"){
       image_pub.publish(msg_image_out);    // Imagem passa direto por aqui, so sincronizada
+      ROS_INFO("Publicou camera TERMICA");
+    } else {
+      ROS_INFO("Publicou camera VISUAL");
     }
-
   }
 
   // Libera as nuvens

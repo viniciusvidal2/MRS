@@ -6,6 +6,7 @@ Panels:
       Expanded:
         - /Global Options1
         - /PointCloud21
+        - /Odometry1
       Splitter Ratio: 0.5
     Tree Height: 565
   - Class: rviz/Selection
@@ -78,6 +79,40 @@ Visualization Manager:
       Use Fixed Frame: true
       Use rainbow: true
       Value: true
+    - Angle Tolerance: 0.100000001
+      Class: rviz/Odometry
+      Covariance:
+        Orientation:
+          Alpha: 0.5
+          Color: 255; 255; 127
+          Color Style: Unique
+          Frame: Local
+          Offset: 1
+          Scale: 1
+          Value: true
+        Position:
+          Alpha: 0.300000012
+          Color: 204; 51; 204
+          Scale: 1
+          Value: true
+        Value: false
+      Enabled: true
+      Keep: 100
+      Name: Odometry
+      Position Tolerance: 0.100000001
+      Shape:
+        Alpha: 1
+        Axes Length: 1
+        Axes Radius: 0.100000001
+        Color: 255; 25; 0
+        Head Length: 0.300000012
+        Head Radius: 0.100000001
+        Shaft Length: 1
+        Shaft Radius: 0.0500000007
+        Value: Axes
+      Topic: /stereo_odometer/odometry
+      Unreliable: false
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -103,25 +138,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 33.312912
+      Distance: 6.45863485
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.752939045
-        Y: 1.07245708
-        Z: 32.1138954
+        X: 0.657523811
+        Y: -0.644636393
+        Z: 2.10220766
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: -1.54479635
+      Pitch: -1.56979632
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 4.75857735
+      Yaw: 4.70989752
     Saved: ~
 Window Geometry:
   Displays:
@@ -139,5 +174,5 @@ Window Geometry:
   Views:
     collapsed: true
   Width: 1200
-  X: 91
-  Y: 129
+  X: 720
+  Y: 190

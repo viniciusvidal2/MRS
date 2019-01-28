@@ -42,10 +42,8 @@ typedef sync_policies::ApproximateTime<sensor_msgs::PointCloud2, Odometry> syncP
 
 /// Global vars
 PointCloud<PointT >::Ptr accumulated_cloud;
-PointCloud<PointT>::Ptr cloud_acumulada_termica;
 tf::TransformListener *p_listener;
 boost::shared_ptr<ros::Publisher> pub;
-boost::shared_ptr<ros::Publisher> pub_termica;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void passthrough(PointCloud<PointT>::Ptr in, std::string field, float min, float max){
@@ -70,6 +68,17 @@ void filter_grid(PointCloud<PointT>::Ptr in, float lf){
   grid.setInputCloud(in);
   grid.setLeafSize(lf, lf, lf);
   grid.filter(*in);
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void publicar_nuvem_atual(){
+  if (accumulated_cloud->size() > 0){
+    sensor_msgs::PointCloud2 msg_out;
+    toROSMsg(*accumulated_cloud, msg_out);
+    msg_out.header.stamp = ros::Time::now();
+    msg_out.header.frame_id = accumulated_cloud->header.frame_id;
+    ROS_INFO("Publicando nuvem acumulada TERMICA");
+    pub->publish(msg_out);
+  }
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void acumulador_callback(const sensor_msgs::PointCloud2ConstPtr& msg_ptc_ter,
@@ -111,12 +120,12 @@ void acumulador_callback(const sensor_msgs::PointCloud2ConstPtr& msg_ptc_ter,
 
   // Accumulate the point cloud using the += operator
   (*accumulated_cloud) += (*cloud_transformed);
-  ROS_INFO("Tamanho da nuvem acumulada = %ld", accumulated_cloud->points.size());
+  ROS_INFO("Tamanho da nuvem acumulada termica = %ld", accumulated_cloud->points.size());
 
   // Convert the pcl point cloud to ros msg and publish
-  toROSMsg(*accumulated_cloud, msg_out);
-  msg_out.header.stamp = ros::Time::now();
-  pub->publish(msg_out);
+//  toROSMsg(*accumulated_cloud, msg_out);
+//  msg_out.header.stamp = ros::Time::now();
+//  pub->publish(msg_out);
 
   // Reseta as nuvens
   cloud.reset();
@@ -138,7 +147,7 @@ int main (int argc, char** argv)
 
   // Initialize the point cloud publisher
   pub = (boost::shared_ptr<ros::Publisher>) new ros::Publisher;
-  *pub = nh.advertise<sensor_msgs::PointCloud2>("/accumulated_termica", 300);
+  *pub = nh.advertise<sensor_msgs::PointCloud2>("/accumulated_termica", 5);
 
   // Subscriber para a nuvem instantanea e odometria
   message_filters::Subscriber<sensor_msgs::PointCloud2>  subptcter(nh, "/termica/cloud_inst", 100);
@@ -148,7 +157,13 @@ int main (int argc, char** argv)
   Synchronizer<syncPolicy> sync(syncPolicy(100), subptcter, subodo);
   sync.registerCallback(boost::bind(&acumulador_callback, _1, _2));
 
-  ros::spin();
+  ros::Rate rate(1);
+  while(ros::ok()){
+    publicar_nuvem_atual();
+
+    rate.sleep();
+    ros::spinOnce();
+  }
 
   return 0;
 }

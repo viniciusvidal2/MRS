@@ -238,7 +238,7 @@ void monitor_mrs::MainWindow::on_pushButton_iniciaStereo_clicked()
     ui.pushButton_iniciaStereo->setStyleSheet("background-color: rgb(230, 0, 20); color: rgb(0, 0, 0)"); // Assim esta deve parar stereo
     ui.pushButton_iniciaStereo->setText("Parar processo Stereo");
 
-    system("gnome-terminal -x sh -c 'roslaunch rustbot_bringup all.launch do_accumulation:=false do_gps:=true do_fusion:=false do_slam:=false do_stereo:=true online_stereo:=true'");
+    system("gnome-terminal -x sh -c 'roslaunch rustbot_bringup all.launch do_accumulation:=false do_gps:=true do_fusion:=false do_slam:=true do_stereo:=true online_stereo:=true'");
     ui.listWidget->addItem(QString::fromStdString("Processamento Stereo lancado, sistema rodando..."));
     ui.listWidget->addItem(QString::fromStdString("Assim que possivel, inicie a coleta e armazenagem de dados."));
     if(ui.radioButton_automatico->isChecked()){
