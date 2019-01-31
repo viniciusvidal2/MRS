@@ -40,7 +40,8 @@ image_geometry::PinholeCameraModel model;
 ros::Publisher pc_termica_pub;
 ros::Publisher odom_pub;
 
-boost::array<double, 12> P_correta{1400, 0, 330, -50, 0, 1400, 270, -8.16, 0, 0, 1, 0};
+//boost::array<double, 12> P_correta{1400, 0, 330, -50, 0, 1400, 270, -8.16, 0, 0, 1, 0};
+boost::array<double, 12> P_correta{1580, 0, 330, -280, 0, 1580, 270, 228.16, 0, 0, 1, 0};
 
 cv::Size image_size;
 
