@@ -75,7 +75,7 @@ Visualization Manager:
       Selectable: true
       Size (Pixels): 3
       Size (m): 0.00999999978
-      Style: Flat Squares
+      Style: Points
       Topic: /accumulated_point_cloud
       Unreliable: false
       Use Fixed Frame: true
@@ -137,7 +137,7 @@ Visualization Manager:
       Position Transformer: XYZ
       Queue Size: 10
       Selectable: true
-      Size (Pixels): 3
+      Size (Pixels): 5
       Size (m): 0.00999999978
       Style: Points
       Topic: /accumulated_termica
@@ -170,25 +170,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 0.225043967
+      Distance: 2.29429173
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.393309414
-        Y: 0.0361022949
-        Z: -0.403825253
+        X: 0.497831613
+        Y: -1.29431701
+        Z: -0.0171916373
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: -1.56479633
+      Pitch: -1.56979632
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 4.69940948
+      Yaw: 4.72941113
     Saved:
       - Class: rviz/Orbit
         Distance: 20.8807545
@@ -226,5 +226,5 @@ Window Geometry:
   Views:
     collapsed: true
   Width: 1311
-  X: 359
-  Y: 18
+  X: 624
+  Y: 1137

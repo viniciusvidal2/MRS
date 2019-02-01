@@ -75,6 +75,7 @@ int n_pontos_fora_da_imagem_referencia = 0;
 
 // Tamanho da imagem de entrada, nao precisa da imagem em si aqui
 cv::Size image_size;
+float thresh_dist = 10.0;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Iniciar o modelo da camera
@@ -133,6 +134,17 @@ void loop_closure_callback(const sensor_msgs::ImageConstPtr& msg_ima,
 
     // Calcular transformacao relativa entre os instantes
     calcula_transformacao_relativa();
+    // Aqui ja checa o que foi deslocado, se passou do limite renova a pose da camera referencia e publica ao final
+    if(t_relativo.norm() > thresh_dist){
+      cout << "\nPassou a distancia: " << t_relativo.norm() << endl;
+
+      podemos_publicar = true; // Podemos publicar qual seja a nuvem filtrada e as imagens
+      msg_odom_out  = *msg_odo;
+      msg_image_out = *msg_ima; // Separadas as mensagens de imagem e odometria pra passar em frente sincronizado, camera termica somente
+      // Armazena para a proxima iteracao a odometria de referencia
+      q_anterior = q_atual;
+      t_anterior = t_atual;
+    }
 
     // Transformar camera para o ponto onde estava na iteracao anterior, e a nuvem para a iteracao de agora
     transformPointCloud<PointT>(*cloud, *cloud_tf, t_relativo, q_relativo);
@@ -144,7 +156,7 @@ void loop_closure_callback(const sensor_msgs::ImageConstPtr& msg_ima,
 
     if (overlap_0_a_1 < 0.4){
       (*cloud_filt) = (*cloud);
-    } else {
+    } else if(podemos_publicar == false) {
       for(int i=0; i < cloud_tf->size(); i++){
         ponto3D.x = cloud_tf->points[i].x;
         ponto3D.y = cloud_tf->points[i].y;
@@ -163,7 +175,7 @@ void loop_closure_callback(const sensor_msgs::ImageConstPtr& msg_ima,
     cout << "Estamos com " << cloud_filt->size() << " nao projetados dentre " << cloud_tf->size() << " totais." << endl;
 
     // Testar se reduzimos o suficiente o overlap desejado, se sim podemos atualizar a referencia e seguir com mensagens publicadas
-    if( float(cloud->size() - n_pontos_fora_da_imagem_referencia) / float(cloud->size())  <  overlap_0_a_1 ){
+    if( float(cloud->size() - n_pontos_fora_da_imagem_referencia) / float(cloud->size())  <  overlap_0_a_1 && podemos_publicar == false){
 
       cout << "\nQuantos pontos fora da imagem: " << n_pontos_fora_da_imagem_referencia << "\tTotal: " << cloud->size() << endl;
       cout << "Taxa de relacao: " << float(cloud->size() - n_pontos_fora_da_imagem_referencia) / float(cloud->size())  << endl;
