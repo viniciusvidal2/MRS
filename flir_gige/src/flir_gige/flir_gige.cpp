@@ -42,7 +42,8 @@ void FlirGige::Connect() {
 
   // Temperatura CONFIG
     param_array_->SetEnumValue( "TemperatureLinearMode", 1 );
-    param_array_->SetEnumValue( "TemperatureLinearResolution", 1 );
+    param_array_->SetEnumValue( "TemperatureLinearResolution", 0 );  // 1: high gain mode (K = 0.04, T = -25C -> 135C)
+                                                                     // 0: low gain mode  (K = 0.40, T = -40C -> 550C)
 }
 
 void FlirGige::Disconnect() {
