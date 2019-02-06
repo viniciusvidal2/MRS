@@ -43,10 +43,10 @@ int cont = 0, iteracoes = 100;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 void visualizar_nuvem(){
-  boost::shared_ptr<pcl::visualization::PCLVisualizer> vis_placa (new PCLVisualizer("caminhos"));
-  vis_placa->addPointCloud<PointT>(caminho_zed, "caminhos");
-  vis_placa->addPointCloud<PointT>(caminho_odo, "caminhos");
-  vis_placa->spin();
+  //boost::shared_ptr<pcl::visualization::PCLVisualizer> vis_placa (new PCLVisualizer("caminhos"));
+  //vis_placa->addPointCloud<PointT>(caminho_zed, "caminhos");
+  //vis_placa->addPointCloud<PointT>(caminho_odo, "caminhos");
+  //vis_placa->spin();
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void atualizar_nuvem(const OdometryConstPtr& odom, string nome){

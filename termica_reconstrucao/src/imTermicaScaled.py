@@ -32,8 +32,8 @@ class imScale():
 
 
             ## Fator de ganho da camera termica
-            K = 0.04   #high resolution mode
-            #K = 0.4   #low resolution mode
+            #K = 0.04   #high resolution mode
+            K = 0.4   #low resolution mode
 
 
             ## Escolhendo as temperaturas minimas e maximas a serem detectadas
