@@ -26,6 +26,9 @@
 
 /// Namespaces
 using namespace pcl;
+
+using namespace pcl::visualization;
+
 using namespace std;
 using namespace message_filters;
 using namespace nav_msgs;
@@ -37,16 +40,17 @@ typedef PointXYZRGBNormal PointT;
 typedef sync_policies::ApproximateTime<sensor_msgs::Image, Odometry, Odometry> syncPolicy;
 
 // Variaveis globais
-PointCloud<PointT> caminho_zed;
-PointCloud<PointT> caminho_odo;
+PointCloud<PointT>::Ptr caminho_zed;
+PointCloud<PointT>::Ptr caminho_odo;
+
 int cont = 0, iteracoes = 100;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 void visualizar_nuvem(){
-  //boost::shared_ptr<pcl::visualization::PCLVisualizer> vis_placa (new PCLVisualizer("caminhos"));
-  //vis_placa->addPointCloud<PointT>(caminho_zed, "caminhos");
-  //vis_placa->addPointCloud<PointT>(caminho_odo, "caminhos");
-  //vis_placa->spin();
+  boost::shared_ptr<PCLVisualizer> vis_placa (new PCLVisualizer("caminhos"));
+  vis_placa->addPointCloud<PointT>(caminho_zed, "caminho_zed");
+  vis_placa->addPointCloud<PointT>(caminho_odo, "caminho_stereo");
+  vis_placa->spin();
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void atualizar_nuvem(const OdometryConstPtr& odom, string nome){
@@ -77,11 +81,34 @@ void atualizar_nuvem(const OdometryConstPtr& odom, string nome){
   // Acumular na nuvem certa
   if(nome == "zed"){
     point.r = 0.0f; point.g = 250.0f; point.b = 0.0f; // Verde para referencia
-    caminho_zed.push_back(point);
+
+    caminho_zed->push_back(point);
   } else {
     point.r = 0.0f; point.g = 0.0f; point.b = 250.0f; // Azul para o testado
-    caminho_odo.push_back(point);
+    caminho_odo->push_back(point);
   }
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void salvar_nuvens(){
+  ROS_INFO("Salvando o arquivo com a odometria para ser guardado...");
+  time_t t = time(0);
+  struct tm * now = localtime( & t );
+  std::string month, day, hour, minutes;
+  month   = boost::lexical_cast<std::string>(now->tm_mon );
+  day     = boost::lexical_cast<std::string>(now->tm_mday);
+  hour    = boost::lexical_cast<std::string>(now->tm_hour);
+  minutes = boost::lexical_cast<std::string>(now->tm_min );
+  string date = "_" + month + "_" + day + "_" + hour + "h_" + minutes + "m";
+  string home = getenv("HOME");
+  string filename1 = (home+"/Desktop/stereo_"+date+".ply").c_str();
+  string filename2 = (home+"/Desktop/zed_"+date+".ply").c_str();
+  // Salvando com o nome diferenciado
+  if(!io::savePLYFileASCII(filename1, *caminho_odo))
+    cout << "\n\nSalvo stereo na pasta caminhos com o nome stereo_"+date+".ply" << endl;
+  if(!io::savePLYFileASCII(filename2, *caminho_zed))
+    cout << "\n\nSalvo zed    na pasta caminhos com o nome zed_"+date+".ply" << endl;
+
+  ros::shutdown();
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void odoms_callback(const sensor_msgs::ImageConstPtr& msg_im,
@@ -92,6 +119,11 @@ void odoms_callback(const sensor_msgs::ImageConstPtr& msg_im,
     atualizar_nuvem(msg_odo, "stereo");
     cont++;
   } else {
+    salvar_nuvens();
+    if(true)
+      visualizar_nuvem();
+  }
+
     ROS_INFO("Salvando o arquivo com a odometria para ser guardado...");
     time_t t = time(0);
     struct tm * now = localtime( & t );
@@ -121,15 +153,30 @@ int main(int argc, char **argv)
 {
   ros::init(argc, argv, "sincroniza_odometrias");
   ros::NodeHandle nh;
+  ros::NodeHandle n_("~");
+
+  // Inicia nuvens
+  caminho_zed = (PointCloud<PointT>::Ptr) new PointCloud<PointT>;
+  caminho_odo = (PointCloud<PointT>::Ptr) new PointCloud<PointT>;
+
+  // Tamanho do path a ser gravado das odometrias - iteracoes
+  n_.getParam("iteracoes", iteracoes);
+  ROS_INFO("Numero de iteracoes: %d", iteracoes);
 
   // Subscriber para a imagem instantanea e odometrias
-  message_filters::Subscriber<sensor_msgs::Image> subima(nh, "/stereo/left/image_raw", 100);
-  message_filters::Subscriber<Odometry>           subzed(nh, "/zed/odom"             , 100);
-  message_filters::Subscriber<Odometry>           subodo(nh, "/stereo/odom/odometry" , 100);
+  message_filters::Subscriber<sensor_msgs::Image> subima(nh, "/stereo/left/image_raw"   , 100);
+  message_filters::Subscriber<Odometry>           subzed(nh, "/zed/odom"                , 100);
+  message_filters::Subscriber<Odometry>           subodo(nh, "/stereo_odometer/odometry", 100);
 
   // Sincroniza as leituras dos topicos
   Synchronizer<syncPolicy> sync(syncPolicy(100), subima, subzed, subodo);
   sync.registerCallback(boost::bind(&odoms_callback, _1, _2, _3));
 
-  ros::spin();
+  while(ros::ok()){
+    ros::spinOnce();
+  }
+//  if(!ros::ok())
+  salvar_nuvens();
+
+  return 0;
 }
