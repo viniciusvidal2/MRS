@@ -26,7 +26,9 @@
 
 /// Namespaces
 using namespace pcl;
+
 using namespace pcl::visualization;
+
 using namespace std;
 using namespace message_filters;
 using namespace nav_msgs;
@@ -40,6 +42,7 @@ typedef sync_policies::ApproximateTime<sensor_msgs::Image, Odometry, Odometry> s
 // Variaveis globais
 PointCloud<PointT>::Ptr caminho_zed;
 PointCloud<PointT>::Ptr caminho_odo;
+
 int cont = 0, iteracoes = 100;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -78,6 +81,7 @@ void atualizar_nuvem(const OdometryConstPtr& odom, string nome){
   // Acumular na nuvem certa
   if(nome == "zed"){
     point.r = 0.0f; point.g = 250.0f; point.b = 0.0f; // Verde para referencia
+
     caminho_zed->push_back(point);
   } else {
     point.r = 0.0f; point.g = 0.0f; point.b = 250.0f; // Azul para o testado
@@ -120,6 +124,28 @@ void odoms_callback(const sensor_msgs::ImageConstPtr& msg_im,
       visualizar_nuvem();
   }
 
+    ROS_INFO("Salvando o arquivo com a odometria para ser guardado...");
+    time_t t = time(0);
+    struct tm * now = localtime( & t );
+    std::string month, day, hour, minutes;
+    month   = boost::lexical_cast<std::string>(now->tm_mon );
+    day     = boost::lexical_cast<std::string>(now->tm_mday);
+    hour    = boost::lexical_cast<std::string>(now->tm_hour);
+    minutes = boost::lexical_cast<std::string>(now->tm_min );
+    string date = "_" + month + "_" + day + "_" + hour + "h_" + minutes + "m";
+    string filename1 = "/home/mrs/Desktop/stereo_"+date+".ply";
+    string filename2 = "/home/mrs/Desktop/zed_"+date+".ply";
+    // Salvando com o nome diferenciado
+    if(!io::savePLYFileASCII(filename1, caminho_odo))
+      cout << "\n\nSalvo stereo na pasta caminhos com o nome stereo_"+date+".ply" << endl;
+    if(!io::savePLYFileASCII(filename2, caminho_zed))
+      cout << "\n\nSalvo zed    na pasta caminhos com o nome zed_"+date+".ply" << endl;
+
+    if(true){
+      visualizar_nuvem();
+    }
+    ros::shutdown();
+  }
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
