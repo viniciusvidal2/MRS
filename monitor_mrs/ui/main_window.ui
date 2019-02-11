@@ -2946,6 +2946,19 @@
        </layout>
       </widget>
      </widget>
+     <widget class="QPushButton" name="pushButton_setaimagem">
+      <property name="geometry">
+       <rect>
+        <x>820</x>
+        <y>75</y>
+        <width>231</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Imagem termica</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="tab_off">
      <attribute name="title">

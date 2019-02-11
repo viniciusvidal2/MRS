@@ -58,6 +58,10 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
   ui.horizontalSlider_offset->hide();
   ui.verticalSlider_offset->hide();
 
+  ui.pushButton_setaimagem->setAutoFillBackground(true);
+  ui.pushButton_setaimagem->setStyleSheet("background-color: rgb(230, 230, 0); color: rgb(0, 0, 0)");
+  ui.pushButton_setaimagem->setText("Imagem termica");
+
   ui.radioButton_caminhocompleto->setChecked(true);
   ui.radioButton_pontosdeinteresse->setChecked(false);
 
@@ -78,6 +82,10 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
 
   gige_ir.setOffset(0, 0);
   gige_ir.vamos_gravar(false);
+
+  // Qual imagem vai comecar rodando?
+  fonte_imagem = visual; // Imagem que estara aparecendo
+  gige_ir.set_imagem(0); // 0 esta para visual, default
 }
 
 MainWindow::~MainWindow() {}
@@ -221,18 +229,6 @@ void monitor_mrs::MainWindow::on_pushButton_iniciaStereo_clicked()
 {
   gige_ir.setOffset(0, 0); // Assim apontamos para frente forcado
 
-//  // Ver o tempo para criar pasta automaticamente onde gravar dados novos
-//  time_t t = time(0);
-//  struct tm * now = localtime( & t );
-//  string year, month, day, hour, minutes;
-//  year    = boost::lexical_cast<std::string>(now->tm_year + 1900);
-//  month   = boost::lexical_cast<std::string>(now->tm_mon );
-//  day     = boost::lexical_cast<std::string>(now->tm_mday);
-//  hour    = boost::lexical_cast<std::string>(now->tm_hour);
-//  minutes = boost::lexical_cast<std::string>(now->tm_min );
-//  string date = year + "_" + month + "_" + day + "_" + hour + "h_" + minutes + "m";
-
-
   if(!controle_stereo){ // Nao estamos fazendo stereo, clicou para comecar
     ui.pushButton_iniciaStereo->setAutoFillBackground(true);
     ui.pushButton_iniciaStereo->setStyleSheet("background-color: rgb(230, 0, 20); color: rgb(0, 0, 0)"); // Assim esta deve parar stereo
@@ -246,6 +242,7 @@ void monitor_mrs::MainWindow::on_pushButton_iniciaStereo_clicked()
       ui.verticalSlider_offset->show();
     }
     sleep(5);
+    system("gnome-terminal -x sh -c 'rosrun termica_reconstrucao imTermicaScaled.py'");
 //    system("gnome-terminal -x sh -c 'roslaunch termica_reconstrucao reconstrucao_teste2.launch do_accumulation:=false'");
     controle_stereo = true;
 
@@ -268,7 +265,7 @@ void monitor_mrs::MainWindow::on_pushButton_iniciaStereo_clicked()
 
 void monitor_mrs::MainWindow::on_pushButton_cameratermica_clicked()
 {
-  system("gnome-terminal -x sh -c 'rqt_image_view /termica/thermal/image_raw'");
+  system("gnome-terminal -x sh -c 'rqt_image_view /dados_sync/image_8bits'");
 }
 void monitor_mrs::MainWindow::on_pushButton_reconstrucaoInstantaneaTermica_clicked()
 {
@@ -472,4 +469,26 @@ void monitor_mrs::MainWindow::on_pushButton_recAcumulada_clicked()
 void monitor_mrs::MainWindow::on_pushButton_recAcumuladaTermica_clicked()
 {
   system("gnome-terminal -x sh -c 'rosrun rviz rviz -f odom -d $HOME/mrs_ws/src/MRS/monitor_mrs/resources/salvacao_do_mundo_termica.rviz'");
+}
+
+void monitor_mrs::MainWindow::on_pushButton_setaimagem_clicked()
+{
+
+  if(fonte_imagem == visual){ // Estamos na visual e ao clicar mudamos pra termica, tudo tem que indicar o caminho de volta pra visual
+    ui.pushButton_setaimagem->setAutoFillBackground(true);
+    ui.pushButton_setaimagem->setStyleSheet("background-color: rgb(0, 100, 230); color: rgb(250, 250, 250)");
+    ui.pushButton_setaimagem->setText("Imagem visual");
+
+    gige_ir.set_imagem(1); // Chama a imagem termica
+    fonte_imagem = termica; // Agora nossa fonte e a termica
+
+  } else if(fonte_imagem == termica) {
+    ui.pushButton_setaimagem->setAutoFillBackground(true);
+    ui.pushButton_setaimagem->setStyleSheet("background-color: rgb(230, 230, 0); color: rgb(0, 0, 0)");
+    ui.pushButton_setaimagem->setText("Imagem termica");
+
+    gige_ir.set_imagem(0); // Chama a imagem visual
+    fonte_imagem = visual; // Agora nossa fonte e a visual
+
+  }
 }

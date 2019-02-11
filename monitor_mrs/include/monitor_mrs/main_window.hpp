@@ -95,6 +95,8 @@ private Q_SLOTS:
         void on_pushButton_recAcumulada_clicked();
         void on_pushButton_recAcumuladaTermica_clicked();
 
+        void on_pushButton_setaimagem_clicked();
+
 private:
         Ui::MainWindowDesign ui;
         std::string nome;
@@ -111,6 +113,9 @@ private:
         int offset;
         int offset_tilt;
         int esquema_apontar_caminho; // 1 = apontar so em frente; 2 = apontar para os pontos de interesse automaticamente
+
+        enum controle_imagem_subscrever {visual, termica};
+        controle_imagem_subscrever fonte_imagem;
 
         // Lucas, aba 2
         QString filename;

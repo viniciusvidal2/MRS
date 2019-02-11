@@ -111,8 +111,6 @@ void projecao_callback(const sensor_msgs::ImageConstPtr imagem_input,
       }
     } // fim do for
 
-    cout << "\nTamanho da nuvem termica: " << cloud_termica_instantanea->size() << endl;
-
     // Empacota e publica novamente a nuvem termica e a odometria correspondente
     sensor_msgs::PointCloud2 termica_out;
     pcl::toROSMsg (*cloud_termica_instantanea, termica_out);

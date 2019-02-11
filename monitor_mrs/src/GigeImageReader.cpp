@@ -65,7 +65,23 @@ void GigeImageReader::init(){
 
   msg_esq.data = 1; // Inicia com o caminho todo
 
-  ros::spin();
+  tt = visual; // Comecamos vendo a imagem visual, se quiser mudar pra termica depois
+  toggle_imagem = false; // Nao vamos variar a fonte da imagem
+
+  while(ros::ok()){
+    if(toggle_imagem){ // Vamos mudar a fonte da imagem se visual ou termica
+      image_sub_.shutdown(); // Seguranca
+      if(tt == visual)
+        image_sub_ = it_.subscribe("/stereo/left/image_rect_color", 1, &GigeImageReader::imageCb, this);
+      else if(tt == termica)
+        image_sub_ = it_.subscribe("/dados_sync/image_scaled",      1, &GigeImageReader::imageCb, this);
+      toggle_imagem = false; // Ja mudamos, nao entrar mais aqui, vindo da funcao set_imagem
+    }
+
+    ros::spinOnce();
+  }
+
+//  ros::spin();
 
 }
 
@@ -152,6 +168,12 @@ void GigeImageReader::setOffset(int offp, int offt)
 {
   offset = offp;
   offset_tilt = offt;
+}
+
+void GigeImageReader::set_imagem(int t)
+{
+  tt = tipo_imagem(t); // Armazena qual imagem vai vir
+  toggle_imagem = true;
 }
 
 int GigeImageReader::getProcIdByName(string procName)

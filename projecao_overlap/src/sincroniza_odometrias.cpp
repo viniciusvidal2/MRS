@@ -136,16 +136,16 @@ void odoms_callback(const sensor_msgs::ImageConstPtr& msg_im,
     string filename1 = "/home/mrs/Desktop/stereo_"+date+".ply";
     string filename2 = "/home/mrs/Desktop/zed_"+date+".ply";
     // Salvando com o nome diferenciado
-    if(!io::savePLYFileASCII(filename1, caminho_odo))
+   /* if(!io::savePLYFileASCII(filename1, caminho_odo))
       cout << "\n\nSalvo stereo na pasta caminhos com o nome stereo_"+date+".ply" << endl;
     if(!io::savePLYFileASCII(filename2, caminho_zed))
       cout << "\n\nSalvo zed    na pasta caminhos com o nome zed_"+date+".ply" << endl;
-
+*/
     if(true){
       visualizar_nuvem();
     }
     ros::shutdown();
-  }
+
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

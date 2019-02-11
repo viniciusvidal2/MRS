@@ -63,6 +63,9 @@ public:
   int  getProcIdByName(std::string procName);
   bool set_raio(float raio);
 
+  enum tipo_imagem {visual, termica};
+  void set_imagem(int tipo); // Para definir se imagem termica ou visual no visor online
+
 Q_SIGNALS:
   void send_mat_image(cv::Mat img,qint64 timestamp);
   void loggingUpdated();
@@ -80,6 +83,10 @@ private:
   std_msgs::Int8 msg_off;
   std_msgs::Int8 msg_off_tilt;
   std_msgs::Int8 msg_esq;
+
+
+  tipo_imagem tt;
+  bool toggle_imagem;
 
   ros::Subscriber sub_estamosdentro;
   ros::Subscriber sub_gps;
