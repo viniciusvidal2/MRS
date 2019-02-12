@@ -36,7 +36,7 @@ class imScale():
                 self.thermal_sub = Subscriber("/termica/thermal/image_raw", Image)
                 self.pc_sub = Subscriber("/stereo/points2", PointCloud2)
                 self.odom_sub = Subscriber("/stereo_odometer/odometry", Odometry)
-                self.ats = ApproximateTimeSynchronizer([self.thermal_sub, self.pc_sub, self.odom_sub], queue_size=5, slop=0.1)
+                self.ats = ApproximateTimeSynchronizer([self.thermal_sub, self.pc_sub, self.odom_sub], queue_size=5, slop=0.5)
                 self.ats.registerCallback(self.tcallback)
 		self.bridge = CvBridge()
 

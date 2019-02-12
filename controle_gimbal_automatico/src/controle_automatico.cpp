@@ -111,7 +111,7 @@ private:
 
     if (esquema == 2) { // Pegar os pontos de interesse
 
-      //    ROS_INFO("yaw ATUAL: %.2f\tyaw APONTAR: %.2f\tdelta yaw: %.2f", yaw_atual, yaw_para_apontar, delta_yaw);
+      ROS_INFO("yaw ATUAL: %.2f\tyaw APONTAR: %.2f\tdelta yaw: %.2f", yaw_atual, yaw_para_apontar, delta_yaw);
       if(estamos_dentro == 0.0f){ // Se nao estamos dentro o offset vale, se estamos dentro so vale o automatico
         delta_yaw   = offset_ang;
         delta_pitch = offset_tilt_ang;
