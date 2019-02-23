@@ -7,6 +7,7 @@
 #include <ros/ros.h>
 #include <std_msgs/Int8.h>
 #include <std_msgs/Float32.h>
+#include <std_msgs/Bool.h>
 #include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/image_encodings.h>
@@ -62,6 +63,7 @@ public:
   void ler_gps(const sensor_msgs::NavSatFixConstPtr& msg);
   int  getProcIdByName(std::string procName);
   bool set_raio(float raio);
+  void set_salvar_nuvens(bool salvar);
 
   enum tipo_imagem {visual, termica};
   void set_imagem(int tipo); // Para definir se imagem termica ou visual no visor online
@@ -78,6 +80,7 @@ private:
   ros::Publisher offset_pub;
   ros::Publisher offset_tilt_pub;
   ros::Publisher esquema_pub;
+  ros::Publisher salvar_nuvens_pub;
   int offset; // Para guardar os offsets a serem publicados
   int offset_tilt;
   std_msgs::Int8 msg_off;
@@ -87,6 +90,8 @@ private:
 
   tipo_imagem tt;
   bool toggle_imagem;
+
+  std_msgs::Bool salvar_nuvens;
 
   ros::Subscriber sub_estamosdentro;
   ros::Subscriber sub_gps;

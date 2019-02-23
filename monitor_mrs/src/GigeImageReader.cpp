@@ -3,6 +3,7 @@
 #include <iostream>
 #include <std_msgs/String.h>
 #include <std_msgs/Int8.h>
+#include <std_msgs/Bool.h>
 #include <sstream>
 #include <string>
 #include <QStringListModel>
@@ -53,6 +54,7 @@ void GigeImageReader::init(){
   offset_pub      = nh_.advertise<std_msgs::Int8>("offset_pub", 100);
   offset_tilt_pub = nh_.advertise<std_msgs::Int8>("offset_tilt_pub", 100);
   esquema_pub     = nh_.advertise<std_msgs::Int8>("esquema_pub", 100);
+  salvar_nuvens_pub = nh_.advertise<std_msgs::Bool>("/podemos_salvar_nuvens", 10);
   offset = 0; // a ser publicado para alterar pan do motor
   offset_tilt = 0; // a ser publicado para alterar tilt do motor
   sub_estamosdentro = nh_.subscribe("/estamos_dentro", 10, &GigeImageReader::estamosdentroCb, this);
@@ -60,6 +62,7 @@ void GigeImageReader::init(){
   sub_gps = nh_.subscribe("/mavros/global_position/global", 10, &GigeImageReader::ler_gps, this);
 
   estado_anterior_gravar = 0.0f;
+  salvar_nuvens.data = false; // Comecamos sem poder salvar, so com o botao pressionado e salvo
 
   raio_client = nh_.serviceClient<mavros_msgs::ParamSet>("/mavros/param/set");
 
@@ -78,6 +81,9 @@ void GigeImageReader::init(){
       toggle_imagem = false; // Ja mudamos, nao entrar mais aqui, vindo da funcao set_imagem
     }
 
+    salvar_nuvens_pub.publish(salvar_nuvens);
+//    if(salvar_nuvens.data == true) // Assim nao precisa desligar o no de salvar, pode usar quantas vezes quiser
+//      salvar_nuvens.data = false;
     ros::spinOnce();
   }
 
@@ -242,6 +248,10 @@ bool GigeImageReader::set_raio(float raio){
 
 void GigeImageReader::set_esquema(int esq){
   msg_esq.data = esq;
+}
+
+void GigeImageReader::set_salvar_nuvens(bool salvar){
+  salvar_nuvens.data = salvar;
 }
 
 }

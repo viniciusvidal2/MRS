@@ -164,7 +164,7 @@ void loop_closure_callback(const sensor_msgs::ImageConstPtr& msg_ima,
 
         pontoProjetado = model.project3dToPixel(ponto3D);
         // Se cair fora da imagem pode-se considerar ponto novo e armazena
-        if(!(pontoProjetado.x > 0 && pontoProjetado.x < image_size.width/2 && pontoProjetado.y > 0 && pontoProjetado.y < image_size.height/2)){
+        if(!(pontoProjetado.x > 0 && pontoProjetado.x < image_size.width && pontoProjetado.y > 0 && pontoProjetado.y < image_size.height)){
           n_pontos_fora_da_imagem_referencia++;
           if(overlap_0_a_1 > 0.4)
             cloud_filt->push_back(cloud->points[i]); // Guardar o ponto sem transformacao relativa

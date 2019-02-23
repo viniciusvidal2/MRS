@@ -418,6 +418,7 @@ void monitor_mrs::MainWindow::on_pushButton_playBag_clicked()
    }
  }
  system("gnome-terminal -x sh -c 'roslaunch rustbot_bringup all.launch do_stereo:=true online_stereo:=false do_accumulation:=true'");
+ system("gnome-terminal -x sh -c 'rosrun rustbot_accumulate_point_clouds save_cloud'");
  sleep(5);
 // system("gnome-terminal -x sh -c 'roslaunch termica_reconstrucao reconstrucao_teste2.launch do_accumulation:=true'");
 // sleep(5);
@@ -453,11 +454,14 @@ void monitor_mrs::MainWindow::on_pushButton_paraBag_clicked()
  ui.pushButton_salvaNuvem->setEnabled(false);
  ui.pushButton_recAcumulada->setEnabled(false);
  ui.pushButton_recAcumuladaTermica->setEnabled(false);
+
+ gige_ir.set_salvar_nuvens(false); // Assim nao iniciamos outra bag salvando nuvens desesperadamente
 }
 
 void monitor_mrs::MainWindow::on_pushButton_salvaNuvem_clicked()
 {
- system("gnome-terminal -x sh -c 'rosrun rustbot_accumulate_point_clouds save_cloud'");
+  gige_ir.set_salvar_nuvens(true);
+// system("gnome-terminal -x sh -c 'rosrun rustbot_accumulate_point_clouds save_cloud'");
  ui.listWidget_2->addItem(QString::fromStdString("Nuvem de pontos salva com sucesso."));
 }
 
