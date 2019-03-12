@@ -98,12 +98,12 @@ void acumulador_callback(const sensor_msgs::PointCloud2ConstPtr& msg_ptc_ter,
   fromROSMsg (*msg_ptc_ter, *cloud);
 
   // Filter with passthrough filter -> region to see
-  passthrough(cloud, "z",   0, 20);
-  passthrough(cloud, "x", -10, 10);
-  passthrough(cloud, "y", -10, 10);
+//  passthrough(cloud, "z",   0, 20);
+//  passthrough(cloud, "x", -10, 10);
+//  passthrough(cloud, "y", -10, 10);
 
   // Remove outiliers
-  remove_outlier(cloud, 15, 0.2);
+//  remove_outlier(cloud, 10, 1);
 
   /// Obter a odometria da mensagem
   // Rotacao
