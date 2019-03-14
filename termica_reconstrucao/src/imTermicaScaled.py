@@ -21,25 +21,38 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 from message_filters import ApproximateTimeSynchronizer, Subscriber
 from sensor_msgs.msg import PointCloud2
 from nav_msgs.msg import Odometry
+from std_msgs.msg import Bool
 
 
 class imScale():
 
-	def __init__(self):
+	def __init__(self, tempThr):
+				# Threshold de temperatura
+				self.tempThreshold = tempThr
+
                 # Pub
                 self.image_pub_scaled = rospy.Publisher("/dados_sync/image_scaled", Image, queue_size = 10)
                 self.image_pub_8bit = rospy.Publisher("/dados_sync/image_8bits", Image, queue_size = 10)
                 self.pub_pc = rospy.Publisher("/dados_sync/point_cloud", PointCloud2, queue_size = 10)
                 self.pub_odom = rospy.Publisher("/dados_sync/odometry", Odometry, queue_size = 10)
+				self.pub_flag_temp = rospy.Publisher("/flag_temp_alto", Bool, queue_size = 10)
 
                 # Sub
+				self.flag_grav_sub = rospy.Subscriber("/flag_gravando_bag", Bool, self.gravandoCallback)
                 self.thermal_sub = Subscriber("/termica/thermal/image_raw", Image)
                 self.pc_sub = Subscriber("/stereo/points2", PointCloud2)
                 self.odom_sub = Subscriber("/stereo_odometer/odometry", Odometry)
                 self.ats = ApproximateTimeSynchronizer([self.thermal_sub, self.pc_sub, self.odom_sub], queue_size=5, slop=0.5)
                 self.ats.registerCallback(self.tcallback)
-		self.bridge = CvBridge()
+				self.bridge = CvBridge()
+				self.flag_gravando = Bool(false)
 
+				#
+
+
+		def gravandoCallback(self, flag_msg):
+				self.flag_gravando = flag_msg
+			pass
 
         def tcallback(self, img_msg, pc_msg, odom_msg):
            ## msg -> opencv
@@ -99,17 +112,26 @@ class imScale():
            data_raw = data_raw.reshape(fig_raw.canvas.get_width_height()[::-1] + (3,))
            img_msg_out = self.bridge.cv2_to_imgmsg(data_raw, "bgr8");
 
+		   ## Verificando se há alguma temperatura alta
+		   dataSca = (data + 273.15)/K
+		   countTempAlto = np.count_nonzero(np.all(dataSca >= self.tempThreshold))
+		   if (countTempAlto > 0 and flag_gravando == Bool(true))
+		   	flagTempAlto = Bool(true)
+		   else
+		   	flagTempAlto = Bool(false)
 
+		   flag_msg_out = flagTempAlto
            pc_msg_out = pc_msg
            odom_msg_out = odom_msg;
            t = rospy.Time.now()
+		   flag_msg_out.header.stamp = t
            img_s_msg_out.header.stamp = t
            img_msg_out.header.stamp = t
            pc_msg_out.header.stamp = t
            odom_msg_out.header.stamp = t
 
            print "publicando"
-
+		   self.pub_flag_temp.publish(flag_msg_out)
            self.image_pub_scaled.publish(img_s_msg_out)
            self.image_pub_8bit.publish(img_msg_out)
            self.pub_pc.publish(pc_msg_out)
@@ -123,8 +145,9 @@ class imScale():
 
 
 def main(args):
-	imS = imScale()
 	rospy.init_node('escala' , anonymous = True)
+	tempThr = rospy.get_param('temp_thr', 25)
+	imS = imScale(tempThr)
 
 	try:
 		rospy.spin()
