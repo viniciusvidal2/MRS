@@ -62,6 +62,10 @@ void GigeImageReader::init(){
 
   sub_gps = nh_.subscribe("/mavros/global_position/global", 10, &GigeImageReader::ler_gps, this);
 
+  // Escutando flag do Felipe
+  sub_flag_temperatura = nh_.subscribe("/flag_temp_alto", 10, &GigeImageReader::escutar_flag_temperatura, this);
+  flag_temperatura = 0; // Inicia emm 0, ou seja, esta tudo dentro dos conformes
+
   estado_anterior_gravar = 0.0f;
   salvar_nuvens.data = false; // Comecamos sem poder salvar, so com o botao pressionado e salvo
 
@@ -146,8 +150,6 @@ void GigeImageReader::estamosdentroCb(const std_msgs::Int8 &msg){
       else
         nome_bag = "ponto_"+year+"_"+month+"_"+day+"_"+hour+"h_"+minutes+"m.bag";
       string comando_full = "gnome-terminal -x sh -c 'roslaunch rustbot_bringup record_raw.launch only_raw_data:=true folder:="+pasta+" bag:=";
-//      ROS_INFO("%s", (comando_full+nome_bag+"'").c_str());
-//      sleep((10));
       system((comando_full+nome_bag+"'").c_str());
 
     } else if(msg.data - estado_anterior_gravar == -1) { // nao vamos gravar, parar a gravacao
@@ -155,6 +157,11 @@ void GigeImageReader::estamosdentroCb(const std_msgs::Int8 &msg){
       int pid = getProcIdByName("record");
       if(pid!=-1)
         kill(pid, SIGINT);
+      // Se foi informado ponto quente, ver aqui de mudar para a pasta quente
+      if(flag_temperatura == 1){
+        std::string comando_muda_pasta = "gnome-terminal -x sh -c 'mv "+pasta+" "+pasta+"/Quente'";
+        system(comando_muda_pasta.c_str());
+      }
     }
     estado_anterior_gravar = msg.data;
   }
@@ -259,6 +266,14 @@ void GigeImageReader::set_salvar_nuvens(bool salvar){
 
 void GigeImageReader::set_flag_gravando_bag(int flag){
   msg_gravando_bag.data = flag;
+}
+
+void GigeImageReader::escutar_flag_temperatura(const std_msgs::Int8ConstPtr &flag){
+  flag_temperatura = flag->data;
+}
+
+int GigeImageReader::get_flag_temperatura(){
+  return flag_temperatura;
 }
 
 }

@@ -65,6 +65,8 @@ public:
   bool set_raio(float raio);
   void set_salvar_nuvens(bool salvar);
   void set_flag_gravando_bag(int flag);
+  int get_flag_temperatura();
+  void escutar_flag_temperatura(const std_msgs::Int8ConstPtr& flag);
 
   enum tipo_imagem {visual, termica};
   void set_imagem(int tipo); // Para definir se imagem termica ou visual no visor online
@@ -97,6 +99,10 @@ private:
   bool toggle_imagem;
 
   std_msgs::Bool salvar_nuvens;
+
+  // Para receber a leitura de temperatura do Felipe
+  ros::Subscriber sub_flag_temperatura;
+  int flag_temperatura;
 
   ros::Subscriber sub_estamosdentro;
   ros::Subscriber sub_gps;

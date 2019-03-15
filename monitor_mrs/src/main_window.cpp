@@ -309,25 +309,28 @@ void monitor_mrs::MainWindow::on_pushButton_salvaBag_clicked()
     // Comeca gravacao segundo nome do bag
     if(ui.radioButton_caminhocompleto->isChecked()){
     nome = ui.lineEdit_nomeBag->text().toStdString();
-    std::string comando_full = "gnome-terminal -x sh -c 'roslaunch rustbot_bringup record_raw.launch only_raw_data:=true bag:=";
     if(nome.length() == 0){
       nome = "mrs_"+date+".bag";
-      system((comando_full+=(nome+"'")).c_str());
     } else {
       nome += (date+".bag");
-      system((comando_full+=(nome+"'")).c_str());
     }
+    string comando_fazer_pasta = "gnome-terminal -x sh -c 'cd ~/Desktop && mkdir -p "+ui.lineEdit_nomeBag->text().toStdString()+date+"/Quentes'";
+    system(comando_fazer_pasta.c_str());
+    std::string comando_full = "gnome-terminal -x sh -c 'roslaunch rustbot_bringup record_raw.launch only_raw_data:=true bag:="+nome;
+    comando_full +=" folder:=/home/mrs/Desktop/"+ui.lineEdit_nomeBag->text().toStdString()+date+"'";
+    system(comando_full.c_str());
+
     } else if(ui.radioButton_pontosdeinteresse->isChecked()) {
       gige_ir.set_nomeDaPasta(ui.lineEdit_nomeBag->text().toStdString()+date);
       // Criando a pasta na area de trabalho
-      string comando_temp = "gnome-terminal -x sh -c 'cd ~/Desktop && mkdir "+ui.lineEdit_nomeBag->text().toStdString()+date+"'";
+      string comando_temp = "gnome-terminal -x sh -c 'cd ~/Desktop && mkdir -p "+ui.lineEdit_nomeBag->text().toStdString()+date+"/Quentes'";
       system(comando_temp.c_str());
       gige_ir.vamos_gravar(true);
     }
     // Anunciar ao usuario
     ui.listWidget->addItem(QString::fromStdString("Iniciando gravacao do arquivo na area de trabalho..."));
     ui.listWidget->addItem(QString::fromStdString("ATENCAO: APOS 20 MINUTOS REINICIE o programa por seguranca."));
-  } else if(controle_gravacao) { // Estamos gravando
+  } else if(controle_gravacao) { // Estamos gravando e terminando agora
     // Traz aparencia novamente para poder gravar
     ui.pushButton_salvaBag->setAutoFillBackground(true);
     ui.pushButton_salvaBag->setStyleSheet("background-color: rgb(0, 200, 50); color: rgb(0, 0, 0)"); // Assim esta quando pode gravar
@@ -339,6 +342,14 @@ void monitor_mrs::MainWindow::on_pushButton_salvaBag_clicked()
     int pid = getProcIdByName("record");
     if(pid!=-1)
       kill(pid, SIGINT);
+    // Checar se o arquivo foi quente ou nao, dai mover para a outra pasta -> Aqui so para caminho completo,
+    // pontos de interesse dentro da classe gige_ir
+    if(ui.radioButton_caminhocompleto->isChecked()){
+      if(gige_ir.get_flag_temperatura() == 1){
+        std::string comando_muda_pasta = "gnome-terminal -x sh -c 'mv ~/Desktop/"+nome+date+" ~/Desktop/"+nome+date+"/Quente'";
+        system(comando_muda_pasta.c_str());
+      }
+    }
     // Anunciar ao usuario
     ui.listWidget->addItem(QString::fromStdString("Arquivo gravado para pos processamento. Conferir na area de trabalho"));
     if(ui.radioButton_pontosdeinteresse->isChecked())
