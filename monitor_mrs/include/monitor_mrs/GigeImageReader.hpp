@@ -64,6 +64,7 @@ public:
   int  getProcIdByName(std::string procName);
   bool set_raio(float raio);
   void set_salvar_nuvens(bool salvar);
+  void set_flag_gravando_bag(int flag);
 
   enum tipo_imagem {visual, termica};
   void set_imagem(int tipo); // Para definir se imagem termica ou visual no visor online
@@ -81,12 +82,16 @@ private:
   ros::Publisher offset_tilt_pub;
   ros::Publisher esquema_pub;
   ros::Publisher salvar_nuvens_pub;
+  ros::Publisher flag_gravando_bag_pub;
   int offset; // Para guardar os offsets a serem publicados
   int offset_tilt;
   std_msgs::Int8 msg_off;
   std_msgs::Int8 msg_off_tilt;
   std_msgs::Int8 msg_esq;
-
+  // Felipe vai escutar no nó de leitura de temperatura. Inicia com 0
+  // 1: gravando bag
+  // 0: nao gravando
+  std_msgs::Int8 msg_gravando_bag;
 
   tipo_imagem tt;
   bool toggle_imagem;

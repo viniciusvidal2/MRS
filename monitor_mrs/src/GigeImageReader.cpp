@@ -55,6 +55,7 @@ void GigeImageReader::init(){
   offset_tilt_pub = nh_.advertise<std_msgs::Int8>("offset_tilt_pub", 100);
   esquema_pub     = nh_.advertise<std_msgs::Int8>("esquema_pub", 100);
   salvar_nuvens_pub = nh_.advertise<std_msgs::Bool>("/podemos_salvar_nuvens", 10);
+  flag_gravando_bag_pub = nh_.advertise<std_msgs::Int8>("/flag_gravando_bag", 10);
   offset = 0; // a ser publicado para alterar pan do motor
   offset_tilt = 0; // a ser publicado para alterar tilt do motor
   sub_estamosdentro = nh_.subscribe("/estamos_dentro", 10, &GigeImageReader::estamosdentroCb, this);
@@ -67,6 +68,7 @@ void GigeImageReader::init(){
   raio_client = nh_.serviceClient<mavros_msgs::ParamSet>("/mavros/param/set");
 
   msg_esq.data = 1; // Inicia com o caminho todo
+  msg_gravando_bag.data = 0; // Nao estamos gravando a principio
 
   tt = visual; // Comecamos vendo a imagem visual, se quiser mudar pra termica depois
   toggle_imagem = false; // Nao vamos variar a fonte da imagem
@@ -81,6 +83,7 @@ void GigeImageReader::init(){
       toggle_imagem = false; // Ja mudamos, nao entrar mais aqui, vindo da funcao set_imagem
     }
 
+    flag_gravando_bag_pub.publish(msg_gravando_bag);
     salvar_nuvens_pub.publish(salvar_nuvens);
 //    if(salvar_nuvens.data == true) // Assim nao precisa desligar o no de salvar, pode usar quantas vezes quiser
 //      salvar_nuvens.data = false;
@@ -252,6 +255,10 @@ void GigeImageReader::set_esquema(int esq){
 
 void GigeImageReader::set_salvar_nuvens(bool salvar){
   salvar_nuvens.data = salvar;
+}
+
+void GigeImageReader::set_flag_gravando_bag(int flag){
+  msg_gravando_bag.data = flag;
 }
 
 }

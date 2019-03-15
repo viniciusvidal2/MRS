@@ -305,7 +305,8 @@ void monitor_mrs::MainWindow::on_pushButton_salvaBag_clicked()
     ui.pushButton_salvaBag->setText("Parar gravacao");
     // ajusta flag para estamos gravando
     controle_gravacao = true;
-    // COmeca gravacao segundo nome do bag
+    gige_ir.set_flag_gravando_bag(controle_gravacao);
+    // Comeca gravacao segundo nome do bag
     if(ui.radioButton_caminhocompleto->isChecked()){
     nome = ui.lineEdit_nomeBag->text().toStdString();
     std::string comando_full = "gnome-terminal -x sh -c 'roslaunch rustbot_bringup record_raw.launch only_raw_data:=true bag:=";
@@ -329,10 +330,11 @@ void monitor_mrs::MainWindow::on_pushButton_salvaBag_clicked()
   } else if(controle_gravacao) { // Estamos gravando
     // Traz aparencia novamente para poder gravar
     ui.pushButton_salvaBag->setAutoFillBackground(true);
-    ui.pushButton_salvaBag->setStyleSheet("background-color: rgb(0, 200, 50); color: rgb(0, 0, 0)"); // Assim esta quando pode gravars
+    ui.pushButton_salvaBag->setStyleSheet("background-color: rgb(0, 200, 50); color: rgb(0, 0, 0)"); // Assim esta quando pode gravar
     ui.pushButton_salvaBag->setText("Gravar dados");
-    // ajusta flag de novo para gravar
+    // ajusta flag de novo para gravar futuramente - PARAMOS DE GRAVAR AGORA
     controle_gravacao = false;
+    gige_ir.set_flag_gravando_bag(controle_gravacao);
     // Envia sinal para parar bag (SIGINT)
     int pid = getProcIdByName("record");
     if(pid!=-1)
