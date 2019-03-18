@@ -209,7 +209,7 @@ void loop_closure_callback(const sensor_msgs::ImageConstPtr& msg_ima,
     q_anterior.w() = (double)msg_odo->pose.pose.orientation.w;
     t_anterior = {msg_odo->pose.pose.position.x, msg_odo->pose.pose.position.y, msg_odo->pose.pose.position.z};
 
-    primeira_vez = false;
+//    primeira_vez = false;
     podemos_publicar = true;
 
     ros::Rate rate(1);
@@ -219,23 +219,32 @@ void loop_closure_callback(const sensor_msgs::ImageConstPtr& msg_ima,
   // Publica tudo aqui a depender da camera e do resultado da avaliacao do overlap
   if(podemos_publicar){
 
-    ros::Time t = ros::Time::now();
-    msg_ptc_out.header.stamp   = t;
-    msg_odom_out.header.stamp  = t;
-    msg_image_out.header.stamp = t;
+//    ros::Time t = ros::Time::now();
+//    msg_ptc_out.header.stamp   = t;
+//    msg_odom_out.header.stamp  = t;
+//    msg_image_out.header.stamp = t;
 
     toROSMsg(*cloud, msg_ptc_out);
-//    toROSMsg(*cloud_filt, msg_ptc_out);
-    cloud_pub.publish(msg_ptc_out);
 
-    odom_pub.publish(msg_odom_out); // Odometria a depender da iteracao
+    int repetir=1;
 
-    if(camera_type == "termica"){
-      image_pub.publish(msg_image_out);    // Imagem passa direto por aqui, so sincronizada
-      ROS_INFO("Publicou camera TERMICA");
-    } else {
-      ROS_INFO("Publicou camera VISUAL");
+    if(primeira_vez)
+      repetir = 4;
+
+    for(int i=1; i < repetir; i++){
+      cloud_pub.publish(msg_ptc_out);
+
+      odom_pub.publish(msg_odom_out); // Odometria a depender da iteracao
+
+      if(camera_type == "termica"){
+        image_pub.publish(msg_image_out);    // Imagem passa direto por aqui, so sincronizada
+        ROS_INFO("Publicou camera TERMICA");
+      } else {
+        ROS_INFO("Publicou camera VISUAL");
+      }
     }
+
+    primeira_vez = false;
   }
 
   // Libera as nuvens
