@@ -265,6 +265,10 @@ int main(int argc, char **argv){
   n_.getParam("camera_type"    , camera_type    );
   n_.getParam("overlap_rate"   , overlap_rate   );
 
+  // Sleep para o no de acumulacao iniciar corretamente primeiro
+  ros::Rate r(5);
+  r.sleep();
+
   // Porcentagem que a nuvem vai ter de diferenca para a referencia
   overlap_0_a_1 = overlap_rate/100.0;
 
@@ -274,9 +278,9 @@ int main(int argc, char **argv){
   cloud_filt = (PointCloud<PointT>::Ptr) new PointCloud<PointT>;
 
   // Inicia o publicador
-  cloud_pub = nh.advertise<sensor_msgs::PointCloud2> (cloud_topic_out, 100);
-  image_pub = nh.advertise<sensor_msgs::Image      > (image_topic_out, 100);
-  odom_pub  = nh.advertise<Odometry                > (odom_topic_out , 100);
+  cloud_pub = nh.advertise<sensor_msgs::PointCloud2> (cloud_topic_out, 1);
+  image_pub = nh.advertise<sensor_msgs::Image      > (image_topic_out, 1);
+  odom_pub  = nh.advertise<Odometry                > (odom_topic_out , 1);
 
   // Inicia o modelo da camera com arquivo de calibracao
   camera_info_manager::CameraInfoManager cam_info(n_, "left_optical", camera_calibration_yaml);

@@ -242,8 +242,8 @@ void monitor_mrs::MainWindow::on_pushButton_iniciaStereo_clicked()
       ui.horizontalSlider_offset->show();
       ui.verticalSlider_offset->show();
     }
-    sleep(5);
-    system("gnome-terminal -x sh -c 'rosrun termica_reconstrucao imTermicaScaled.py'");
+    sleep(1);
+    system("gnome-terminal -x sh -c 'rosrun termica_reconstrucao imTermicaScaled.py temp_thr:=100'");
 //    system("gnome-terminal -x sh -c 'roslaunch termica_reconstrucao reconstrucao_teste2.launch do_accumulation:=false'");
     controle_stereo = true;
 

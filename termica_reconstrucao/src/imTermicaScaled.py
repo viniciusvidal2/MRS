@@ -35,7 +35,7 @@ class imScale():
         self.image_pub_8bit = rospy.Publisher("/dados_sync/image_8bits", Image, queue_size = 10)
         self.pub_pc = rospy.Publisher("/dados_sync/point_cloud", PointCloud2, queue_size = 10)
         self.pub_odom = rospy.Publisher("/dados_sync/odometry", Odometry, queue_size = 10)
-        self.pub_flag_temp = rospy.Publisher("/flag_temp_alto", Int8, queue_size = 10)
+        self.pub_flag_temp = rospy.Publisher("/flag_temp_alto", Int8, queue_size = 1)
 
         # Sub
         self.flag_grav_sub = rospy.Subscriber("/flag_gravando_bag", Int8, self.gravandoCallback)
@@ -46,10 +46,15 @@ class imScale():
         self.ats.registerCallback(self.tcallback)
         self.bridge = CvBridge()
         self.flag_gravando = 0
-        self.flagTempAlto = 0
+        self.flag_temp_alto = 0
+        self.glag_gravando_ant = 0
 
     def gravandoCallback(self, flag_msg):
-        self.flag_gravando = flag_msg
+
+        if(self.flag_gravando == 0 and flag_msg.data == 1):
+            print self.flag_gravando
+            self.flag_gravando = flag_msg.data
+            print self.flag_gravando
         pass
 
     def tcallback(self, img_msg, pc_msg, odom_msg):
@@ -109,19 +114,18 @@ class imScale():
        ## Verificando se há alguma temperatura alta x*K - 273.15
        dataSca = data*K - 273.15
        countTempAlto = np.count_nonzero(np.array(dataSca >= self.tempThreshold))
-       print self.flag_gravando == 1
+       #print self.flag_gravando
+
        if ((countTempAlto > 0) and (self.flag_gravando == 1)):
-           self.flagTempAlto = 1
+           self.flag_temp_alto = 1
 
-       if self.flag_gravando == 0:
-           self.flagTempAlto = 0
+       #if self.flag_gravando == 0:
+       #    self.flag_temp_alto = 0
 
-
-       flag_msg_out = self.flagTempAlto
+       flag_msg_out = self.flag_temp_alto
        pc_msg_out = pc_msg
        odom_msg_out = odom_msg;
        t = rospy.Time.now()
-       #flag_msg_out.header.stamp = t
        img_s_msg_out.header.stamp = t
        img_msg_out.header.stamp = t
        pc_msg_out.header.stamp = t
@@ -144,6 +148,7 @@ class imScale():
 def main(args):
     rospy.init_node('escala' , anonymous = True)
     tempThr = rospy.get_param('temp_thr', 25)
+    print tempThr
     imS = imScale(tempThr)
 
     try:
