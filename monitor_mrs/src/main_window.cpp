@@ -146,7 +146,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
     kill(pid, SIGINT);
   }
   sleep(2);
-  system("gnome-terminal -x sh -c 'rosservice call /joint_command raw 537 1740'"); // Posiciona o motor no minimo cuidadosamente ao desligar
+  system("gnome-terminal -x sh -c 'rosservice call /joint_command raw 537 2015'"); // Posiciona o motor no minimo cuidadosamente ao desligar
   sleep(5);
   QMainWindow::closeEvent(event);
   system("gnome-terminal -x sh -c 'rosnode kill -a'");
@@ -204,7 +204,8 @@ void monitor_mrs::MainWindow::on_pushButton_motores_clicked()
 {
   if(ui.radioButton_automatico->isChecked()) { // Aqui estamos com a pixhawk
     system("gnome-terminal -x sh -c 'roslaunch automatico_mrs lancar_gimbal.launch'");
-//    system("gnome-terminal -x sh -c 'rosservice call /joint_command raw 490 2000'"); // Posiciona o robo olhando para frente
+    sleep(1); // Para o no iniciar ok
+    system("gnome-terminal -x sh -c 'rosservice call /joint_command raw 537 2142'"); // Posiciona o robo olhando para frente
     ui.listWidget->addItem(QString::fromStdString("Motores ligados, controle automatico."));
   } else if(ui.radioButton_manual->isChecked()) { // Aqui estamos com o joy
     system("gnome-terminal -x sh -c 'roslaunch automatico_mrs lancar_gimbal.launch automatico:=false'");
@@ -387,7 +388,7 @@ void monitor_mrs::MainWindow::on_horizontalSlider_offset_sliderMoved()
 
 void monitor_mrs::MainWindow::on_verticalSlider_offset_sliderMoved()
 {
-  offset_tilt = ui.verticalSlider_offset->value() - 49; // Aqui diferente por causa do nivel horizontal estar em 60% do range, invertendo tudo
+  offset_tilt = ui.verticalSlider_offset->value() - 69; // Aqui diferente por causa do nivel horizontal estar em 60% do range, invertendo tudo
   gige_ir.setOffset(offset, offset_tilt);
 }
 
