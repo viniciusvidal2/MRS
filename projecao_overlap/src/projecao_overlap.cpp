@@ -43,7 +43,7 @@ using namespace cv;
 
 /// Definitions
 typedef PointXYZRGB PointT;
-typedef sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::PointCloud2> syncPolicy;
+typedef sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::PointCloud2, nav_msgs::Odometry> syncPolicy;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Variaveis globais
@@ -170,7 +170,10 @@ void calcula_transformacao_relativa(){
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void acumular_visual(PointCloud<PointT>::Ptr temp){
+void acumular_visual(PointCloud<PointT>::Ptr temp, Eigen::Quaternion<double> q, Eigen::Vector3d t){
+
+  transformPointCloud<PointT>(*temp, *temp, t, q);
+
   *acumulada += *temp;
   ROS_INFO("Tamanho da nuvem acumulada VISUAL: %d", acumulada->points.size());
 }
@@ -237,11 +240,9 @@ void acumular_termica(PointCloud<PointT>::Ptr temp, const sensor_msgs::ImageCons
 /// Callback para evitar repeticao da nuvem por projecao na imagem anterior
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void loop_closure_callback(const sensor_msgs::ImageConstPtr& msg_ima,
-                           const sensor_msgs::PointCloud2ConstPtr& msg_ptc
-                           ){
-
-  ROS_INFO("ENTROU NO CALLBACK!!!!!!!!!");
-
+                           const sensor_msgs::PointCloud2ConstPtr& msg_ptc,
+                           const nav_msgs::OdometryConstPtr& msg_odo
+                           ){  
   // Ler nuvem de pontos
   fromROSMsg(*msg_ptc, *cloud);
 
@@ -249,115 +250,118 @@ void loop_closure_callback(const sensor_msgs::ImageConstPtr& msg_ima,
   vector<int> indicesNAN;
   removeNaNFromPointCloud(*cloud, *cloud, indicesNAN);
 
-//  // Vamos publicar a nuvem de saida? a principio nao, convencer do contrario com o overlap
-//  bool podemos_publicar = false;
+  // Vamos publicar a nuvem de saida? a principio nao, convencer do contrario com o overlap
+  bool podemos_publicar = false;
 
-//  /// LOOP de transformacao e PROJECAO sobre a nuvem
-//  if(!primeira_vez){
-//    // Pega rotacao e translacao atual
-//    q_atual.x() = (double)msg_odo->pose.pose.orientation.x;
-//    q_atual.y() = (double)msg_odo->pose.pose.orientation.y;
-//    q_atual.z() = (double)msg_odo->pose.pose.orientation.z;
-//    q_atual.w() = (double)msg_odo->pose.pose.orientation.w;
-//    t_atual = {msg_odo->pose.pose.position.x, msg_odo->pose.pose.position.y, msg_odo->pose.pose.position.z};
+  /// LOOP de transformacao e PROJECAO sobre a nuvem
+  if(!primeira_vez){
+    // Pega rotacao e translacao atual
+    q_atual.x() = (double)msg_odo->pose.pose.orientation.x;
+    q_atual.y() = (double)msg_odo->pose.pose.orientation.y;
+    q_atual.z() = (double)msg_odo->pose.pose.orientation.z;
+    q_atual.w() = (double)msg_odo->pose.pose.orientation.w;
+    t_atual = {msg_odo->pose.pose.position.x, msg_odo->pose.pose.position.y, msg_odo->pose.pose.position.z};
 
-//    // Calcular transformacao relativa entre os instantes
-//    calcula_transformacao_relativa();
+    // Calcular transformacao relativa entre os instantes
+    calcula_transformacao_relativa();
 
-//    // Aqui ja checa o que foi deslocado, se passou do limite renova a pose da camera referencia e publica ao final
-//    if(t_relativo.norm() > thresh_dist){
-//      cout << "\nPassou a distancia: " << t_relativo.norm() << endl;
+    // Aqui ja checa o que foi deslocado, se passou do limite renova a pose da camera referencia e publica ao final
+    if(t_relativo.norm() > thresh_dist){
+      cout << "\nPassou a distancia: " << t_relativo.norm() << endl;
 
-//      podemos_publicar = true; // Podemos publicar qual seja a nuvem filtrada e as imagens
+      podemos_publicar = true; // Podemos publicar qual seja a nuvem filtrada e as imagens
 
-//      // Armazena para a proxima iteracao a odometria de referencia
-//      q_anterior = q_atual;
-//      t_anterior = t_atual;
-//    }
+      // Armazena para a proxima iteracao a odometria de referencia
+      q_anterior = q_atual;
+      t_anterior = t_atual;
+    }
 
-//    // Transformar camera para o ponto onde estava na iteracao anterior, e a nuvem para a iteracao de agora
-//    transformPointCloud<PointT>(*cloud, *cloud_tf, t_relativo, q_relativo);
+    // Transformar camera para o ponto onde estava na iteracao anterior, e a nuvem para a iteracao de agora
+    transformPointCloud<PointT>(*cloud, *cloud_tf, t_relativo, q_relativo);
 
-//    // Projeta cada ponto da nuvem na imagem e se cair fora adiciona na nuvem filtrada - OU REMOVE DA NUVEM
-//    cv::Point3d ponto3D;
-//    cv::Point2d pontoProjetado;
-//    n_pontos_fora_da_imagem_referencia = 0;
+    // Projeta cada ponto da nuvem na imagem e se cair fora adiciona na nuvem filtrada - OU REMOVE DA NUVEM
+    cv::Point3d ponto3D;
+    cv::Point2d pontoProjetado;
+    n_pontos_fora_da_imagem_referencia = 0;
 
-//    if(podemos_publicar == false) {
-//      for(int i=0; i < cloud_tf->size(); i++){
-//        ponto3D.x = cloud_tf->points[i].x;
-//        ponto3D.y = cloud_tf->points[i].y;
-//        ponto3D.z = cloud_tf->points[i].z;
+    if(podemos_publicar == false) {
+      for(int i=0; i < cloud_tf->size(); i++){
+        ponto3D.x = cloud_tf->points[i].x;
+        ponto3D.y = cloud_tf->points[i].y;
+        ponto3D.z = cloud_tf->points[i].z;
 
-//        pontoProjetado = model_esquerda.project3dToPixel(ponto3D);
-//        // Se cair fora da imagem pode-se considerar ponto novo e armazena
-//        if(!(pontoProjetado.x > 0 && pontoProjetado.x < image_size_esquerda.width &&
-//             pontoProjetado.y > 0 && pontoProjetado.y < image_size_esquerda.height))
-//          n_pontos_fora_da_imagem_referencia++;
-//      } // Fim do for
-//    }
+        pontoProjetado = model_esquerda.project3dToPixel(ponto3D);
+        // Se cair fora da imagem pode-se considerar ponto novo e armazena
+        if(!(pontoProjetado.x > 0 && pontoProjetado.x < image_size_esquerda.width &&
+             pontoProjetado.y > 0 && pontoProjetado.y < image_size_esquerda.height))
+          n_pontos_fora_da_imagem_referencia++;
+      } // Fim do for
+    }
 
-//    cout << "Estamos com " << n_pontos_fora_da_imagem_referencia << " nao projetados dentre " << cloud_tf->size() << " totais." << endl;
+    cout << "Estamos com " << n_pontos_fora_da_imagem_referencia << " nao projetados dentre " << cloud_tf->size() << " totais." << endl;
 
-//    // Testar se reduzimos o suficiente o overlap desejado, se sim podemos atualizar a referencia e seguir com mensagens publicadas
-//    if( float(cloud->size() - n_pontos_fora_da_imagem_referencia) / float(cloud->size())  <  overlap_0_a_1 && podemos_publicar == false){
+    // Testar se reduzimos o suficiente o overlap desejado, se sim podemos atualizar a referencia e seguir com mensagens publicadas
+    if( float(cloud->size() - n_pontos_fora_da_imagem_referencia) / float(cloud->size())  <  overlap_0_a_1 && podemos_publicar == false){
 
-//      cout << "\nQuantos pontos fora da imagem: " << n_pontos_fora_da_imagem_referencia << "\tTotal: " << cloud->size() << endl;
-//      cout << "Taxa de relacao: " << float(cloud->size() - n_pontos_fora_da_imagem_referencia) / float(cloud->size())  << endl;
+      cout << "\nQuantos pontos fora da imagem: " << n_pontos_fora_da_imagem_referencia << "\tTotal: " << cloud->size() << endl;
+      cout << "Taxa de relacao: " << float(cloud->size() - n_pontos_fora_da_imagem_referencia) / float(cloud->size())  << endl;
 
-//      podemos_publicar = true; // Podemos publicar qual seja a nuvem filtrada e as imagens
+      podemos_publicar = true; // Podemos publicar qual seja a nuvem filtrada e as imagens
 
-//      // Armazena para a proxima iteracao a odometria de referencia
-//      q_anterior = q_atual;
-//      t_anterior = t_atual;
+      // Armazena para a proxima iteracao a odometria de referencia
+      q_anterior = q_atual;
+      t_anterior = t_atual;
 
-//    } // Fim do if de overlap
+    } // Fim do if de overlap
 
-//  } else {
+  } else {
 
-//    cout << "Primeira iteracao" << endl;
+    cout << "Primeira iteracao" << endl;
 
-//    // Segura a primeira odometria para referencia
-//    q_anterior.x() = (double)msg_odo->pose.pose.orientation.x;
-//    q_anterior.y() = (double)msg_odo->pose.pose.orientation.y;
-//    q_anterior.z() = (double)msg_odo->pose.pose.orientation.z;
-//    q_anterior.w() = (double)msg_odo->pose.pose.orientation.w;
-//    t_anterior = {msg_odo->pose.pose.position.x, msg_odo->pose.pose.position.y, msg_odo->pose.pose.position.z};
+    // Segura a primeira odometria para referencia
+    q_anterior.x() = (double)msg_odo->pose.pose.orientation.x;
+    q_anterior.y() = (double)msg_odo->pose.pose.orientation.y;
+    q_anterior.z() = (double)msg_odo->pose.pose.orientation.z;
+    q_anterior.w() = (double)msg_odo->pose.pose.orientation.w;
+    t_anterior = {msg_odo->pose.pose.position.x, msg_odo->pose.pose.position.y, msg_odo->pose.pose.position.z};
 
-//    primeira_vez = false;
-//    podemos_publicar = true;
+    q_atual = q_anterior;
+    t_atual = t_anterior;
 
-//  } // fim do if
+    primeira_vez = false;
+    podemos_publicar = true;
 
-//  // Publica tudo aqui a depender da camera e do resultado da avaliacao do overlap
-//  if(podemos_publicar){
+  } // fim do if
 
-//    // Cuidados com a nuvem antes de acumular
-//    passthrough(cloud, "z",   0, 20);
-//    passthrough(cloud, "x", -10, 10);
-//    passthrough(cloud, "y", -10, 10);
+  // Publica tudo aqui a depender da camera e do resultado da avaliacao do overlap
+  if(podemos_publicar){
 
-//    remove_outlier(cloud, 10, 1);
+    // Cuidados com a nuvem antes de acumular
+    passthrough(cloud, "z",   0, 20);
+    passthrough(cloud, "x", -10, 10);
+    passthrough(cloud, "y", -10, 10);
 
-//    // Acumular se for termica ou visual
-//    if(camera_type == "termica"){
+    remove_outlier(cloud, 10, 1);
 
-//     // acumular_termica(cloud, msg_ima, q_atual, t_atual);
+    // Acumular se for termica ou visual
+    if(camera_type == "termica"){
 
-//    } else {
+      acumular_termica(cloud, msg_ima, q_atual, t_atual);
 
-//      filter_color(cloud_tf);
-//      acumular_visual(cloud_tf);
+    } else {
 
-//    }
+      filter_color(cloud);
+      acumular_visual(cloud, q_atual, t_atual);
 
-//    // Aguardar a proxima possibilidade de acumular / publicar
-//    podemos_publicar = false;
+    }
 
-//  }
+    // Aguardar a proxima possibilidade de acumular / publicar
+    podemos_publicar = false;
 
-//  // Libera as nuvens
-//  cloud->clear(); cloud_filt->clear(); cloud_tf->clear();
+  }
+
+  // Libera as nuvens
+  cloud->clear(); cloud_filt->clear(); cloud_tf->clear();
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -415,51 +419,39 @@ int main(int argc, char **argv){
   cloud_termica_instantanea = (PointCloud<PointT>::Ptr) new PointCloud<PointT>;
 
   acumulada = (PointCloud<PointT>::Ptr) new PointCloud<PointT>;
+  acumulada->header.frame_id = "odom";
 
   // Inicia o publicador
   acumulada_pub = nh.advertise<sensor_msgs::PointCloud2> (cloud_topic_out, 10);
 
-//  /// Inicia o modelo da camera com arquivo de calibracao
-//  camera_info_manager::CameraInfoManager cam_info(n_, "left_optical", camera_calibration_yaml);
-//  // Para a camera esquerda
-//  sensor_msgs::CameraInfo ci = cam_info.getCameraInfo();
-//  model_esquerda.fromCameraInfo(ci);
-//  image_size_esquerda = model_esquerda.fullResolution(); // Armazena ja o tamanho da imagem pra nao ter erro ali nos testes
-//  model_termica = model_esquerda;
-//  // Aqui carrega forcadamente a partir da YAML da termica para o novo modelo
-//  cam_info.loadCameraInfo(termica_calibration_yaml);
-//  sensor_msgs::CameraInfo ci2 = cam_info.getCameraInfo();
-//  ci2.P = P_correta;
-//  model_termica.fromCameraInfo(ci2);
-//  image_size_termica = model_termica.fullResolution();
-
-//  inicia_modelo_cameras(&cam_info);
+  /// Inicia o modelo da camera com arquivo de calibracao
+  camera_info_manager::CameraInfoManager cam_info(n_, "left_optical", camera_calibration_yaml);
+  // Para a camera esquerda
+  sensor_msgs::CameraInfo ci = cam_info.getCameraInfo();
+  model_esquerda.fromCameraInfo(ci);
+  image_size_esquerda = model_esquerda.fullResolution(); // Armazena ja o tamanho da imagem pra nao ter erro ali nos testes
+  model_termica = model_esquerda;
+  // Aqui carrega forcadamente a partir da YAML da termica para o novo modelo
+  cam_info.loadCameraInfo(termica_calibration_yaml);
+  sensor_msgs::CameraInfo ci2 = cam_info.getCameraInfo();
+  ci2.P = P_correta;
+  model_termica.fromCameraInfo(ci2);
+  image_size_termica = model_termica.fullResolution();
 
   // Subscriber para a nuvem instantanea e odometria
-  message_filters::Subscriber<sensor_msgs::Image>       subima(nh, "/stereo/left/image_rect", 1);
-  message_filters::Subscriber<sensor_msgs::PointCloud2> subptc(nh, "/stereo/points2", 1);
-  message_filters::Subscriber<Odometry>                 subodo(nh, "/stereo_odometer/odometry" , 1);
-
-  cout << "\nTopicos passados aqui\n";
-
-  cout << image_topic_in << endl;
-  cout << cloud_topic_in << endl;
-  cout << odom_topic_in  << endl;
-
-  cout << "\n\n\n\n";
+  message_filters::Subscriber<sensor_msgs::Image>       subima(nh, image_topic_in, 100);
+  message_filters::Subscriber<sensor_msgs::PointCloud2> subptc(nh, cloud_topic_in, 100);
+  message_filters::Subscriber<Odometry>                 subodo(nh, odom_topic_in , 100);
 
   // Sincroniza as leituras dos topicos
-  Synchronizer<syncPolicy> sync(syncPolicy(10), subima, subptc);
-  sync.registerCallback(boost::bind(&loop_closure_callback, _1, _2));
-
-  ROS_INFO("AQUI INICIOU TUDO NO NO DE OVERLAP");
+  Synchronizer<syncPolicy> sync(syncPolicy(100), subima, subptc, subodo);
+  sync.registerCallback(boost::bind(&loop_closure_callback, _1, _2, _3));
 
   ros::Rate r(10);
   while (ros::ok()){
     publicar_nuvem_atual();
     r.sleep();
-
-    ROS_INFO("Rodando...");
+    ros::spinOnce();
   }
 
 }
