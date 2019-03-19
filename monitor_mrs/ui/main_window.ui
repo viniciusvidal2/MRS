@@ -2331,9 +2331,9 @@
             <property name="geometry">
              <rect>
               <x>20</x>
-              <y>30</y>
+              <y>60</y>
               <width>221</width>
-              <height>124</height>
+              <height>121</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -2371,9 +2371,9 @@
             <property name="geometry">
              <rect>
               <x>20</x>
-              <y>160</y>
+              <y>190</y>
               <width>221</width>
-              <height>120</height>
+              <height>101</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_9">
@@ -2443,6 +2443,55 @@
               </widget>
              </item>
             </layout>
+           </widget>
+           <widget class="QLabel" name="label_temperatura">
+            <property name="geometry">
+             <rect>
+              <x>19</x>
+              <y>30</y>
+              <width>155</width>
+              <height>25</height>
+             </rect>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>12</pointsize>
+             </font>
+            </property>
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::Box</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Sunken</enum>
+            </property>
+            <property name="text">
+             <string>Temperatura critica:</string>
+            </property>
+            <property name="textFormat">
+             <enum>Qt::RichText</enum>
+            </property>
+            <property name="scaledContents">
+             <bool>false</bool>
+            </property>
+           </widget>
+           <widget class="QLineEdit" name="lineEdit_temperaturacritica">
+            <property name="geometry">
+             <rect>
+              <x>175</x>
+              <y>30</y>
+              <width>65</width>
+              <height>25</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>50</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
            </widget>
           </widget>
          </item>

@@ -159,7 +159,7 @@ void GigeImageReader::estamosdentroCb(const std_msgs::Int8 &msg){
         kill(pid, SIGINT);
       // Se foi informado ponto quente, ver aqui de mudar para a pasta quente
       if(flag_temperatura == 1){
-        std::string comando_muda_pasta = "gnome-terminal -x sh -c 'mv "+pasta+" "+pasta+"/Quente'";
+        std::string comando_muda_pasta = "gnome-terminal -x sh -c 'mv "+pasta+"/"+nome_bag+" "+pasta+"/Quente/"+nome_bag+"'";
         system(comando_muda_pasta.c_str());
       }
     }

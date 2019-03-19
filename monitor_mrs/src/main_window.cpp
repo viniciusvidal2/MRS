@@ -243,7 +243,8 @@ void monitor_mrs::MainWindow::on_pushButton_iniciaStereo_clicked()
       ui.verticalSlider_offset->show();
     }
     sleep(1);
-    system("gnome-terminal -x sh -c 'rosrun termica_reconstrucao imTermicaScaled.py temp_thr:=100'");
+    string comando_termica_felipe = "gnome-terminal -x sh -c 'rosrun termica_reconstrucao imTermicaScaled.py temp_thr:="+ui.lineEdit_temperaturacritica->text().toStdString()+"'";
+    system(comando_termica_felipe.c_str());
 //    system("gnome-terminal -x sh -c 'roslaunch termica_reconstrucao reconstrucao_teste2.launch do_accumulation:=false'");
     controle_stereo = true;
 
@@ -288,18 +289,21 @@ void monitor_mrs::MainWindow::on_radioButton_caminhocompleto_clicked()
 
 void monitor_mrs::MainWindow::on_pushButton_salvaBag_clicked()
 {
-  // Ver o tempo para diferenciar bags gravadas automaticamente
-  time_t t = time(0);
-  struct tm * now = localtime( & t );
-  string year, month, day, hour, minutes;
-  year    = boost::lexical_cast<std::string>(now->tm_year + 1900);
-  month   = boost::lexical_cast<std::string>(now->tm_mon );
-  day     = boost::lexical_cast<std::string>(now->tm_mday);
-  hour    = boost::lexical_cast<std::string>(now->tm_hour);
-  minutes = boost::lexical_cast<std::string>(now->tm_min );
-  string date = "_" + year + "_" + month + "_" + day + "_" + hour + "h_" + minutes + "m";
+  string date;
 
   if(!controle_gravacao){ // Nao estamos gravando, pode gravar
+
+    // Ver o tempo para diferenciar bags gravadas automaticamente
+    time_t t = time(0);
+    struct tm * now = localtime( & t );
+    string year, month, day, hour, minutes;
+    year    = boost::lexical_cast<std::string>(now->tm_year + 1900);
+    month   = boost::lexical_cast<std::string>(now->tm_mon );
+    day     = boost::lexical_cast<std::string>(now->tm_mday);
+    hour    = boost::lexical_cast<std::string>(now->tm_hour);
+    minutes = boost::lexical_cast<std::string>(now->tm_min );
+    date = "_" + year + "_" + month + "_" + day + "_" + hour + "h_" + minutes + "m";
+
     // Botao fica vermelho, mostrando que vamos ficar gravando
     ui.pushButton_salvaBag->setAutoFillBackground(true);
     ui.pushButton_salvaBag->setStyleSheet("background-color: rgb(230, 0, 20); color: rgb(0, 0, 0)"); // Assim esta quando pode gravar
@@ -311,20 +315,20 @@ void monitor_mrs::MainWindow::on_pushButton_salvaBag_clicked()
     if(ui.radioButton_caminhocompleto->isChecked()){
     nome = ui.lineEdit_nomeBag->text().toStdString();
     if(nome.length() == 0){
-      nome = "mrs_"+date+".bag";
+      nome = "mrs_"+date;
     } else {
-      nome += (date+".bag");
+      nome += date;
     }
-    string comando_fazer_pasta = "gnome-terminal -x sh -c 'cd ~/Desktop && mkdir -p "+ui.lineEdit_nomeBag->text().toStdString()+date+"/Quentes'";
+    string comando_fazer_pasta = "gnome-terminal -x sh -c 'cd ~/Desktop && mkdir -p "+nome+"/Quentes'";
     system(comando_fazer_pasta.c_str());
-    std::string comando_full = "gnome-terminal -x sh -c 'roslaunch rustbot_bringup record_raw.launch only_raw_data:=true bag:="+nome;
-    comando_full +=" folder:=/home/mrs/Desktop/"+ui.lineEdit_nomeBag->text().toStdString()+date+"'";
+    std::string comando_full = "gnome-terminal -x sh -c 'roslaunch rustbot_bringup record_raw.launch only_raw_data:=true bag:="+nome+".bag";
+    comando_full +=" folder:=/home/mrs/Desktop/"+nome+"'";
     system(comando_full.c_str());
 
     } else if(ui.radioButton_pontosdeinteresse->isChecked()) {
-      gige_ir.set_nomeDaPasta(ui.lineEdit_nomeBag->text().toStdString()+date);
+      gige_ir.set_nomeDaPasta(nome);
       // Criando a pasta na area de trabalho
-      string comando_temp = "gnome-terminal -x sh -c 'cd ~/Desktop && mkdir -p "+ui.lineEdit_nomeBag->text().toStdString()+date+"/Quentes'";
+      string comando_temp = "gnome-terminal -x sh -c 'cd ~/Desktop && mkdir -p "+nome+"/Quentes'";
       system(comando_temp.c_str());
       gige_ir.vamos_gravar(true);
     }
@@ -347,7 +351,7 @@ void monitor_mrs::MainWindow::on_pushButton_salvaBag_clicked()
     // pontos de interesse dentro da classe gige_ir
     if(ui.radioButton_caminhocompleto->isChecked()){
       if(gige_ir.get_flag_temperatura() == 1){
-        std::string comando_muda_pasta = "gnome-terminal -x sh -c 'mv ~/Desktop/"+nome+date+" ~/Desktop/"+nome+date+"/Quente'";
+        std::string comando_muda_pasta = "gnome-terminal -x sh -c 'mv ~/Desktop/"+nome+" ~/Desktop/"+nome+"/Quente'";
         system(comando_muda_pasta.c_str());
       }
     }
