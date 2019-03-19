@@ -212,6 +212,8 @@ void monitor_mrs::MainWindow::on_pushButton_motores_clicked()
     ui.listWidget->addItem(QString::fromStdString("Motores ligados, controle por Joystick."));
   }
   ui.groupBox_raio->setEnabled(true);
+  ui.radioButton_automatico->hide();
+  ui.radioButton_manual->hide();
 }
 
 void monitor_mrs::MainWindow::on_pushButton_qground_clicked()
@@ -243,9 +245,8 @@ void monitor_mrs::MainWindow::on_pushButton_iniciaStereo_clicked()
       ui.verticalSlider_offset->show();
     }
     sleep(1);
-    string comando_termica_felipe = "gnome-terminal -x sh -c 'rosrun termica_reconstrucao imTermicaScaled.py temp_thr:="+ui.lineEdit_temperaturacritica->text().toStdString()+"'";
+    string comando_termica_felipe = "gnome-terminal -x sh -c 'rosrun termica_reconstrucao imTermicaScaled.py "+ui.lineEdit_temperaturacritica->text().toStdString()+"'";
     system(comando_termica_felipe.c_str());
-//    system("gnome-terminal -x sh -c 'roslaunch termica_reconstrucao reconstrucao_teste2.launch do_accumulation:=false'");
     controle_stereo = true;
 
   } else {

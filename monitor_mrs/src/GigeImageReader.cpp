@@ -55,7 +55,7 @@ void GigeImageReader::init(){
   offset_tilt_pub = nh_.advertise<std_msgs::Int8>("offset_tilt_pub", 100);
   esquema_pub     = nh_.advertise<std_msgs::Int8>("esquema_pub", 100);
   salvar_nuvens_pub = nh_.advertise<std_msgs::Bool>("/podemos_salvar_nuvens", 10);
-  flag_gravando_bag_pub = nh_.advertise<std_msgs::Int8>("/flag_gravando_bag", 10);
+  flag_gravando_bag_pub = nh_.advertise<std_msgs::Int8>("/flag_gravando_bag", 1);
   offset = 0; // a ser publicado para alterar pan do motor
   offset_tilt = 0; // a ser publicado para alterar tilt do motor
   sub_estamosdentro = nh_.subscribe("/estamos_dentro", 10, &GigeImageReader::estamosdentroCb, this);

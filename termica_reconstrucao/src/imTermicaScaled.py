@@ -47,7 +47,7 @@ class imScale():
         self.bridge = CvBridge()
         self.flag_gravando = 0
         self.flag_temp_alto = 0
-        self.glag_gravando_ant = 0
+        self.flag_gravando_ant = 0
 
     def gravandoCallback(self, flag_msg):
 
@@ -147,7 +147,8 @@ class imScale():
 
 def main(args):
     rospy.init_node('escala' , anonymous = True)
-    tempThr = rospy.get_param('temp_thr', 25)
+    tempThr = sys.argv[1]
+#    tempThr = rospy.get_param('temp_thr', 25)
     print tempThr
     imS = imScale(tempThr)
 
