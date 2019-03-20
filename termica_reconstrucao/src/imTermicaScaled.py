@@ -34,7 +34,7 @@ class imScale():
         self.image_pub_scaled = rospy.Publisher("/dados_sync/image_scaled", Image, queue_size = 10)
         self.image_pub_8bit = rospy.Publisher("/dados_sync/image_8bits", Image, queue_size = 10)
         self.pub_pc = rospy.Publisher("/dados_sync/point_cloud", PointCloud2, queue_size = 10)
-        self.pub_odom = rospy.Publisher("/dados_sync/odometry", Odometry, queue_size = 10)
+        self.pub_odom = rospy.Publisher("/dados_sync/odometry", Odometry, queue_size = 10)ac
         self.pub_flag_temp = rospy.Publisher("/flag_temp_alto", Int8, queue_size = 1)
 
         # Sub
@@ -48,12 +48,13 @@ class imScale():
         self.flag_gravando = 0
 	self.flag_gravando_ant = 0
         self.flag_temp_alto = 0
+	self.flag_temp = 0
 
     def gravandoCallback(self, flag_msg):
 	self.flag_gravando_ant = self.flag_gravando
 	self.flag_gravando = flag_msg.data
 
-	if(self.flag_gravando_ant == 0 and self.flag_gravando == 1)
+	if(self.flag_gravando_ant == 0 and self.flag_gravando == 1 and self.flag_temp == 0)
 	    self.flag_temp_alto = 0	
 
 
@@ -115,6 +116,11 @@ class imScale():
        dataSca = data*K - 273.15
        countTempAlto = np.count_nonzero(np.array(dataSca >= self.tempThreshold))
        #print self.flag_gravando
+
+       if countTempAlto > 0:
+           self.flag_temp = 1
+       else:
+           self.flag_temp = 0   
 
        if ((countTempAlto > 0) and (self.flag_gravando == 1)):
            self.flag_temp_alto = 1
