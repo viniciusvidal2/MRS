@@ -46,17 +46,16 @@ class imScale():
         self.ats.registerCallback(self.tcallback)
         self.bridge = CvBridge()
         self.flag_gravando = 0
+	self.flag_gravando_ant = 0
         self.flag_temp_alto = 0
 
     def gravandoCallback(self, flag_msg):
+	self.flag_gravando_ant = self.flag_gravando
+	self.flag_gravando = flag_msg.data
 
-        if(self.flag_gravando == 0 and flag_msg.data == 1):
-            self.flag_gravando = flag_msg.data
+	if(self.flag_gravando_ant == 0 and self.flag_gravando == 1)
+	    self.flag_temp_alto = 0	
 
-	if(self.flag_gravando == 1 and flag_msg.data == 0):
-	    self.flag_temp_alto = 0
-            self.flag_gravando = flag_msg.data	
-        pass
 
     def tcallback(self, img_msg, pc_msg, odom_msg):
 
