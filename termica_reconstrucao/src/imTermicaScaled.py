@@ -34,7 +34,7 @@ class imScale():
         self.image_pub_scaled = rospy.Publisher("/dados_sync/image_scaled", Image, queue_size = 10)
         self.image_pub_8bit = rospy.Publisher("/dados_sync/image_8bits", Image, queue_size = 10)
         self.pub_pc = rospy.Publisher("/dados_sync/point_cloud", PointCloud2, queue_size = 10)
-        self.pub_odom = rospy.Publisher("/dados_sync/odometry", Odometry, queue_size = 10)ac
+        self.pub_odom = rospy.Publisher("/dados_sync/odometry", Odometry, queue_size = 10)
         self.pub_flag_temp = rospy.Publisher("/flag_temp_alto", Int8, queue_size = 1)
 
         # Sub
