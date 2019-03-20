@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+﻿#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 # Se inscreve no tópico 'thermal/image_raw'
@@ -47,14 +47,15 @@ class imScale():
         self.bridge = CvBridge()
         self.flag_gravando = 0
         self.flag_temp_alto = 0
-        self.glag_gravando_ant = 0
 
     def gravandoCallback(self, flag_msg):
 
         if(self.flag_gravando == 0 and flag_msg.data == 1):
-            print self.flag_gravando
             self.flag_gravando = flag_msg.data
-            print self.flag_gravando
+
+	if(self.flag_gravando == 1 and flag_msg.data == 0):
+	    self.flag_temp_alto = 0
+            self.flag_gravando = flag_msg.data	
         pass
 
     def tcallback(self, img_msg, pc_msg, odom_msg):
@@ -118,9 +119,6 @@ class imScale():
 
        if ((countTempAlto > 0) and (self.flag_gravando == 1)):
            self.flag_temp_alto = 1
-
-       #if self.flag_gravando == 0:
-       #    self.flag_temp_alto = 0
 
        flag_msg_out = self.flag_temp_alto
        pc_msg_out = pc_msg
