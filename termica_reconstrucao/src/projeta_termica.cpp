@@ -60,7 +60,6 @@ void inicia_modelo_camera(sensor_msgs::CameraInfo ci){
 void projecao_callback(const sensor_msgs::ImageConstPtr imagem_input,
                        const sensor_msgs::PointCloud2ConstPtr cloud_input,
                        const nav_msgs::OdometryConstPtr odom_input){
-  ROS_INFO("Processo rodando normalmente");
 
   // Coisas de imagem
   cv::Mat img_g;
