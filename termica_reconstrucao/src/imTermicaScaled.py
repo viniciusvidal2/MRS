@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 # Se inscreve no tópico 'thermal/image_raw'
@@ -46,16 +46,15 @@ class imScale():
         self.ats.registerCallback(self.tcallback)
         self.bridge = CvBridge()
         self.flag_gravando = 0
-	      self.flag_gravando_ant = 0
+        self.flag_gravando_ant = 0
         self.flag_temp_alto = 0
       	self.flag_temp = 0
-
 
     def gravandoCallback(self, flag_msg):
 	self.flag_gravando_ant = self.flag_gravando
 	self.flag_gravando = flag_msg.data
 
-	if(self.flag_gravando_ant == 0 and self.flag_gravando == 1 and self.flag_temp == 0)
+        if(self.flag_gravando_ant == 0 and self.flag_gravando == 1 and self.flag_temp == 0):
 	    self.flag_temp_alto = 0	
 
 
@@ -115,7 +114,7 @@ class imScale():
 
        ## Verificando se há alguma temperatura alta x*K - 273.15
        dataSca = data*K - 273.15
-       countTempAlto = np.count_nonzero(np.array(dataSca >= self.tempThreshold))
+       countTempAlto = np.count_nonzero(dataSca >= self.tempThreshold)
        #print self.flag_gravando
 
        if countTempAlto > 0:

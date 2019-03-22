@@ -323,7 +323,7 @@ void monitor_mrs::MainWindow::on_pushButton_salvaBag_clicked()
     string comando_fazer_pasta = "gnome-terminal -x sh -c 'cd ~/Desktop && mkdir -p "+nome+"/Quentes'";
     system(comando_fazer_pasta.c_str());
     std::string comando_full = "gnome-terminal -x sh -c 'roslaunch rustbot_bringup record_raw.launch only_raw_data:=true bag:="+nome+".bag";
-    comando_full +=" folder:=/home/mrs/Desktop/"+nome+"'";
+    comando_full +=" folder:=$HOME/Desktop/"+nome+"'";
     system(comando_full.c_str());
 
     } else if(ui.radioButton_pontosdeinteresse->isChecked()) {
@@ -352,7 +352,7 @@ void monitor_mrs::MainWindow::on_pushButton_salvaBag_clicked()
     // pontos de interesse dentro da classe gige_ir
     if(ui.radioButton_caminhocompleto->isChecked()){
       if(gige_ir.get_flag_temperatura() == 1){
-        std::string comando_muda_pasta = "gnome-terminal -x sh -c 'mv ~/Desktop/"+nome+" ~/Desktop/"+nome+"/Quente'";
+        std::string comando_muda_pasta = "gnome-terminal -x sh -c 'mv ~/Desktop/"+nome+"/"+nome+".bag ~/Desktop/"+nome+"/Quentes/"+nome+".bag'";
         system(comando_muda_pasta.c_str());
       }
     }

@@ -337,11 +337,11 @@ void loop_closure_callback(const sensor_msgs::ImageConstPtr& msg_ima,
   if(podemos_publicar){
 
     // Cuidados com a nuvem antes de acumular
-    passthrough(cloud, "z",   0, 20);
-    passthrough(cloud, "x", -10, 10);
-    passthrough(cloud, "y", -10, 10);
+    passthrough(cloud, "z",   0, 30);
+    passthrough(cloud, "x", -15, 15);
+    passthrough(cloud, "y", -15, 15);
 
-    remove_outlier(cloud, 10, 1);
+    remove_outlier(cloud, 7, 1);
 
     // Acumular se for termica ou visual
     if(camera_type == "termica"){
@@ -368,18 +368,22 @@ void loop_closure_callback(const sensor_msgs::ImageConstPtr& msg_ima,
 /// Publica continuamente nuvem acumulada
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void publicar_nuvem_atual(){
+
   if (acumulada->size() > 0){
     sensor_msgs::PointCloud2 msg_out;
     toROSMsg(*acumulada, msg_out);
     msg_out.header.stamp = ros::Time::now();
     msg_out.header.frame_id = acumulada->header.frame_id;
+
     if(camera_type == "termica"){
       ROS_INFO("Publicando nuvem acumulada TERMICA");
     } else {
       ROS_INFO("Publicando nuvem acumulada VISUAL");
     }
+
     acumulada_pub.publish(msg_out);
   }
+
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -447,7 +451,7 @@ int main(int argc, char **argv){
   Synchronizer<syncPolicy> sync(syncPolicy(100), subima, subptc, subodo);
   sync.registerCallback(boost::bind(&loop_closure_callback, _1, _2, _3));
 
-  ros::Rate r(10);
+  ros::Rate r(2);
   while (ros::ok()){
     publicar_nuvem_atual();
     r.sleep();
