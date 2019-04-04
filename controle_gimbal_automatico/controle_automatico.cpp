@@ -28,12 +28,12 @@ private:
   float pitch_para_apontar, yaw_atual, yaw_para_apontar, estamos_dentro;
   // Ranges para alcance de pwm e angulo [DEGREES] de yaw e pitch
   int pwm_yaw_range[2]     = {0, 1023}; // [PWM]
-  int pwm_pitch_range[2]   = {2015, 2343}; // [PWM]
+  int pwm_pitch_range[2]   = {1900, 2246}; // [PWM]
   float ang_yaw_range[2]   = {0.0  , 300.0}; // [DEGREES]
-  float ang_pitch_range[2] = {175.0, 205.0}; // [DEGREES]
-  float ang_pitch_horizontal = 186.0; // [DEGREES]
+  float ang_pitch_range[2] = {165.0, 197.0}; // [DEGREES]
+  float ang_pitch_horizontal = 177.0; // [DEGREES]
   float ang_yaw_frente = 157.0; // [DEGREES]
-  int pwm_pitch_horizontal = 2142; // [PWM]
+  int pwm_pitch_horizontal = 2022; // [PWM]
   int pwm_yaw_frente = 537; // apontar sempre para frente do veiculo caso nao precise virar [PWM]
   float yaw_mid_range, pitch_mid_range; // [DEGREES]
   // Relacao pwm/ang[PWM/DEGREES] para os dois casos
@@ -125,7 +125,7 @@ private:
     offset_ang = -300.0f*((float)offset + 48.0f)/97.0f + 300 - ang_yaw_frente; // Diferenca para o centro do range
     offset_tilt_ang = (ang_pitch_range[0]-ang_pitch_range[1])*((float)offset_tilt - 48.0f)/(-99.0f) + ang_pitch_range[1] - ang_pitch_horizontal; // Diferenca para o centro do range
 
-    offset_tilt_ang = offset_tilt_ang*2; // Para condizer com os novos limites apos adicao do bumper
+    offset_tilt_ang = offset_tilt_ang; // Para condizer com os novos limites apos adicao do bumper
 
     if (esquema == 2) { // Pegar os pontos de interesse
 

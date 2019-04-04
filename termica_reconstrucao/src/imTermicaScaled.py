@@ -115,7 +115,7 @@ class imScale():
        ## Verificando se há alguma temperatura alta x*K - 273.15
        dataSca = data*K - 273.15
        countTempAlto = np.count_nonzero(dataSca >= self.tempThreshold)
-       #print self.flag_gravando
+       #print countTempAlto
 
        if countTempAlto > 0:
            self.flag_temp = 1
@@ -150,7 +150,7 @@ class imScale():
 
 def main(args):
     rospy.init_node('escala' , anonymous = True)
-    tempThr = sys.argv[1]
+    tempThr = float(sys.argv[1])
 #    tempThr = rospy.get_param('temp_thr', 25)
     print tempThr
     imS = imScale(tempThr)
