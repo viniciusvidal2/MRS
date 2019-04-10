@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 # Se inscreve no tópico 'thermal/image_raw'
 # Cria colorbar e publica imagem no tópico 'thermal/image_scaled'
@@ -26,25 +28,33 @@ from std_msgs.msg import Int8
 
 class imScale():
 
-    def __init__(self):
+    def __init__(self, tempThr):
+        # Threshold de temperatura
+        self.tempThreshold = tempThr
 
         # Pub
-        self.image_pub_scaled = rospy.Publisher("/dados_sync/image_scaled", Image, queue_size = 10)
-        self.image_pub_8bit = rospy.Publisher("/dados_sync/image_8bits", Image, queue_size = 10)
-        self.pub_pc = rospy.Publisher("/dados_sync/point_cloud", PointCloud2, queue_size = 10)
-        self.pub_odom = rospy.Publisher("/dados_sync/odometry", Odometry, queue_size = 10)
+        self.image_pub_scaled = rospy.Publisher("/dados_sync/image_scaled", Image, queue_size = 2)
+        self.image_pub_8bit = rospy.Publisher("/dados_sync/image_8bits", Image, queue_size = 2)
+        self.pub_flag_temp = rospy.Publisher("/flag_temp_alto", Int8, queue_size = 1)
 
         # Sub
-        self.thermal_sub = Subscriber("/termica/thermal/image_raw", Image)
-        self.pc_sub = Subscriber("/stereo/points2", PointCloud2)
-        self.odom_sub = Subscriber("/stereo_odometer/odometry", Odometry)
-        self.ats = ApproximateTimeSynchronizer([self.thermal_sub, self.pc_sub, self.odom_sub], queue_size=5, slop=0.5)
-        self.ats.registerCallback(self.tcallback)
+        self.flag_grav_sub = rospy.Subscriber("/flag_gravando_bag", Int8, self.gravandoCallback, queue_size = 1)
+        self.thermal_sub = rospy.Subscriber("/termica/thermal/image_raw", Image, self.tcallback, queue_size = 1)
         self.bridge = CvBridge()
-        
+        self.flag_gravando = 0
+        self.flag_gravando_ant = 0
+        self.flag_temp_alto = 0
+        self.flag_temp = 0
+
+    def gravandoCallback(self, flag_msg):
+        self.flag_gravando_ant = self.flag_gravando
+        self.flag_gravando = flag_msg.data
+
+        if(self.flag_gravando_ant == 0 and self.flag_gravando == 1 and self.flag_temp == 0):
+            self.flag_temp_alto = 0
 
 
-    def tcallback(self, img_msg, pc_msg, odom_msg):
+    def tcallback(self, img_msg):
 
        cv_image = self.bridge.imgmsg_to_cv2(img_msg, desired_encoding="passthrough")
 
@@ -98,24 +108,32 @@ class imScale():
        data_raw = data_raw.reshape(fig_raw.canvas.get_width_height()[::-1] + (3,))
        img_msg_out = self.bridge.cv2_to_imgmsg(data_raw, "bgr8");
 
+       ## Verificando se há alguma temperatura alta x*K - 273.15
+       dataSca = data*K - 273.15
+       countTempAlto = np.count_nonzero(dataSca >= self.tempThreshold)
+       #print countTempAlto
 
-       pc_msg_out = pc_msg
-       odom_msg_out = odom_msg;
+       if countTempAlto > 0:
+           self.flag_temp = 1
+       else:
+           self.flag_temp = 0
+
+       if ((countTempAlto > 0) and (self.flag_gravando == 1)):
+           self.flag_temp_alto = 1
+
+       flag_msg_out = self.flag_temp_alto
        t = rospy.Time.now()
        img_s_msg_out.header.stamp = t
        img_msg_out.header.stamp = t
-       pc_msg_out.header.stamp = t
-       odom_msg_out.header.stamp = t
+
 
        print "publicando TERMICA"
+       self.pub_flag_temp.publish(flag_msg_out)
        self.image_pub_scaled.publish(img_s_msg_out)
        self.image_pub_8bit.publish(img_msg_out)
-       self.pub_pc.publish(pc_msg_out)
-       self.pub_odom.publish(odom_msg_out)
 
        plt.close(fig) # MUITO IMPORTANTE PRA NAO ESTOURAR MEMORIA!
        plt.close(fig_raw)
-
        pass
 
 
@@ -123,7 +141,10 @@ class imScale():
 
 def main(args):
     rospy.init_node('escala' , anonymous = True)
-    imS = imScale()
+    tempThr = float(sys.argv[1])
+#    tempThr = rospy.get_param('temp_thr', 25)
+    print tempThr
+    imS = imScale(tempThr)
 
     try:
         rospy.spin()

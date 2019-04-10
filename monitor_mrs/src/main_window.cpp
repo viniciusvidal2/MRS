@@ -204,8 +204,8 @@ void monitor_mrs::MainWindow::on_pushButton_motores_clicked()
 {
   if(ui.radioButton_automatico->isChecked()) { // Aqui estamos com a pixhawk
     system("gnome-terminal -x sh -c 'roslaunch automatico_mrs lancar_gimbal.launch'");
-    sleep(3); // Para o no iniciar ok
-    system("gnome-terminal -x sh -c 'rosservice call /joint_command raw 537 2246'"); // Posiciona o robo olhando para frente
+    sleep(1); // Para o no iniciar ok
+    system("gnome-terminal -x sh -c 'rosservice call /joint_command raw 537 2200'"); // Posiciona o robo olhando para frente
     ui.listWidget->addItem(QString::fromStdString("Motores ligados, controle automatico."));
   } else if(ui.radioButton_manual->isChecked()) { // Aqui estamos com o joy
     system("gnome-terminal -x sh -c 'roslaunch automatico_mrs lancar_gimbal.launch automatico:=false'");
@@ -244,8 +244,7 @@ void monitor_mrs::MainWindow::on_pushButton_iniciaStereo_clicked()
       ui.horizontalSlider_offset->show();
       ui.verticalSlider_offset->show();
     }
-//    sleep(1);
-    string comando_termica_felipe = "gnome-terminal -x sh -c 'rosrun termica_reconstrucao imTermicaScaled.py "+ui.lineEdit_temperaturacritica->text().toStdString()+"'";
+    string comando_termica_felipe = "gnome-terminal -x sh -c 'rosrun termica_reconstrucao imTermicaScaledOnline.py "+ui.lineEdit_temperaturacritica->text().toStdString()+"'";
     system(comando_termica_felipe.c_str());
     controle_stereo = true;
 
@@ -353,6 +352,7 @@ void monitor_mrs::MainWindow::on_pushButton_salvaBag_clicked()
     if(ui.radioButton_caminhocompleto->isChecked()){
       if(gige_ir.get_flag_temperatura() == 1){
         std::string comando_muda_pasta = "gnome-terminal -x sh -c 'mv ~/Desktop/"+nome+"/"+nome+".bag ~/Desktop/"+nome+"/Quentes/"+nome+".bag'";
+        sleep(1);
         system(comando_muda_pasta.c_str());
       }
     }
@@ -393,7 +393,7 @@ void monitor_mrs::MainWindow::on_horizontalSlider_offset_sliderMoved()
 
 void monitor_mrs::MainWindow::on_verticalSlider_offset_sliderMoved()
 {
-  offset_tilt = ui.verticalSlider_offset->value() - 89; // Aqui diferente por causa do nivel horizontal estar em 60% do range, invertendo tudo
+  offset_tilt = ui.verticalSlider_offset->value() - 49; // Aqui diferente por causa do nivel horizontal estar em 60% do range, invertendo tudo
   gige_ir.setOffset(offset, offset_tilt);
 }
 
@@ -438,9 +438,9 @@ void monitor_mrs::MainWindow::on_pushButton_playBag_clicked()
  }
  system("gnome-terminal -x sh -c 'roslaunch rustbot_bringup all.launch do_stereo:=true online_stereo:=false do_accumulation:=true'");
  system("gnome-terminal -x sh -c 'rosrun rustbot_accumulate_point_clouds save_cloud'");
+ string comando_termica_felipe = "gnome-terminal -x sh -c 'rosrun termica_reconstrucao imTermicaScaled.py'";
+ system(comando_termica_felipe.c_str());
  sleep(5);
-// system("gnome-terminal -x sh -c 'roslaunch termica_reconstrucao reconstrucao_teste2.launch do_accumulation:=true'");
-// sleep(5);
  QString teste_comando = "gnome-terminal -x sh -c 'roslaunch rustbot_bringup playback.launch bag:=";
  teste_comando.append(arquivo.left(arquivo.size()-4));
  teste_comando.append(" local:=");

@@ -28,12 +28,12 @@ private:
   float pitch_para_apontar, yaw_atual, yaw_para_apontar, estamos_dentro;
   // Ranges para alcance de pwm e angulo [DEGREES] de yaw e pitch
   int pwm_yaw_range[2]     = {0, 1023}; // [PWM]
-  int pwm_pitch_range[2]   = {1900, 2246}; // [PWM]
+  int pwm_pitch_range[2]   = {1965, 2300}; // [PWM]
   float ang_yaw_range[2]   = {0.0  , 300.0}; // [DEGREES]
-  float ang_pitch_range[2] = {165.0, 197.0}; // [DEGREES]
-  float ang_pitch_horizontal = 177.0; // [DEGREES]
+  float ang_pitch_range[2] = {172.0, 202.0}; // [DEGREES]
+  float ang_pitch_horizontal = 193.0; // [DEGREES]
   float ang_yaw_frente = 157.0; // [DEGREES]
-  int pwm_pitch_horizontal = 2022; // [PWM]
+  int pwm_pitch_horizontal = 2200; // [PWM]
   int pwm_yaw_frente = 537; // apontar sempre para frente do veiculo caso nao precise virar [PWM]
   float yaw_mid_range, pitch_mid_range; // [DEGREES]
   // Relacao pwm/ang[PWM/DEGREES] para os dois casos
@@ -102,9 +102,9 @@ public:
     rate.request.message_rate = 10; // X Hz das mensagens que vem
     rate.request.on_off = 1; // Nao sei
     if(srvRate.call(rate))
-      ROS_INFO("Taxado mavros mudada para %d Hz", rate.request.message_rate);
+      ROS_INFO("Taxado Mavlink mudada para %d Hz", rate.request.message_rate);
     else
-      ROS_INFO("Nao pode chamar o servico, taxa nao mudada.");
+      ROS_INFO("Nao pode alterar a taxa Mavlink.");
 
     dyn_msg.header.frame_id = "odom"; // Por desencargo
   }

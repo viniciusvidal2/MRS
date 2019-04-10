@@ -51,9 +51,9 @@ void GigeImageReader::init(){
 
   //image_sub_ = it_.subscribe("/stereo/left/image_color", 1, &GigeImageReader::imageCb, this);
   image_sub_ = it_.subscribe("/stereo/left/image_rect_color", 1, &GigeImageReader::imageCb, this);
-  offset_pub      = nh_.advertise<std_msgs::Int8>("offset_pub", 100);
-  offset_tilt_pub = nh_.advertise<std_msgs::Int8>("offset_tilt_pub", 100);
-  esquema_pub     = nh_.advertise<std_msgs::Int8>("esquema_pub", 100);
+  offset_pub      = nh_.advertise<std_msgs::Int8>("offset_pub", 10);
+  offset_tilt_pub = nh_.advertise<std_msgs::Int8>("offset_tilt_pub", 10);
+  esquema_pub     = nh_.advertise<std_msgs::Int8>("esquema_pub", 10);
   salvar_nuvens_pub = nh_.advertise<std_msgs::Bool>("/podemos_salvar_nuvens", 10);
   flag_gravando_bag_pub = nh_.advertise<std_msgs::Int8>("/flag_gravando_bag", 1);
   offset = 0; // a ser publicado para alterar pan do motor
@@ -93,8 +93,6 @@ void GigeImageReader::init(){
 //      salvar_nuvens.data = false;
     ros::spinOnce();
   }
-
-//  ros::spin();
 
 }
 
