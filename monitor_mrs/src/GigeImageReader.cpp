@@ -12,6 +12,9 @@
 
 #include <boost/lexical_cast.hpp>
 
+#include <rosbag/bag.h>
+#include <rosbag/view.h>
+
 namespace monitor_mrs {
 
 using namespace std;
@@ -54,7 +57,7 @@ void GigeImageReader::init(){
   offset_pub      = nh_.advertise<std_msgs::Int8>("offset_pub", 10);
   offset_tilt_pub = nh_.advertise<std_msgs::Int8>("offset_tilt_pub", 10);
   esquema_pub     = nh_.advertise<std_msgs::Int8>("esquema_pub", 10);
-  salvar_nuvens_pub = nh_.advertise<std_msgs::Bool>("/podemos_salvar_nuvens", 10);
+  salvar_nuvens_pub = nh_.advertise<std_msgs::Bool>("/podemos_salvar_nuvens", 1);
   flag_gravando_bag_pub = nh_.advertise<std_msgs::Int8>("/flag_gravando_bag", 1);
   offset = 0; // a ser publicado para alterar pan do motor
   offset_tilt = 0; // a ser publicado para alterar tilt do motor
@@ -88,9 +91,11 @@ void GigeImageReader::init(){
     }
 
     flag_gravando_bag_pub.publish(msg_gravando_bag);
+
+    if((tempo_final_bag_offline - ros::Time::now()).toSec() < 1.0) // Assim salvaria 1 segundo antes de acabar a bag
+      salvar_nuvens.data = true;
     salvar_nuvens_pub.publish(salvar_nuvens);
-//    if(salvar_nuvens.data == true) // Assim nao precisa desligar o no de salvar, pode usar quantas vezes quiser
-//      salvar_nuvens.data = false;
+
     ros::spinOnce();
   }
 
@@ -272,6 +277,13 @@ void GigeImageReader::escutar_flag_temperatura(const std_msgs::Int8ConstPtr &fla
 
 int GigeImageReader::get_flag_temperatura(){
   return flag_temperatura;
+}
+
+void GigeImageReader::set_nome_bag_offline(std::string nome){
+  rosbag::Bag bag;
+  bag.open(nome);
+  rosbag::View view(bag, rosbag::TopicQuery("/stereo/left/image_raw"));
+  tempo_final_bag_offline = view.getEndTime();
 }
 
 }

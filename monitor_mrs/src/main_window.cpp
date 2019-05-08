@@ -448,9 +448,10 @@ void monitor_mrs::MainWindow::on_pushButton_playBag_clicked()
  teste_comando.append("'");
  localstd = teste_comando.toStdString();
  system(localstd.c_str());
-// sleep(8); // Para dar tempo do topico entrar ok
  ui.listWidget_2->addItem(QString::fromStdString("Bag inicializada."));
 
+ // Para acompanhar o processo e salvar as nuvens ao final
+ gige_ir.set_nome_bag_offline(filename.toStdString());
 
  ui.pushButton_paraBag->setEnabled(true);
  ui.pushButton_salvaNuvem->setEnabled(true);
@@ -481,7 +482,7 @@ void monitor_mrs::MainWindow::on_pushButton_salvaNuvem_clicked()
 {
   gige_ir.set_salvar_nuvens(true);
 // system("gnome-terminal -x sh -c 'rosrun rustbot_accumulate_point_clouds save_cloud'");
- ui.listWidget_2->addItem(QString::fromStdString("Nuvem de pontos salva com sucesso."));
+ ui.listWidget_2->addItem(QString::fromStdString("OBSERVE SE OS ARQUIVOS ESTAO SENDO SALVOS PELO TERMINAL CORRETO."));
 }
 
 void monitor_mrs::MainWindow::on_pushButton_recAcumulada_clicked()

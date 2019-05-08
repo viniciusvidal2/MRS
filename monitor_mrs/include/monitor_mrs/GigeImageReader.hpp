@@ -38,6 +38,8 @@
 #include <ctime>
 #include <math.h>
 
+#include <rosbag/bag.h>
+#include <rosbag/view.h>
 
 namespace monitor_mrs {
 
@@ -67,6 +69,7 @@ public:
   void set_flag_gravando_bag(int flag);
   int get_flag_temperatura();
   void escutar_flag_temperatura(const std_msgs::Int8ConstPtr& flag);
+  void set_nome_bag_offline(std::string nome);
 
   enum tipo_imagem {visual, termica};
   void set_imagem(int tipo); // Para definir se imagem termica ou visual no visor online
@@ -114,6 +117,8 @@ private:
   double lon; // Vindo da placa
 
   std::string nome_bag; // para gravar automaticamente
+
+  ros::Time tempo_final_bag_offline; // Para salvar automaticamente a bag quando estiver proximo do fim
 
   ros::ServiceClient raio_client; // Para alterar o raio de acao do robo pela GUI
 };
