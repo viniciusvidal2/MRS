@@ -11,13 +11,13 @@ project(monitor_mrs)
 
 # qt_build provides the qt cmake glue, roscpp the comms for a default talker
 find_package(OpenCV REQUIRED)
-find_package(catkin REQUIRED COMPONENTS qt_build roscpp cv_bridge sensor_msgs std_msgs image_transport)
+find_package(catkin REQUIRED COMPONENTS qt_build roscpp cv_bridge sensor_msgs std_msgs image_transport rosbag)
 include_directories(${catkin_INCLUDE_DIRS})
 include_directories(${OpenCV_INCLUDE_DIRS})
 # Use this to define what the package will export (e.g. libs, headers).
 # Since the default here is to produce only a binary, we don't worry about
 # exporting anything. 
-catkin_package(CATKIN_DEPENDS qt_build roscpp cv_bridge sensor_msgs std_msgs image_transport)
+catkin_package(CATKIN_DEPENDS qt_build roscpp cv_bridge sensor_msgs std_msgs image_transport rosbag)
 
 ##############################################################################
 # Qt Environment

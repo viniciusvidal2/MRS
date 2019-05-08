@@ -77,6 +77,8 @@ void GigeImageReader::init(){
   msg_esq.data = 1; // Inicia com o caminho todo
   msg_gravando_bag.data = 0; // Nao estamos gravando a principio
 
+  tempo_final_bag_offline = ros::Time::now(); // Inicia com o valor de agora, mas vai receber valor certo se for definida uma bag de processo offline
+
   tt = visual; // Comecamos vendo a imagem visual, se quiser mudar pra termica depois
   toggle_imagem = false; // Nao vamos variar a fonte da imagem
 
@@ -92,7 +94,7 @@ void GigeImageReader::init(){
 
     flag_gravando_bag_pub.publish(msg_gravando_bag);
 
-    if((tempo_final_bag_offline - ros::Time::now()).toSec() < 1.0) // Assim salvaria 1 segundo antes de acabar a bag
+    if(tempo_final_bag_offline.toSec() != 0 && (tempo_final_bag_offline - ros::Time::now()).toSec() > 0 && abs((tempo_final_bag_offline - ros::Time::now()).toSec()) < 1.0) // Assim salvaria 1 segundo antes de acabar a bag
       salvar_nuvens.data = true;
     salvar_nuvens_pub.publish(salvar_nuvens);
 
