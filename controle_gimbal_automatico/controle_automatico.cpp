@@ -27,14 +27,14 @@ private:
   // Dados vindos da placa
   float pitch_para_apontar, yaw_atual, yaw_para_apontar, estamos_dentro;
   // Ranges para alcance de pwm e angulo [DEGREES] de yaw e pitch
-  int pwm_yaw_range[2]     = {0, 1023}; // [PWM]
+  int pwm_yaw_range[2]     = {133, 3979}; // [PWM]
   int pwm_pitch_range[2]   = {1965, 2300}; // [PWM]
-  float ang_yaw_range[2]   = {0.0  , 300.0}; // [DEGREES]
+  float ang_yaw_range[2]   = {11.0, 349.0}; // [DEGREES]
   float ang_pitch_range[2] = {172.0, 202.0}; // [DEGREES]
   float ang_pitch_horizontal = 193.0; // [DEGREES]
-  float ang_yaw_frente = 157.0; // [DEGREES]
+  float ang_yaw_frente = 186.0; // [DEGREES]
   int pwm_pitch_horizontal = 2200; // [PWM]
-  int pwm_yaw_frente = 537; // apontar sempre para frente do veiculo caso nao precise virar [PWM]
+  int pwm_yaw_frente = 2118; // apontar sempre para frente do veiculo caso nao precise virar [PWM]
   float yaw_mid_range, pitch_mid_range; // [DEGREES]
   // Relacao pwm/ang[PWM/DEGREES] para os dois casos
   float pwm_ang_yaw, pwm_ang_pitch;
@@ -50,10 +50,8 @@ private:
   // Mensagem destinada ao servico do motor
   dynamixel_workbench_msgs::JointCommand posicao;
   // Offset vindo da GUI, movimenta em PAN e TILT
-  int offset = 0; // Vem na mensagem de -48 a 49
-  float offset_ang = 0; // Convertido para angulos [DEGREES]
-  int offset_tilt = 0; // Vem na mensagem de -59 a 39
-  float offset_tilt_ang = 0; // Convertido para angulos [DEGREES]
+  int offset_yaw = 0; // Vem na mensagem com o range determinado acima direto da main_window.cpp em DEGREES
+  int offset_tilt = 0; // Vem na mensagem com o range determinado acima direto da main_window.cpp em DEGREES
   ros::Subscriber subOff;
   ros::Subscriber subOffTilt;
   // Publicando se estamos dentro ou nao, para controle de gravacao de bag
@@ -121,20 +119,13 @@ public:
 private:
   void calcularAngulosMotores()
   {
-    // Inserindo o offset vindo da GUI
-    offset_ang = -300.0f*((float)offset + 48.0f)/97.0f + 300 - ang_yaw_frente; // Diferenca para o centro do range
-    offset_tilt_ang = (ang_pitch_range[0]-ang_pitch_range[1])*((float)offset_tilt - 48.0f)/(-99.0f) + ang_pitch_range[1] - ang_pitch_horizontal; // Diferenca para o centro do range
-
-    offset_tilt_ang = offset_tilt_ang; // Para condizer com os novos limites apos adicao do bumper
-
     if (esquema == 2) { // Pegar os pontos de interesse
 
       //    ROS_INFO("yaw ATUAL: %.2f\tyaw APONTAR: %.2f\tdelta yaw: %.2f", yaw_atual, yaw_para_apontar, delta_yaw);
       if(estamos_dentro == 0.0f){ // Se nao estamos dentro o offset vale, se estamos dentro so vale o automatico
-        delta_yaw   = offset_ang;
-        delta_pitch = offset_tilt_ang;
+        delta_yaw   = offset_yaw;
+        delta_pitch = offset_tilt;
         //      ROS_INFO("OFFSET DE TILT: %.2f", offset_tilt_ang);
-
       } else { // Dentro do controle automatico
         //      delta_yaw = (int)(delta_yaw/60) * 60; // Aqui arredonda para multiplos de 60, creio eu
         // Analisando diferenca de yaw
@@ -151,8 +142,8 @@ private:
 
     } else if (esquema == 1) { // Apontar so para frente, a nao ser que queira mexer na camera
 
-      delta_yaw   = offset_ang;
-      delta_pitch = offset_tilt_ang;
+      delta_yaw   = offset_yaw;
+      delta_pitch = offset_tilt;
 
       pwm_pan  = pwm_yaw_frente + delta_yaw*pwm_ang_yaw;
       pwm_pan  = (pwm_pan > pwm_yaw_range[1]) ? pwm_yaw_range[1] : (pwm_pan < pwm_yaw_range[0] ? pwm_yaw_range[0] : pwm_pan); // Limitando em maximo e minimo aqui, mais seguro
@@ -219,7 +210,7 @@ private:
 
   void escutarOffset(const std_msgs::Int8& msg)
   {
-    offset = msg.data;
+    offset_yaw = msg.data;
   }
 
   void escutarOffset_tilt(const std_msgs::Int8& msg)
@@ -254,7 +245,6 @@ int main(int argc, char **argv)
   while(ros::ok())
   {
     pxm.ExecutarClasse(argc, argv);
-//    rate.sleep();
     ros::spinOnce();
   }
   return 0;

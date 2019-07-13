@@ -55,7 +55,7 @@ bool MultiPort::loadDynamixel()
   dynamixel_driver::DynamixelInfo *pan_info = new dynamixel_driver::DynamixelInfo;
 
   pan_info->lode_info.device_name      = node_handle_.param<std::string>("pan/device_name", "/dev/ttyUSB0");
-  pan_info->lode_info.baud_rate        = node_handle_.param<int>("pan/baud_rate", 57600);
+  pan_info->lode_info.baud_rate        = node_handle_.param<int>("pan/baud_rate", 1000000);
   pan_info->lode_info.protocol_version = node_handle_.param<float>("pan/protocol_version", 2.0);
 
   pan_info->model_id                   = node_handle_.param<int>("pan/id", 2);
@@ -65,7 +65,7 @@ bool MultiPort::loadDynamixel()
   dynamixel_driver::DynamixelInfo *tilt_info = new dynamixel_driver::DynamixelInfo;
 
   tilt_info->lode_info.device_name      = node_handle_.param<std::string>("tilt/device_name", "/dev/ttyUSB0");
-  tilt_info->lode_info.baud_rate        = node_handle_.param<int>("tilt/baud_rate", 57600);
+  tilt_info->lode_info.baud_rate        = node_handle_.param<int>("tilt/baud_rate", 1000000);
   tilt_info->lode_info.protocol_version = node_handle_.param<float>("tilt/protocol_version", 1.0);
 
   tilt_info->model_id                   = node_handle_.param<int>("tilt/id", 1);
@@ -120,9 +120,17 @@ bool MultiPort::setTorque(bool onoff)
 // VINICIUS - Suavizar os motores, velocidade esta a 150, mas pode aumentar
 void MultiPort::setSlope()
 {
-  pan_driver_->writeRegister("cw_compliance_slope",  128);
-  pan_driver_->writeRegister("ccw_compliance_slope", 128);
-  pan_driver_->writeRegister("moving_speed", 220);
+//  pan_driver_->writeRegister("cw_compliance_slope",  128);
+//  pan_driver_->writeRegister("ccw_compliance_slope", 128);
+//  pan_driver_->writeRegister("moving_speed", 220);
+
+  pan_driver_->writeRegister("moving_speed", 318);
+  pan_driver_->writeRegister("cw_angle_limit" ,  133); // 11  degrees
+  pan_driver_->writeRegister("ccw_angle_limit", 3979); // 349 degrees
+
+  pan_driver_->writeRegister("p_gain", 17);
+  pan_driver_->writeRegister("i_gain",  5);
+  pan_driver_->writeRegister("d_gain",  5);
 
   tilt_driver_->writeRegister("moving_speed", 35);
   tilt_driver_->writeRegister("cw_angle_limit" ,  1965); //1965 172 degrees

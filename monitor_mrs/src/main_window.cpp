@@ -56,7 +56,11 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
 //  ui.pushButton_cameratermica->setStyleSheet("background-color: rgb(200, 200, 200); color: rgb(0, 0, 0)");
   ui.pushButton_iniciaStereo->setStyleSheet("background-color: rgb(0, 200, 50); color: rgb(0, 0, 0)"); // Assim esta para comecar a gravar
   ui.horizontalSlider_offset->hide();
+  ui.horizontalSlider_offset->setRange(-169, 169); // Casa com os limites de angulos setados para o motor MX-106
+  ui.horizontalSlider_offset->setValue(0);
   ui.verticalSlider_offset->hide();
+  ui.verticalSlider_offset->setRange(-15, 15); // Casa com os limites de angulos setados para o motor MX-64
+  ui.verticalSlider_offset->setValue(0);
 
   ui.pushButton_setaimagem->setAutoFillBackground(true);
   ui.pushButton_setaimagem->setStyleSheet("background-color: rgb(230, 230, 0); color: rgb(0, 0, 0)");
@@ -71,10 +75,8 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
   ui.label_MRS->setPixmap(pix.scaled(120,120,Qt::KeepAspectRatio));
   ui.label_MRS2->setPixmap(pix.scaled(120,120,Qt::KeepAspectRatio));
 
-  ui.horizontalSlider_offset->setValue(49); // Posicionar no centro, que e 49 aproximadamente
-  ui.verticalSlider_offset->setValue(59); // Posicionar em 59 que e aproximadamente a horizontal
-  offset = 0;
-  offset_tilt = 0;
+  offset_pan = ui.horizontalSlider_offset->value();
+  offset_tilt = ui.verticalSlider_offset->value();
   esquema_apontar_caminho = 1; // Default olhar pra frente
 
   // Por que esse no nao funciona?
@@ -146,7 +148,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
     kill(pid, SIGINT);
   }
   sleep(2);
-  system("gnome-terminal -x sh -c 'rosservice call /joint_command raw 537 1900'"); // Posiciona o motor no minimo cuidadosamente ao desligar
+  system("gnome-terminal -x sh -c 'rosservice call /joint_command raw 2118 1900'"); // Posiciona o motor no minimo cuidadosamente ao desligar
   sleep(5);
   QMainWindow::closeEvent(event);
   system("gnome-terminal -x sh -c 'rosnode kill -a'");
@@ -205,7 +207,7 @@ void monitor_mrs::MainWindow::on_pushButton_motores_clicked()
   if(ui.radioButton_automatico->isChecked()) { // Aqui estamos com a pixhawk
     system("gnome-terminal -x sh -c 'roslaunch automatico_mrs lancar_gimbal.launch'");
     sleep(1); // Para o no iniciar ok
-    system("gnome-terminal -x sh -c 'rosservice call /joint_command raw 537 2200'"); // Posiciona o robo olhando para frente
+    system("gnome-terminal -x sh -c 'rosservice call /joint_command raw 2118 2200'"); // Posiciona o robo olhando para frente
     ui.listWidget->addItem(QString::fromStdString("Motores ligados, controle automatico."));
   } else if(ui.radioButton_manual->isChecked()) { // Aqui estamos com o joy
     system("gnome-terminal -x sh -c 'roslaunch automatico_mrs lancar_gimbal.launch automatico:=false'");
@@ -371,7 +373,7 @@ void monitor_mrs::MainWindow::on_pushButton_nuvemInstantanea_clicked()
 
 void monitor_mrs::MainWindow::on_pushButton_reiniciarTudo_clicked()
 {
-  system("gnome-terminal -x sh -c 'rosservice call /joint_command raw 537 1900'"); //Posiciona o motor no minimo cuidadosamente ao desligar
+  system("gnome-terminal -x sh -c 'rosservice call /joint_command raw 2118 1900'"); //Posiciona o motor no minimo cuidadosamente ao desligar
   sleep(5);
   int pid = getProcIdByName("play");
   if(pid!=-1)
@@ -387,14 +389,14 @@ void monitor_mrs::MainWindow::on_pushButton_limpaTexto_clicked()
 
 void monitor_mrs::MainWindow::on_horizontalSlider_offset_sliderMoved()
 {
-  offset = ui.horizontalSlider_offset->value() - 49;
-  gige_ir.setOffset(offset, offset_tilt);
+  offset_pan = ui.horizontalSlider_offset->value();
+  gige_ir.setOffset(offset_pan, offset_tilt);
 }
 
 void monitor_mrs::MainWindow::on_verticalSlider_offset_sliderMoved()
 {
-  offset_tilt = ui.verticalSlider_offset->value() - 49; // Aqui diferente por causa do nivel horizontal estar em 60% do range, invertendo tudo
-  gige_ir.setOffset(offset, offset_tilt);
+  offset_tilt = ui.verticalSlider_offset->value(); // Aqui diferente por causa do nivel horizontal estar em 60% do range, invertendo tudo
+  gige_ir.setOffset(offset_pan, offset_tilt);
 }
 
 void monitor_mrs::MainWindow::on_pushButton_enviaraio_clicked()

@@ -110,8 +110,7 @@ private:
 
         bool controle_stereo;
         bool controle_gravacao;
-        int offset;
-        int offset_tilt;
+        int offset_pan, offset_tilt;
         int esquema_apontar_caminho; // 1 = apontar so em frente; 2 = apontar para os pontos de interesse automaticamente
 
         enum controle_imagem_subscrever {visual, termica};
