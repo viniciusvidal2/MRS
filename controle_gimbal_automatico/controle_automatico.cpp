@@ -145,8 +145,13 @@ private:
       delta_yaw   = offset_yaw;
       delta_pitch = offset_tilt;
 
+      ROS_INFO("Offset de yaw em angulos: %.2f valor final em angulo: %.2f", delta_yaw, ang_yaw_frente+delta_yaw);
+
       pwm_pan  = pwm_yaw_frente + delta_yaw*pwm_ang_yaw;
-      pwm_pan  = (pwm_pan > pwm_yaw_range[1]) ? pwm_yaw_range[1] : (pwm_pan < pwm_yaw_range[0] ? pwm_yaw_range[0] : pwm_pan); // Limitando em maximo e minimo aqui, mais seguro
+      pwm_pan  = (pwm_pan > pwm_yaw_range[1]) ? pwm_yaw_range[1] : pwm_pan;
+      pwm_pan  = (pwm_pan < pwm_yaw_range[0]) ? pwm_yaw_range[0] : pwm_pan; // Limitando em maximo e minimo aqui, mais seguro
+
+      ROS_INFO("%.2f   %.2f   %.2f", pwm_yaw_range[0], pwm_pan, pwm_yaw_range[1]);
 
       pwm_tilt = pwm_pitch_horizontal + delta_pitch*pwm_ang_pitch;
       pwm_tilt = (pwm_tilt > pwm_pitch_range[1]) ? pwm_pitch_range[1] : (pwm_tilt < pwm_pitch_range[0] ? pwm_pitch_range[0] : pwm_tilt); // Limitando em maximo e minimo aqui, mais seguro

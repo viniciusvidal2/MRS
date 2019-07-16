@@ -56,7 +56,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
 //  ui.pushButton_cameratermica->setStyleSheet("background-color: rgb(200, 200, 200); color: rgb(0, 0, 0)");
   ui.pushButton_iniciaStereo->setStyleSheet("background-color: rgb(0, 200, 50); color: rgb(0, 0, 0)"); // Assim esta para comecar a gravar
   ui.horizontalSlider_offset->hide();
-  ui.horizontalSlider_offset->setRange(-169, 169); // Casa com os limites de angulos setados para o motor MX-106
+  ui.horizontalSlider_offset->setRange(-120, 120); // Casa com os limites de angulos setados para o motor MX-106
   ui.horizontalSlider_offset->setValue(0);
   ui.verticalSlider_offset->hide();
   ui.verticalSlider_offset->setRange(-15, 15); // Casa com os limites de angulos setados para o motor MX-64
@@ -389,7 +389,7 @@ void monitor_mrs::MainWindow::on_pushButton_limpaTexto_clicked()
 
 void monitor_mrs::MainWindow::on_horizontalSlider_offset_sliderMoved()
 {
-  offset_pan = ui.horizontalSlider_offset->value();
+  offset_pan = -ui.horizontalSlider_offset->value();
   gige_ir.setOffset(offset_pan, offset_tilt);
 }
 
