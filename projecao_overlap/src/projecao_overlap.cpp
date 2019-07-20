@@ -77,7 +77,7 @@ int n_pontos_fora_da_imagem_referencia = 0;
 cv::Size image_size_esquerda, image_size_termica;
 
 // Distancia onde ja se considera uma nova nuvem
-float thresh_dist = 10.0;
+float thresh_dist = 7.0;
 
 // Transformacao enfre camera esquerda e camera termica
 //boost::array<double, 12> P_correta{1400, 0, 330, -50, 0, 1400, 270, -8.16, 0, 0, 1, 0};
