@@ -31,6 +31,8 @@ Panels:
     Name: Time
     SyncMode: 0
     SyncSource: PointCloud2
+Toolbars:
+  toolButtonStyle: 2
 Visualization Manager:
   Class: ""
   Displays:
@@ -128,7 +130,7 @@ Visualization Manager:
       Color: 255; 255; 255
       Color Transformer: RGB8
       Decay Time: 0
-      Enabled: false
+      Enabled: true
       Invert Rainbow: false
       Max Color: 255; 255; 255
       Max Intensity: 4096
@@ -141,11 +143,11 @@ Visualization Manager:
       Size (Pixels): 5
       Size (m): 0.00999999978
       Style: Points
-      Topic: /accumulated_termica
+      Topic: /portal
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
-      Value: false
+      Value: true
     - Class: rviz/Image
       Enabled: true
       Image Topic: /termica/thermal/image_raw
@@ -183,25 +185,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 4.39268446
+      Distance: 15.6873798
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.624762595
-        Y: 0.0716745332
-        Z: 0.0310675856
+        X: -2.71812248
+        Y: 1.21000075
+        Z: 0.0101491474
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: -1.56979632
+      Pitch: -1.42979634
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 4.72440958
+      Yaw: 4.64440727
     Saved:
       - Class: rviz/Orbit
         Distance: 20.8807545

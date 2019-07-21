@@ -423,6 +423,7 @@ void monitor_mrs::MainWindow::on_pushButtonSelectBag_clicked()
  ui.labelBagName->setText(filename);
  ui.listWidget_2->addItem(QString::fromStdString("Bag pronta para ser inicializada. Clique em Iniciar Bag para prosseguir."));
  ui.pushButton_playBag->setEnabled(true);
+ ui.horizontalLayout_tempoinicio->setEnabled(true);
 }
 
 void monitor_mrs::MainWindow::on_pushButton_playBag_clicked()
@@ -447,6 +448,8 @@ void monitor_mrs::MainWindow::on_pushButton_playBag_clicked()
  teste_comando.append(arquivo.left(arquivo.size()-4));
  teste_comando.append(" local:=");
  teste_comando.append(local);
+ teste_comando.append(" tempo:=");
+ teste_comando.append(ui.lineEdit_tempoinicio->text());
  teste_comando.append("'");
  localstd = teste_comando.toStdString();
  system(localstd.c_str());

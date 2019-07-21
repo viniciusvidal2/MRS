@@ -464,7 +464,7 @@
      </palette>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab_on">
      <property name="sizePolicy">
@@ -2333,7 +2333,7 @@
               <x>20</x>
               <y>60</y>
               <width>221</width>
-              <height>121</height>
+              <height>124</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -2373,7 +2373,7 @@
               <x>20</x>
               <y>190</y>
               <width>221</width>
-              <height>101</height>
+              <height>120</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_9">
@@ -3031,11 +3031,14 @@
        <rect>
         <x>30</x>
         <y>40</y>
-        <width>1141</width>
+        <width>861</width>
         <height>27</height>
        </rect>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,9">
+       <property name="sizeConstraint">
+        <enum>QLayout::SetNoConstraint</enum>
+       </property>
        <item>
         <widget class="QPushButton" name="pushButtonSelectBag">
          <property name="text">
@@ -3985,6 +3988,35 @@
          </property>
          <property name="text">
           <string>Salvar Nuvem</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="horizontalLayoutWidget">
+      <property name="geometry">
+       <rect>
+        <x>900</x>
+        <y>40</y>
+        <width>211</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_tempoinicio">
+       <item>
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Tempo de inicio (s):</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lineEdit_tempoinicio">
+         <property name="text">
+          <string>0</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
          </property>
         </widget>
        </item>

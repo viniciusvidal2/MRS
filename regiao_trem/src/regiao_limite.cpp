@@ -16,7 +16,7 @@ using namespace std;
 
 typedef PointXYZRGB PointT;
 
-PointCloud<PointT>::Ptr portal;
+PointCloud<PointT>::Ptr portal, portal_acumulado;
 ros::Publisher pub;
 
 bool primeira_vez;
@@ -34,7 +34,7 @@ void escuta_odometria(const nav_msgs::OdometryConstPtr &msg_odom)
         q.w() = (double)msg_odom->pose.pose.orientation.w;
         Eigen::Vector3d t_atual(msg_odom->pose.pose.position.x, msg_odom->pose.pose.position.y, msg_odom->pose.pose.position.z);
 
-        // Vetor z como esta segundo quaternion
+        // Vetor z como esta segundo quaternion (para frente no frame da da camera)
         Eigen::Vector3d vetor_z(0, 0, 1);
         vetor_z = q.matrix()*vetor_z;
 
@@ -47,15 +47,16 @@ void escuta_odometria(const nav_msgs::OdometryConstPtr &msg_odom)
 
         // Transforma a nuvem para o frame desejado
         PointCloud<PointT>::Ptr portal_trans (new PointCloud<PointT>());
+        portal_trans->header.frame_id = "odom";
         transformPointCloud<PointT>(*portal, *portal_trans, t_atual, q*q_rel);
-        Eigen::Vector3d nada(0, 0, 0);
-//        transformPointCloud<PointT>(*portal_trans, *portal_trans, nada, q_rel);
+
+        // Acumula depois de filtrar um pouco para reduzir tamanho talvez
+        *portal_acumulado += *portal_trans;
 
         // Publica a nuvem
         sensor_msgs::PointCloud2 portal_msg;
-        portal_trans->header.frame_id = "odom";
         portal_msg.header.frame_id = "odom";
-        toROSMsg(*portal_trans, portal_msg);
+        toROSMsg(*portal_acumulado, portal_msg);
         pub.publish(portal_msg);
 
         portal_trans->clear();
@@ -77,7 +78,10 @@ int main(int argc, char **argv)
     ros::NodeHandle nh;
 
     // Iniciar nuvem do portal
-    portal = (PointCloud<PointT>::Ptr) new PointCloud<PointT>;
+    portal           = (PointCloud<PointT>::Ptr) new PointCloud<PointT>;
+    portal_acumulado = (PointCloud<PointT>::Ptr) new PointCloud<PointT>;
+    portal->header.frame_id = "odom";
+    portal_acumulado->header.frame_id = "odom";
     // Iniciar publicador
     pub = nh.advertise<sensor_msgs::PointCloud2>("/portal", 10);
     /// Criar a nuvem de pontos constante do portal
@@ -110,7 +114,7 @@ int main(int argc, char **argv)
 
     ros::Subscriber sub = nh.subscribe("/stereo_odometer/odometry", 10, escuta_odometria);
 
-    ros::Rate r(2);
+    ros::Rate r(1);
     while(ros::ok()){
         r.sleep();
         ros::spinOnce();
