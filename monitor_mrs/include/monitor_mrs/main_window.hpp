@@ -97,6 +97,9 @@ private Q_SLOTS:
 
         void on_pushButton_setaimagem_clicked();
 
+        void on_pushButton_regiaointerferencia_clicked();
+        void on_pushButton_tempcritica_clicked();
+
 private:
         Ui::MainWindowDesign ui;
         std::string nome;

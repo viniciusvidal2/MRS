@@ -11,6 +11,10 @@
 #include <Eigen/Eigen>
 #include <Eigen/Geometry>
 
+#include <mutex>
+#include <thread>
+#include <iostream>
+
 using namespace pcl;
 using namespace std;
 
@@ -21,6 +25,41 @@ ros::Publisher pub;
 
 bool primeira_vez;
 Eigen::Vector3d t_prev;
+
+std::mutex mu;
+
+void ajusta_limites(const nav_msgs::OdometryConstPtr & msg){
+    mu.lock();
+    /// Criar a nuvem de pontos constante do portal
+    portal->clear();
+    float comp_altura = msg->pose.pose.position.y, comp_largura = msg->pose.pose.position.x, amostras = 10;
+    PointT ponto;
+    ponto.r = 250; ponto.g = 0; ponto.b = 0;
+    float coord_x_1 = -comp_largura/2, coord_x_2 = comp_largura/2;
+    float coord_y_barra = -comp_altura;
+
+    for(int z=0; z<1; z++){
+        float coord_z = 0;// - comp_profundidade/2 + z*comp_profundidade/amostras;
+         ponto.z = coord_z;
+        // Laterais
+        for(int y=0; y<amostras; y++){
+            float coord_y = 0 - y*comp_altura/amostras;
+            ponto.y = coord_y;
+            ponto.x = coord_x_1;
+            portal->push_back(ponto);
+            ponto.x = coord_x_2;
+            portal->push_back(ponto);
+        }
+        // Trave superior
+        ponto.y = coord_y_barra;
+        for(int x=0; x<amostras; x++){
+            float coord_x = 0 - comp_largura/2 + x*comp_largura/amostras;
+            ponto.x = coord_x;
+            portal->push_back(ponto);
+        }
+    }
+    mu.unlock();
+}
 
 void escuta_odometria(const nav_msgs::OdometryConstPtr &msg_odom)
 {
@@ -45,6 +84,7 @@ void escuta_odometria(const nav_msgs::OdometryConstPtr &msg_odom)
         Eigen::Quaternion<double> q_rel;
         q_rel.setFromTwoVectors(vetor_z, deslocamento);
 
+        mu.lock();
         // Transforma a nuvem para o frame desejado
         PointCloud<PointT>::Ptr portal_trans (new PointCloud<PointT>());
         portal_trans->header.frame_id = "odom";
@@ -61,6 +101,7 @@ void escuta_odometria(const nav_msgs::OdometryConstPtr &msg_odom)
 
         portal_trans->clear();
         t_prev = t_atual;
+        mu.unlock();
 
     } else {
 
@@ -85,6 +126,7 @@ int main(int argc, char **argv)
     // Iniciar publicador
     pub = nh.advertise<sensor_msgs::PointCloud2>("/portal", 10);
     /// Criar a nuvem de pontos constante do portal
+    mu.lock();
     float comp_altura = 2, comp_largura = 1, comp_profundidade = 2, amostras = 10;
     PointT ponto;
     ponto.r = 250; ponto.g = 0; ponto.b = 0;
@@ -111,8 +153,10 @@ int main(int argc, char **argv)
             portal->push_back(ponto);
         }
     }
+    mu.unlock();
 
     ros::Subscriber sub = nh.subscribe("/stereo_odometer/odometry", 10, escuta_odometria);
+    ros::Subscriber sub_merdadoslimitesdoalexandre = nh.subscribe("/regiao_limite", 10, ajusta_limites);
 
     ros::Rate r(1);
     while(ros::ok()){

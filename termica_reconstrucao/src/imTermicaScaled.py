@@ -26,7 +26,7 @@ from std_msgs.msg import Int8
 
 class imScale():
 
-    def __init__(self):
+    def __init__(self, tempSup):
 
         # Pub
         self.image_pub_scaled = rospy.Publisher("/dados_sync/image_scaled", Image, queue_size = 10)
@@ -42,7 +42,7 @@ class imScale():
         self.ats.registerCallback(self.tcallback)
         self.bridge = CvBridge()
         
-
+        self.tempFundoDeEscala = tempSup
 
     def tcallback(self, img_msg, pc_msg, odom_msg):
 
@@ -53,15 +53,13 @@ class imScale():
        #K = 0.04   #high resolution mode
        K = 0.4   #low resolution mode
 
-
        ## Escolhendo as temperaturas minimas e maximas a serem detectadas
        tempMin = 0  ;
-       tempMax = 100;
-
+       tempMax = self.tempFundoDeEscala;
+       print "temperatura maxima: ", tempMax
 
        ## Escolhendo resolucao de temperatura
        resolucao = 5;
-
 
        ## Plotando imagem termica com escala fixa (tempMin --> tempMax)
        fig, ax = plt.subplots()
@@ -123,7 +121,9 @@ class imScale():
 
 def main(args):
     rospy.init_node('escala' , anonymous = True)
-    imS = imScale()
+    tempSup = float(sys.argv[1]) # assim muda a escala de visualizacao
+
+    imS = imScale(tempSup)
 
     try:
         rospy.spin()

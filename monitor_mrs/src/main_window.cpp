@@ -246,7 +246,7 @@ void monitor_mrs::MainWindow::on_pushButton_iniciaStereo_clicked()
       ui.horizontalSlider_offset->show();
       ui.verticalSlider_offset->show();
     }
-    string comando_termica_felipe = "gnome-terminal -x sh -c 'rosrun termica_reconstrucao imTermicaScaledOnline.py "+ui.lineEdit_temperaturacritica->text().toStdString()+"'";
+    string comando_termica_felipe = "gnome-terminal -x sh -c 'rosrun termica_reconstrucao imTermicaScaledOnline.py "+ui.lineEdit_temperaturacritica->text().toStdString()+" __name:=escala_termica_felipe'";
     system(comando_termica_felipe.c_str());
     controle_stereo = true;
 
@@ -441,7 +441,7 @@ void monitor_mrs::MainWindow::on_pushButton_playBag_clicked()
  }
  system("gnome-terminal -x sh -c 'roslaunch rustbot_bringup all.launch do_stereo:=true online_stereo:=false do_accumulation:=true'");
  system("gnome-terminal -x sh -c 'rosrun rustbot_accumulate_point_clouds save_cloud'");
- string comando_termica_felipe = "gnome-terminal -x sh -c 'rosrun termica_reconstrucao imTermicaScaled.py'";
+ string comando_termica_felipe = "gnome-terminal -x sh -c 'rosrun termica_reconstrucao imTermicaScaled.py "+ui.lineEdit_tempcritica2->text().toStdString()+" __name:=escala_termica_felipe'";
  system(comando_termica_felipe.c_str());
  sleep(5);
  QString teste_comando = "gnome-terminal -x sh -c 'roslaunch rustbot_bringup playback.launch bag:=";
@@ -520,4 +520,13 @@ void monitor_mrs::MainWindow::on_pushButton_setaimagem_clicked()
     fonte_imagem = visual; // Agora nossa fonte e a visual
 
   }
+}
+
+void monitor_mrs::MainWindow::on_pushButton_regiaointerferencia_clicked(){
+    gige_ir.set_regiao_limite(ui.lineEdit_largurainterferencia->text().toFloat(), ui.lineEdit_alturainterferencia->text().toFloat()-2);
+}
+
+void monitor_mrs::MainWindow::on_pushButton_tempcritica_clicked(){
+    string comando_termica_felipe = "gnome-terminal -x sh -c 'rosrun termica_reconstrucao imTermicaScaled.py "+ui.lineEdit_tempcritica2->text().toStdString()+" __name:=escala_termica_felipe'";
+    system(comando_termica_felipe.c_str());
 }

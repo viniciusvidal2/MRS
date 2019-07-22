@@ -59,6 +59,7 @@ void GigeImageReader::init(){
   esquema_pub     = nh_.advertise<std_msgs::Int8>("esquema_pub", 10);
   salvar_nuvens_pub = nh_.advertise<std_msgs::Bool>("/podemos_salvar_nuvens", 1);
   flag_gravando_bag_pub = nh_.advertise<std_msgs::Int8>("/flag_gravando_bag", 1);
+  regiaolimite_pub = nh_.advertise<nav_msgs::Odometry>("/regiao_limite", 1);
   offset = 0; // a ser publicado para alterar pan do motor
   offset_tilt = 0; // a ser publicado para alterar tilt do motor
   sub_estamosdentro = nh_.subscribe("/estamos_dentro", 10, &GigeImageReader::estamosdentroCb, this);
@@ -82,6 +83,10 @@ void GigeImageReader::init(){
   tt = visual; // Comecamos vendo a imagem visual, se quiser mudar pra termica depois
   toggle_imagem = false; // Nao vamos variar a fonte da imagem
 
+  // Inicia os limites da regiao de uma vez aqui pra nao ter erro - default
+  limites_regiao.pose.pose.position.x = 4; // largura
+  limites_regiao.pose.pose.position.y = 2; // altura
+
   while(ros::ok()){
     if(toggle_imagem){ // Vamos mudar a fonte da imagem se visual ou termica
       image_sub_.shutdown(); // Seguranca
@@ -97,6 +102,8 @@ void GigeImageReader::init(){
     if(tempo_final_bag_offline.toSec() != 0 && (tempo_final_bag_offline - ros::Time::now()).toSec() > 0 && abs((tempo_final_bag_offline - ros::Time::now()).toSec()) < 1.0) // Assim salvaria 1 segundo antes de acabar a bag
       salvar_nuvens.data = true;
     salvar_nuvens_pub.publish(salvar_nuvens);
+
+    regiaolimite_pub.publish(limites_regiao);
 
     ros::spinOnce();
   }
@@ -286,6 +293,11 @@ void GigeImageReader::set_nome_bag_offline(std::string nome){
   bag.open(nome);
   rosbag::View view(bag, rosbag::TopicQuery("/stereo/left/image_raw"));
   tempo_final_bag_offline = view.getEndTime();
+}
+
+void GigeImageReader::set_regiao_limite(float l, float a){
+    limites_regiao.pose.pose.position.x = l;
+    limites_regiao.pose.pose.position.y = a;
 }
 
 }

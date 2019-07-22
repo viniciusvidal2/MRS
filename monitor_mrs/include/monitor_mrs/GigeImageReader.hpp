@@ -41,6 +41,8 @@
 #include <rosbag/bag.h>
 #include <rosbag/view.h>
 
+#include <nav_msgs/Odometry.h>
+
 namespace monitor_mrs {
 
 static const std::string OPENCV_WINDOW = "Image window";
@@ -73,6 +75,8 @@ public:
 
   enum tipo_imagem {visual, termica};
   void set_imagem(int tipo); // Para definir se imagem termica ou visual no visor online
+
+  void set_regiao_limite(float l, float a);
 
 Q_SIGNALS:
   void send_mat_image(cv::Mat img,qint64 timestamp);
@@ -121,6 +125,9 @@ private:
   ros::Time tempo_final_bag_offline; // Para salvar automaticamente a bag quando estiver proximo do fim
 
   ros::ServiceClient raio_client; // Para alterar o raio de acao do robo pela GUI
+
+  nav_msgs::Odometry limites_regiao; // Aqui vou colocar as regioes limite do trem para o no ler de acordo com a necessidade do fregues
+  ros::Publisher regiaolimite_pub;
 };
 
 }
