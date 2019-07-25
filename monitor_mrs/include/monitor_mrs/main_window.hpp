@@ -81,7 +81,9 @@ private Q_SLOTS:
         void on_pushButton_reiniciarTudo_clicked();
         void on_pushButton_limpaTexto_clicked();
         void on_horizontalSlider_offset_sliderMoved();
+        void on_horizontalSlider_offset_sliderPressed();
         void on_verticalSlider_offset_sliderMoved();
+        void on_verticalSlider_offset_sliderPressed();
         void on_pushButton_enviaraio_clicked();
         void on_radioButton_pontosdeinteresse_clicked();        
         void on_radioButton_caminhocompleto_clicked();

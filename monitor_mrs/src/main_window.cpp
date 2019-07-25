@@ -393,7 +393,19 @@ void monitor_mrs::MainWindow::on_horizontalSlider_offset_sliderMoved()
   gige_ir.setOffset(offset_pan, offset_tilt);
 }
 
+void monitor_mrs::MainWindow::on_horizontalSlider_offset_sliderPressed()
+{
+  offset_pan = -ui.horizontalSlider_offset->value();
+  gige_ir.setOffset(offset_pan, offset_tilt);
+}
+
 void monitor_mrs::MainWindow::on_verticalSlider_offset_sliderMoved()
+{
+  offset_tilt = ui.verticalSlider_offset->value(); // Aqui diferente por causa do nivel horizontal estar em 60% do range, invertendo tudo
+  gige_ir.setOffset(offset_pan, offset_tilt);
+}
+
+void monitor_mrs::MainWindow::on_verticalSlider_offset_sliderPressed()
 {
   offset_tilt = ui.verticalSlider_offset->value(); // Aqui diferente por causa do nivel horizontal estar em 60% do range, invertendo tudo
   gige_ir.setOffset(offset_pan, offset_tilt);
