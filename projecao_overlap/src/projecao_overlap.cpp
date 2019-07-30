@@ -81,7 +81,7 @@ float thresh_dist = 7.0;
 
 // Transformacao enfre camera esquerda e camera termica
 //boost::array<double, 12> P_correta{1400, 0, 330, -50, 0, 1400, 270, -8.16, 0, 0, 1, 0};
-boost::array<double, 12> P_correta{1580, 0, 330, -280, 0, 1580, 270, 228.16, 0, 0, 1, 0};
+boost::array<double, 12> P_correta{1420, 0, 330, -110, 0, 1420, 270, 80.16, 0, 0, 1, 0};
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Funcoes para trabalho da nuvem
@@ -209,9 +209,9 @@ void acumular_termica(PointCloud<PointT>::Ptr temp, const sensor_msgs::ImageCons
       if(pontoProjetado.x > 0 && pontoProjetado.x < image_size_termica.width &&
          pontoProjetado.y > 0 && pontoProjetado.y < image_size_termica.height)
       {
-        int b = imgCv_.at<cv::Vec3b>(int(pontoProjetado.y), int(pontoProjetado.x))[0];
+        int b = imgCv_.at<cv::Vec3b>(int(pontoProjetado.y), int(pontoProjetado.x))[2];
         int g = imgCv_.at<cv::Vec3b>(int(pontoProjetado.y), int(pontoProjetado.x))[1];
-        int r = imgCv_.at<cv::Vec3b>(int(pontoProjetado.y), int(pontoProjetado.x))[2];
+        int r = imgCv_.at<cv::Vec3b>(int(pontoProjetado.y), int(pontoProjetado.x))[0];
 
         point_termica.x = ponto3D.x;
         point_termica.y = ponto3D.y;
