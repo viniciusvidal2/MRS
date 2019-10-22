@@ -332,7 +332,7 @@ void monitor_mrs::MainWindow::on_pushButton_salvaBag_clicked()
       // Criando a pasta na area de trabalho
       string comando_temp = "gnome-terminal -x sh -c 'cd ~/Desktop && mkdir -p "+nome+"/Quentes'";
       system(comando_temp.c_str());
-      gige_ir.vamos_gravar(true);
+      gige_ir.vamos_gravar(true);      
     }
     // Anunciar ao usuario
     ui.listWidget->addItem(QString::fromStdString("Iniciando gravacao do arquivo na area de trabalho..."));

@@ -37,6 +37,9 @@
 #include <csignal>
 #include <ctime>
 #include <math.h>
+#include <iostream>
+#include <ostream>
+#include <sstream>
 
 #include <rosbag/bag.h>
 #include <rosbag/view.h>

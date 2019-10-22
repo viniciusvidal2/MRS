@@ -173,6 +173,13 @@ void GigeImageReader::estamosdentroCb(const std_msgs::Int8 &msg){
       if(flag_temperatura == 1){
         std::string comando_muda_pasta = "gnome-terminal -x sh -c 'mv "+pasta+"/"+nome_bag+" "+pasta+"/Quentes/"+nome_bag+"'";
         system(comando_muda_pasta.c_str());
+        // Escrever as coordenadas num arquivo auxiliar
+        ofstream arquivo((pasta+"Quentes/coordenadas_quentes.txt").c_str());
+        if(arquivo.is_open()){
+            std::string coord = "Lat: " + std::to_string(lat) + " Lon: " + std::to_string(lon) + "\n";
+            arquivo << coord;
+        }
+        arquivo.close();
       }
     }
     estado_anterior_gravar = msg.data;
