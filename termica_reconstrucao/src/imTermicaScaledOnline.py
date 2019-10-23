@@ -127,7 +127,7 @@ class imScale():
        img_msg_out.header.stamp = t
 
 
-       print "publicando TERMICA"
+       rospy.loginfo("Publicando TERMICA")
        self.pub_flag_temp.publish(flag_msg_out)
        self.image_pub_scaled.publish(img_s_msg_out)
        self.image_pub_8bit.publish(img_msg_out)

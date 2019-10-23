@@ -305,6 +305,12 @@ void monitor_mrs::MainWindow::on_pushButton_salvaBag_clicked()
     hour    = boost::lexical_cast<std::string>(now->tm_hour);
     minutes = boost::lexical_cast<std::string>(now->tm_min );
     date = "_" + year + "_" + month + "_" + day + "_" + hour + "h_" + minutes + "m";
+    nome = ui.lineEdit_nomeBag->text().toStdString();
+    if(nome.length() == 0){
+      nome = "mrs_"+date;
+    } else {
+      nome += date;
+    }
 
     // Botao fica vermelho, mostrando que vamos ficar gravando
     ui.pushButton_salvaBag->setAutoFillBackground(true);
@@ -315,12 +321,7 @@ void monitor_mrs::MainWindow::on_pushButton_salvaBag_clicked()
     gige_ir.set_flag_gravando_bag(controle_gravacao);
     // Comeca gravacao segundo nome do bag
     if(ui.radioButton_caminhocompleto->isChecked()){
-    nome = ui.lineEdit_nomeBag->text().toStdString();
-    if(nome.length() == 0){
-      nome = "mrs_"+date;
-    } else {
-      nome += date;
-    }
+
     string comando_fazer_pasta = "gnome-terminal -x sh -c 'cd ~/Desktop && mkdir -p "+nome+"/Quentes'";
     system(comando_fazer_pasta.c_str());
     std::string comando_full = "gnome-terminal -x sh -c 'roslaunch rustbot_bringup record_raw.launch only_raw_data:=true bag:="+nome+".bag";
@@ -328,11 +329,13 @@ void monitor_mrs::MainWindow::on_pushButton_salvaBag_clicked()
     system(comando_full.c_str());
 
     } else if(ui.radioButton_pontosdeinteresse->isChecked()) {
+
       gige_ir.set_nomeDaPasta(nome);
       // Criando a pasta na area de trabalho
       string comando_temp = "gnome-terminal -x sh -c 'cd ~/Desktop && mkdir -p "+nome+"/Quentes'";
       system(comando_temp.c_str());
       gige_ir.vamos_gravar(true);
+
     }
     // Anunciar ao usuario
     ui.listWidget->addItem(QString::fromStdString("Iniciando gravacao do arquivo na area de trabalho..."));

@@ -87,6 +87,9 @@ void GigeImageReader::init(){
   limites_regiao.pose.pose.position.x = 4; // largura
   limites_regiao.pose.pose.position.y = 2; // altura
 
+  // Para contar no arquivo o ponto que esta escrevendo mais ou menos:
+  porra_de_indice = 1;
+
   while(ros::ok()){
     if(toggle_imagem){ // Vamos mudar a fonte da imagem se visual ou termica
       image_sub_.shutdown(); // Seguranca
@@ -173,6 +176,18 @@ void GigeImageReader::estamosdentroCb(const std_msgs::Int8 &msg){
       if(flag_temperatura == 1){
         std::string comando_muda_pasta = "gnome-terminal -x sh -c 'mv "+pasta+"/"+nome_bag+" "+pasta+"/Quentes/"+nome_bag+"'";
         system(comando_muda_pasta.c_str());
+        // Escrever as coordenadas num arquivo auxiliar
+        std::string arquivo_bosta = "/home/mrs/Desktop/coordenadas_quentes_"+year+"_"+month+"_"+day+"_"+hour+"h_"+minutes+"m.txt";
+        ofstream arquivo;
+        arquivo.open(arquivo_bosta, ofstream::out | ofstream::app);
+        if(arquivo.is_open()){
+            std::string coord = "Ponto " + std::to_string(porra_de_indice) + ": " + std::to_string(lat) + "= " + std::to_string(lon) + "\n";
+            std::replace(coord.begin(), coord.end(), ',', '.');
+            std::replace(coord.begin(), coord.end(), '=', ',');
+            arquivo << coord;
+            porra_de_indice++;
+        }
+        arquivo.close();
       }
     }
     estado_anterior_gravar = msg.data;

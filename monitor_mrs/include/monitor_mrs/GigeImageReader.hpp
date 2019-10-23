@@ -37,6 +37,9 @@
 #include <csignal>
 #include <ctime>
 #include <math.h>
+#include <iostream>
+#include <ostream>
+#include <sstream>
 
 #include <rosbag/bag.h>
 #include <rosbag/view.h>
@@ -128,6 +131,8 @@ private:
 
   nav_msgs::Odometry limites_regiao; // Aqui vou colocar as regioes limite do trem para o no ler de acordo com a necessidade do fregues
   ros::Publisher regiaolimite_pub;
+
+  int porra_de_indice;
 };
 
 }
