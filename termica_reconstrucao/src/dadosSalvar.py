@@ -32,8 +32,8 @@ class SalvarDados():
         self.thermal_sub = Subscriber("/termica/thermal/image_raw", Image)
         self.esq_sub = Subscriber("/stereo/left/image_raw", Image)
         self.dir_sub = Subscriber("/stereo/right/image_raw", Image)
-        # self.odom_sub = Subscriber("/stereo_odometer/odometry", Odometry)
-        self.ats = ApproximateTimeSynchronizer([self.thermal_sub, self.esq_sub, self.dir_sub], queue_size=1, slop=0.2)
+        self.odom_sub = Subscriber("/stereo_odometer/odometry", Odometry)
+        self.ats = ApproximateTimeSynchronizer([self.thermal_sub, self.esq_sub, self.dir_sub, self.odom_sub], queue_size=1, slop=0.2)
         self.ats.registerCallback(self.tcallback)
         self.bridge = CvBridge()
         
@@ -42,7 +42,9 @@ class SalvarDados():
         self.pasta = '/home/vinicius/Desktop/coleta'
         self.contador = 1
 
-    def tcallback(self, ter_msg, esq_msg, dir_msg):
+        f = open(self.pasta+"/odometrias.txt", "w+")
+
+    def tcallback(self, ter_msg, esq_msg, dir_msg, odom_msg):
 
        cv_image  = self.bridge.imgmsg_to_cv2(ter_msg, desired_encoding="passthrough")
        esq_image = self.bridge.imgmsg_to_cv2(esq_msg, desired_encoding="bgr8")
@@ -74,13 +76,12 @@ class SalvarDados():
        ax.xaxis.set_major_locator(plt.NullLocator())
        fig.canvas.draw()
 
-       ## Publicando imagem com escala acoplada
        data2 = np.fromstring(fig.canvas.tostring_rgb(), dtype=np.uint8, sep='')
        data2 = data2.reshape(fig.canvas.get_width_height()[::-1] + (3,))
 
        ## Publicando imagem termica pura
        data = cv_image
-       m_dpi = 165;
+       m_dpi = 165
        fig_raw, ax_raw = plt.subplots(figsize=(640.0/float(m_dpi) , 512.0/float(m_dpi)), dpi = m_dpi )
        fig_raw.subplots_adjust(0,0,1,1)
        plt.margins(0,0)
@@ -92,11 +93,26 @@ class SalvarDados():
        data_raw = np.fromstring(fig_raw.canvas.tostring_rgb(), dtype=np.uint8, sep='')
        data_raw = data_raw.reshape(fig_raw.canvas.get_width_height()[::-1] + (3,))
 
+       ## Salvando dados de odometria no arquivo correto
+       f = open(self.pasta+"/odometrias.txt", "a+")
+       f.write("%d %.2f %.2f %.2f %.2f %.2f %.2f %.2f\n"%(self.contador, odom_msg.pose.pose.orientation.w, odom_msg.pose.pose.orientation.x, \
+       odom_msg.pose.pose.orientation.y,  odom_msg.pose.pose.orientation.z, odom_msg.pose.pose.position.x, odom_msg.pose.pose.position.y, odom_msg.pose.pose.position.z))
+       f.close()
+
+       ## Escreve uma matriz com os valores de temperatura de uma vez para ler no matlab
+    #    temps = np.array(data)
+    #    for i in np.arange(data.shape[0]):
+    #        for j in np.arange(data.shape[1]):
+    #            temps[i, j] = data[i, j]*K - 273.15
+
+       temps = data*K - 273.15*np.ones_like(data)
+
        ## Salvando todas as imagens como devem ser na pasta certa
        cv2.imwrite(self.pasta+'/ter_'+str(self.contador)+'.jpg', data_raw )
        cv2.imwrite(self.pasta+'/esq_'+str(self.contador)+'.jpg', esq_image)
        cv2.imwrite(self.pasta+'/dir_'+str(self.contador)+'.jpg', dir_image)
        cv2.imwrite(self.pasta+'/scl_'+str(self.contador)+'.jpg', data2    )
+       cv2.imwrite(self.pasta+'/raw_'+str(self.contador)+'.jpg', temps    )
 
        rospy.loginfo('Salvando dados %d.', self.contador)
 
