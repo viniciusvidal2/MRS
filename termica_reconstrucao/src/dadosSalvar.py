@@ -39,7 +39,7 @@ class SalvarDados():
         
         self.tempFundoDeEscala = 50
 
-        self.pasta = '/home/vinicius/Desktop/coleta'
+        self.pasta = '/home/grin/Desktop/coleta'
         self.contador = 1
 
         f = open(self.pasta+"/odometrias.txt", "w+")
