@@ -46,7 +46,7 @@ using namespace cv;
 
 /// Definitions
 typedef PointXYZRGB PointT;
-typedef sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::PointCloud2, nav_msgs::Odometry> syncPolicy;
+typedef sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::Image, sensor_msgs::PointCloud2, nav_msgs::Odometry> syncPolicy;
 
 /// Variaveis globais
 Eigen::Quaternion<double> q_anterior, q_anterior_inverso, q_atual, q_relativo;
@@ -67,6 +67,7 @@ void calcula_transformacao_relativa(){
 
 /// Callback
 void salvarDadosCallback(const sensor_msgs::ImageConstPtr& msg_ima,
+                         const sensor_msgs::ImageConstPtr& msg_bit,
                          const sensor_msgs::PointCloud2ConstPtr& msg_ptc,
                          const nav_msgs::OdometryConstPtr& msg_odo
                         ){
@@ -89,14 +90,15 @@ void salvarDadosCallback(const sensor_msgs::ImageConstPtr& msg_ima,
         t_anterior = t_atual;
         // Salvar no bag atual
         ros::Time t = ros::Time::now();
-        bag.write("/termica/thermal/image_raw"       , t, *msg_ima);
+        bag.write("/dados_sync/image_scaled"         , t, *msg_ima);
+        bag.write("/dados_sync/image_8bits"          , t, *msg_bit);
         bag.write("/zed/point_cloud/cloud_registered", t, *msg_ptc);
         bag.write("/zed/odom"                        , t, *msg_odo);
       }
 
     } else {
 
-      cout << "Primeira iteracao" << endl;
+      ROS_INFO("Primeira aquisicao ....");
 
       // Segura a primeira odometria para referencia
       q_anterior.x() = (double)msg_odo->pose.pose.orientation.x;
@@ -110,7 +112,8 @@ void salvarDadosCallback(const sensor_msgs::ImageConstPtr& msg_ima,
 
       // Salvar no bag a primeira mensagem
       ros::Time t = ros::Time::now();
-      bag.write("/termica/thermal/image_raw"       , t, *msg_ima);
+      bag.write("/dados_sync/image_scaled"         , t, *msg_ima);
+      bag.write("/dados_sync/image_8bits"          , t, *msg_bit);
       bag.write("/zed/point_cloud/cloud_registered", t, *msg_ptc);
       bag.write("/zed/odom"                        , t, *msg_odo);
 
@@ -125,18 +128,25 @@ int main(int argc, char **argv)
 {
     ros::init(argc, argv, "dadosComZed");
     ros::NodeHandle nh;
+    ros::NodeHandle n("~");
+
+    std::string nome_bag;
+    n.getParam("nome_bag", nome_bag);
+
+    ROS_INFO("Comecamos aquisicao para bag %s.....", nome_bag.c_str());
 
     // Inicia gravador de bag
-    bag.open("/home/grin/Desktop/bag_artigo.bag", rosbag::bagmode::Write);
+    bag.open(nome_bag.c_str(), rosbag::bagmode::Write);
 
     // Subscriber para a nuvem instantanea e odometria
-    message_filters::Subscriber<sensor_msgs::Image>       subima(nh, "/termica/thermal/image_raw"       , 100);
+    message_filters::Subscriber<sensor_msgs::Image>       subima(nh, "/dados_sync/image_scaled"         , 100);
+    message_filters::Subscriber<sensor_msgs::Image>       subbit(nh, "/dados_sync/image_8bits"          , 100);
     message_filters::Subscriber<sensor_msgs::PointCloud2> subptc(nh, "/zed/point_cloud/cloud_registered", 100);
     message_filters::Subscriber<Odometry>                 subodo(nh, "/zed/odom"                        , 100);
 
     // Sincroniza as leituras dos topicos
-    Synchronizer<syncPolicy> sync(syncPolicy(100), subima, subptc, subodo);
-    sync.registerCallback(boost::bind(&salvarDadosCallback, _1, _2, _3));
+    Synchronizer<syncPolicy> sync(syncPolicy(100), subima, subbit, subptc, subodo);
+    sync.registerCallback(boost::bind(&salvarDadosCallback, _1, _2, _3, _4));
 
     ros::Rate r(2);
     while(ros::ok()){

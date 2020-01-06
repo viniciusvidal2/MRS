@@ -53,3 +53,5 @@ target_link_libraries (projecao_overlap_node ${PCL_LIBRARIES} ${catkin_LIBRARIES
 add_executable(sincroniza_odometrias src/sincroniza_odometrias.cpp)
 target_link_libraries (sincroniza_odometrias ${PCL_LIBRARIES} ${catkin_LIBRARIES} )
 
+add_executable(salvaDadosZedNode src/dadosComZed.cpp)
+target_link_libraries (salvaDadosZedNode ${OpenCV_LIBS} ${Eigen_LIBRARIES} ${PCL_LIBRARIES} ${catkin_LIBRARIES} )

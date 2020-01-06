@@ -1,0 +1,24 @@
+<launch>
+<!--lancar camera termica-->
+<arg name="mac_address_termica" default="00:11:1c:01:7c:80"/>
+<arg name="termica_url" default="file:///home/grin/handsets_ws/src/RustBot/rustbot_calibration/calibration/termica.yaml"/>
+
+      <include file="$(find rustbot_bringup)/launch/all.launch">
+        <arg name="online_stereo"   value="true"/>
+        <arg name="do_stereo"       value="false"/>
+        <arg name="do_accumulation" value="false"/>
+        <arg name="do_slam"         value="false"/>
+      </include>
+
+<node name="agiliza_termica" pkg="termica_reconstrucao" type="imTermicaScaledOnline.py" args=" 50" output="screen">
+</node>
+
+<!--lancar ZED-->
+<include file="$(find zed_wrapper)/launch/zed.launch">
+</include>
+
+<!--lancar aquisicao-->
+<node name="aquisicao" pkg="projecao_overlap" type="salvaDadosZedNode" output="screen">
+    <param name="nome_bag" value="/home/grin/Desktop/bag_artigo2.bag"/>
+</node>
+</launch>
