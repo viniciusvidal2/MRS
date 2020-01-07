@@ -46,7 +46,7 @@ using namespace cv;
 
 /// Definitions
 typedef PointXYZRGB PointT;
-typedef sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::Image, sensor_msgs::PointCloud2, nav_msgs::Odometry> syncPolicy;
+typedef sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::PointCloud2, nav_msgs::Odometry> syncPolicy;
 
 /// Variaveis globais
 Eigen::Quaternion<double> q_anterior, q_anterior_inverso, q_atual, q_relativo;
@@ -67,7 +67,6 @@ void calcula_transformacao_relativa(){
 
 /// Callback
 void salvarDadosCallback(const sensor_msgs::ImageConstPtr& msg_ima,
-                         const sensor_msgs::ImageConstPtr& msg_bit,
                          const sensor_msgs::PointCloud2ConstPtr& msg_ptc,
                          const nav_msgs::OdometryConstPtr& msg_odo
                         ){
@@ -91,7 +90,6 @@ void salvarDadosCallback(const sensor_msgs::ImageConstPtr& msg_ima,
         // Salvar no bag atual
         ros::Time t = ros::Time::now();
         bag.write("/dados_sync/image_scaled"         , t, *msg_ima);
-        bag.write("/dados_sync/image_8bits"          , t, *msg_bit);
         bag.write("/zed/point_cloud/cloud_registered", t, *msg_ptc);
         bag.write("/zed/odom"                        , t, *msg_odo);
       }
@@ -113,7 +111,6 @@ void salvarDadosCallback(const sensor_msgs::ImageConstPtr& msg_ima,
       // Salvar no bag a primeira mensagem
       ros::Time t = ros::Time::now();
       bag.write("/dados_sync/image_scaled"         , t, *msg_ima);
-      bag.write("/dados_sync/image_8bits"          , t, *msg_bit);
       bag.write("/zed/point_cloud/cloud_registered", t, *msg_ptc);
       bag.write("/zed/odom"                        , t, *msg_odo);
 
@@ -139,14 +136,13 @@ int main(int argc, char **argv)
     bag.open(nome_bag.c_str(), rosbag::bagmode::Write);
 
     // Subscriber para a nuvem instantanea e odometria
-    message_filters::Subscriber<sensor_msgs::Image>       subima(nh, "/dados_sync/image_scaled"         , 100);
-    message_filters::Subscriber<sensor_msgs::Image>       subbit(nh, "/dados_sync/image_8bits"          , 100);
+    message_filters::Subscriber<sensor_msgs::Image>       subima(nh, "/termica/thermal/image_raw"       , 100);
     message_filters::Subscriber<sensor_msgs::PointCloud2> subptc(nh, "/zed/point_cloud/cloud_registered", 100);
     message_filters::Subscriber<Odometry>                 subodo(nh, "/zed/odom"                        , 100);
 
     // Sincroniza as leituras dos topicos
-    Synchronizer<syncPolicy> sync(syncPolicy(100), subima, subbit, subptc, subodo);
-    sync.registerCallback(boost::bind(&salvarDadosCallback, _1, _2, _3, _4));
+    Synchronizer<syncPolicy> sync(syncPolicy(100), subima, subptc, subodo);
+    sync.registerCallback(boost::bind(&salvarDadosCallback, _1, _2, _3));
 
     ros::Rate r(2);
     while(ros::ok()){
