@@ -125,8 +125,8 @@ void MultiPort::setSlope()
 //  pan_driver_->writeRegister("moving_speed", 220);
 
   pan_driver_->writeRegister("moving_speed", 270);
-  pan_driver_->writeRegister("cw_angle_limit" ,  133); // 11  degrees
-  pan_driver_->writeRegister("ccw_angle_limit", 3979); // 349 degrees
+  pan_driver_->writeRegister("cw_angle_limit" ,  879); // 77  degrees
+  pan_driver_->writeRegister("ccw_angle_limit", 3357); // 295 degrees
 
   pan_driver_->writeRegister("p_gain", 13);
   pan_driver_->writeRegister("i_gain",  5);

@@ -27,9 +27,9 @@ private:
   // Dados vindos da placa
   float pitch_para_apontar, yaw_atual, yaw_para_apontar, estamos_dentro;
   // Ranges para alcance de pwm e angulo [DEGREES] de yaw e pitch
-  int pwm_yaw_range[2]     = {133, 3979}; // [PWM]
+  int pwm_yaw_range[2]     = {879, 3357}; // [PWM]
   int pwm_pitch_range[2]   = {1965, 2300}; // [PWM]
-  float ang_yaw_range[2]   = {11.0, 349.0}; // [DEGREES]
+  float ang_yaw_range[2]   = {77.0, 295.0}; // [DEGREES]
   float ang_pitch_range[2] = {172.0, 202.0}; // [DEGREES]
   float ang_pitch_horizontal = 193.0; // [DEGREES]
   float ang_yaw_frente = 186.0; // [DEGREES]
@@ -88,8 +88,8 @@ public:
     // Inicia o subscriber de ver se olha so para frente ou para os pontos de interesse
     subesquema = nh_.subscribe("/esquema_pub", 10, &PixhawkeMotor::escutarEsquema, this);
     // Inicia subscribers dos motores
-    subpandyn  = nh_.subscribe("/multi_port/pan_state" , 100, &PixhawkeMotor::escutarPan , this);
-    subtiltdyn = nh_.subscribe("/multi_port/tilt_state", 100, &PixhawkeMotor::escutarTilt, this);
+    subpandyn  = nh_.subscribe("/multi_port/pan_state" , 5, &PixhawkeMotor::escutarPan , this);
+    subtiltdyn = nh_.subscribe("/multi_port/tilt_state", 5, &PixhawkeMotor::escutarTilt, this);
     // Publisher dos motores sincronizados
     pubdyn     = nh_.advertise<nav_msgs::Odometry>("/dynamixel_sync", 100);
 
@@ -125,9 +125,7 @@ private:
       if(estamos_dentro == 0.0f){ // Se nao estamos dentro o offset vale, se estamos dentro so vale o automatico
         delta_yaw   = offset_yaw;
         delta_pitch = offset_tilt;
-        //      ROS_INFO("OFFSET DE TILT: %.2f", offset_tilt_ang);
       } else { // Dentro do controle automatico
-        //      delta_yaw = (int)(delta_yaw/60) * 60; // Aqui arredonda para multiplos de 60, creio eu
         // Analisando diferenca de yaw
         delta_yaw = wrap180(yaw_atual, yaw_para_apontar);
         // Analisando diferenca de pitch -> somente a mesma sobre o pwm para manter horizontal
@@ -135,10 +133,12 @@ private:
       }
       // Uma vez todos os angulos calculados, converter para valor de pwm para enviar aos motores
       pwm_pan  = pwm_yaw_frente + delta_yaw*pwm_ang_yaw;
-      pwm_pan  = (pwm_pan > pwm_yaw_range[1]) ? pwm_yaw_range[1] : (pwm_pan < pwm_yaw_range[0] ? pwm_yaw_range[0] : pwm_pan); // Limitando em maximo e minimo aqui, mais seguro
+      pwm_pan  = (pwm_pan > pwm_yaw_range[1]) ? pwm_yaw_range[1] : pwm_pan;
+      pwm_pan  = (pwm_pan < pwm_yaw_range[0]) ? pwm_yaw_range[0] : pwm_pan; // Limitando em maximo e minimo aqui, mais seguro
 
       pwm_tilt = pwm_pitch_horizontal + delta_pitch*pwm_ang_pitch;
-      pwm_tilt = (pwm_tilt > pwm_pitch_range[1]) ? pwm_pitch_range[1] : (pwm_tilt < pwm_pitch_range[0] ? pwm_pitch_range[0] : pwm_tilt); // Limitando em maximo e minimo aqui, mais seguro
+      pwm_tilt = (pwm_tilt > pwm_pitch_range[1]) ? pwm_pitch_range[1] : pwm_tilt;
+      pwm_tilt = (pwm_tilt < pwm_pitch_range[0]) ? pwm_pitch_range[0] : pwm_tilt; // Limitando em maximo e minimo aqui, mais seguro
 
     } else if (esquema == 1) { // Apontar so para frente, a nao ser que queira mexer na camera
 
@@ -178,12 +178,11 @@ private:
 
     if(delta >  180.0) delta = (delta - 360.0);
     if(delta < -180.0) delta = (delta + 360.0);
+    if(delta >  110.0) delta =  110.0;
+    if(delta < -110.0) delta = -110.0;
     // Pequeno ajuste para nao ficar atrasado na pratica
-    if(delta > 0) delta+=5;
-    if(delta < 0) delta-=5;
-
-//    delta = (delta > 145) ? 145 : delta;
-//    delta = (delta < -145) ? -145 : delta;
+//    if(delta > 0) delta+=5;
+//    if(delta < 0) delta-=5;
 
     return delta;
   }
@@ -193,20 +192,15 @@ private:
     /// Relacoes obtidas da mensagem VFR_HUD vinda da placa
     ///
     estamos_dentro = msg->throttle*100; // Se estamos ou nao na regiao de interesse -> cancela offset (vem 0 ou 0.01 da placa)
-//    ROS_INFO("ESTAMOS DENTRO: %f", estamos_dentro);
     pitch_para_apontar = rad2deg(msg->airspeed);     // [RAD] -> [DEGREES]
-    yaw_atual          = msg->groundspeed;           // [DEGREES]
-    // Ajusta chegada desse angulo que vai de -180 a +180
-    yaw_para_apontar   = ((float)(msg->heading) >= 0) ? (float)(msg->heading) : (float)(msg->heading) + 360.0f; // [DEGREES]
+    yaw_atual          = (float)msg->groundspeed;           // [DEGREES] ja vem de 0 a 360
+    yaw_para_apontar   = (float)msg->heading; // [DEGREES] ja vem de 0 a 360
     std_msgs::Int8 msg_estamosdentro;
     msg_estamosdentro.data = (int)estamos_dentro;
     pub_estamosdentro.publish(msg_estamosdentro); // Daqui vou ler la na janela principal
-//    yaw_para_apontar = msg->heading;
     // Mostrando na tela se esta tudo ok
-    //        ROS_INFO("Pitch: [%.2f]", pitch_para_apontar);
-//    ROS_INFO("Yaw:   [%.2f]", yaw_atual-yaw_para_apontar);
-//    ROS_INFO("YAW_ATUAL [%.2f]\tAPONTAR: [%.2f]\tDELTA: [%.2f]", yaw_atual, yaw_para_apontar, wrap180(yaw_atual, yaw_para_apontar));
-    ROS_INFO("Perseguindo orientacao OK!!!");
+    ROS_INFO("YAW_ATUAL [%.2f]\tAPONTAR: [%.2f]\tDELTA: [%.2f]", yaw_atual, yaw_para_apontar, wrap180(yaw_atual, yaw_para_apontar));
+//    ROS_INFO("Perseguindo orientacao OK!!!");
   }
 
   void escutarOffset(const std_msgs::Int8& msg)
