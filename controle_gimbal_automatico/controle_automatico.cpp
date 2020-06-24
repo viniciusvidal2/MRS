@@ -193,14 +193,14 @@ private:
     ///
     estamos_dentro = msg->throttle*100; // Se estamos ou nao na regiao de interesse -> cancela offset (vem 0 ou 0.01 da placa)
     pitch_para_apontar = rad2deg(msg->airspeed);     // [RAD] -> [DEGREES]
-    yaw_atual          = (float)msg->groundspeed;           // [DEGREES] ja vem de 0 a 360
-    yaw_para_apontar   = (float)msg->heading; // [DEGREES] ja vem de 0 a 360
+    yaw_atual          = (float)rad2deg(msg->groundspeed/100.0f);   // [RAD] ja vem de 0 a 2pi*100
+    yaw_para_apontar   = (float)rad2deg(msg->heading/100.0f); // [RAD] ja vem de 0 a 2pi*100
     std_msgs::Int8 msg_estamosdentro;
     msg_estamosdentro.data = (int)estamos_dentro;
     pub_estamosdentro.publish(msg_estamosdentro); // Daqui vou ler la na janela principal
     // Mostrando na tela se esta tudo ok
-    ROS_INFO("YAW_ATUAL [%.2f]\tAPONTAR: [%.2f]\tDELTA: [%.2f]", yaw_atual, yaw_para_apontar, wrap180(yaw_atual, yaw_para_apontar));
-//    ROS_INFO("Perseguindo orientacao OK!!!");
+    //ROS_INFO("YAW_ATUAL [%.2f]\tAPONTAR: [%.2f]\tDELTA: [%.2f]", yaw_atual, yaw_para_apontar, wrap180(yaw_atual, yaw_para_apontar));
+    ROS_INFO("Perseguindo orientacao OK!!!");
   }
 
   void escutarOffset(const std_msgs::Int8& msg)
